@@ -6,6 +6,8 @@ public class CoordinateNode {
       public ClusterNode node;
       public Vector<Line> Lines = new Vector();
       
+      public boolean isSelected = false;
+      
       public CoordinateNode(ClusterNode node, int x1, int y1, int x2, int y2) {
     	  this.node = node;
     	  Lines.add(new Line(x1,y1,x2,y2));

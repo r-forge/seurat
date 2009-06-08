@@ -31,8 +31,8 @@ class KMeansPlot extends JFrame implements MatrixWindow, IPlot {
 
 	DataManager dataManager;
 
-	Vector<Vector<Variable>> Experiments;
-	Vector<Vector<Gene>> Genes;
+	Vector<Vector<ISelectable>> Experiments;
+	Vector<Vector<ISelectable>> Genes;
 
 	int oldPixelCount;
 
@@ -45,7 +45,7 @@ class KMeansPlot extends JFrame implements MatrixWindow, IPlot {
 		  int shiftX = 2;
 		  
 		  for (int i = 0; i < this.Experiments.size(); i++) {
-				Vector<Variable> exps = this.Experiments.elementAt(i);
+				Vector<ISelectable> exps = this.Experiments.elementAt(i);
 				
 				shiftX = shiftX
 				+ (exps.size() * seurat.settings.PixelSize + panel.pixelSize*2);
@@ -86,7 +86,7 @@ class KMeansPlot extends JFrame implements MatrixWindow, IPlot {
 	}
 
 	public KMeansPlot(Seurat seurat, String name,
-			Vector<Vector<Variable>> Experiments, Vector<Vector<Gene>> Genes) {
+			Vector<Vector<ISelectable>> Experiments, Vector<Vector<ISelectable>> Genes) {
 		super(name);
 
 		this.seurat = seurat;
@@ -99,8 +99,11 @@ class KMeansPlot extends JFrame implements MatrixWindow, IPlot {
 				Experiments, Genes);
 
 		this.addMouseListener(panel);
-
 		
+		
+	
+
+       		
 
 
 		this.setBounds(200, 200, 800, 800);
@@ -193,9 +196,9 @@ class KMeansPanel extends JPanel implements MouseListener, IPlot,
 
 	int abstandOben = 1;
 
-	Vector<Vector<Gene>> Genes;
+	Vector<Vector<ISelectable>> Genes;
 
-	Vector<Vector<Variable>> Experiments;
+	Vector<Vector<ISelectable>> Experiments;
 
 	int[] originalOrderSpalten;
 
@@ -237,8 +240,9 @@ class KMeansPanel extends JPanel implements MouseListener, IPlot,
 	int Approx = 1;
 
 	public KMeansPanel(Seurat seurat, KMeansPlot plot, int pixelSize,
-			Vector<Vector<Variable>> Experiments, Vector<Vector<Gene>> Genes) {
+			Vector<Vector<ISelectable>> Experiments, Vector<Vector<ISelectable>> Genes) {
 
+		System.out.println("KMeans Window...");
 		this.seurat = seurat;
 		this.dataManager = seurat.dataManager;
 		this.plot = plot;
@@ -275,11 +279,11 @@ class KMeansPanel extends JPanel implements MouseListener, IPlot,
 			blocks = new Block[this.Experiments.size()][this.Genes.size()];
 
 			for (int i = 0; i < this.Experiments.size(); i++) {
-				Vector<Variable> exps = this.Experiments.elementAt(i);
+				Vector<ISelectable> exps = this.Experiments.elementAt(i);
 
 				for (int j = 0; j < Genes.size(); j++) {
 
-					Vector<Gene> genes = this.Genes.elementAt(j);
+					Vector<ISelectable> genes = this.Genes.elementAt(j);
 
 					blocks[i][j] = new Block(seurat, exps, genes);
 
@@ -295,7 +299,7 @@ class KMeansPanel extends JPanel implements MouseListener, IPlot,
 		
 		
 		for (int i = 0; i < this.Experiments.size(); i++) {
-			Vector<Variable> exps = this.Experiments.elementAt(i);
+			Vector<ISelectable> exps = this.Experiments.elementAt(i);
 			
 			
 			boolean isMinMaxSet = false;
@@ -305,7 +309,7 @@ class KMeansPanel extends JPanel implements MouseListener, IPlot,
 
 			for (int j = 0; j < Genes.size(); j++) {
 
-				Vector<Gene> genes = this.Genes.elementAt(j);
+				Vector<ISelectable> genes = this.Genes.elementAt(j);
 
 				blocks[i][j].x = shiftX;
 				blocks[i][j].y = shiftY;
@@ -339,12 +343,12 @@ class KMeansPanel extends JPanel implements MouseListener, IPlot,
 				for (int ii = 0; ii < blocks[i][j].Experiments.size(); ii++) {
 					for (int jj = 0; jj < blocks[i][j].Genes.size(); jj++) {
 						
-						if (exps.elementAt(ii).getRealValue(genes.elementAt(jj).ID) != seurat.dataManager.NA) {
+						if (exps.elementAt(ii).getRealValue(genes.elementAt(jj).getID()) != seurat.dataManager.NA) {
 							
 						
 							
 						blocks[i][j].values [ii][jj/this.Approx]+= 
-							exps.elementAt(ii).getRealValue(genes.elementAt(jj).ID) ;
+							exps.elementAt(ii).getRealValue(genes.elementAt(jj).getID()) ;
 				counts [ii][jj/this.Approx]++;
 						
 						            
@@ -380,7 +384,7 @@ class KMeansPanel extends JPanel implements MouseListener, IPlot,
 				
 
 				shiftY = shiftY + genes.size() * seurat.settings.PixelSize/Approx
-						+ pixelSize*2;
+						+ 1;
 			}
 			
 			
@@ -401,7 +405,7 @@ class KMeansPanel extends JPanel implements MouseListener, IPlot,
 			
 
 			shiftX = shiftX
-					+ (exps.size() * seurat.settings.PixelSize + pixelSize*2);
+					+ (exps.size() * seurat.settings.PixelSize + 1);
 
 		}
 		
@@ -428,10 +432,10 @@ this.repaint();
 		 int ii =0, jj = 0;
 		  
 		  for (int i = 0; i < this.Experiments.size(); i++) {
-				Vector<Variable> exps = this.Experiments.elementAt(i);
+				Vector<ISelectable> exps = this.Experiments.elementAt(i);
 				
 				shiftX = shiftX
-				+ (exps.size() * seurat.settings.PixelSize + pixelSize*2);
+				+ (exps.size() * seurat.settings.PixelSize + 1);
 				
 				if (shiftX>e.getX()) {
 					ii = i;
@@ -446,7 +450,7 @@ this.repaint();
 		  for (int j = 0; j < Genes.size(); j++) {
 			  
 				shiftY = shiftY
-				+ (Genes.elementAt(j).size() * seurat.settings.PixelSize/ Approx + pixelSize*2);
+				+ (Genes.elementAt(j).size() * seurat.settings.PixelSize/ Approx + 1);
 				
 				if (shiftY>e.getY()) {
 					jj = j;
@@ -480,7 +484,7 @@ this.repaint();
 
 		if (point1 != null && point2 != null) {
 			
-			seurat.dataManager.clearSelection();
+			dataManager.deleteSelection();
 			
                   for (int i = 0; i < blocks.length; i++) {
                 	  for (int j = 0; j < blocks[i].length; j++) {
@@ -513,20 +517,9 @@ this.repaint();
 		if (x1 == x2)
 			x2 += 1;
 
-		for (int i = 0; i < dataManager.Experiments.size(); i++) {
-			dataManager.Experiments.elementAt(i).selected = false;
-
-//			for (int j = 0; j < dataManager.Genes.size(); j++) {
-
-	//			this.dataManager.Experiments.elementAt(i).isSelected[j] = false;
-		//	}
-
-		}
-
-		for (int i = 0; i < dataManager.Genes.size(); i++) {
-			dataManager.Genes.elementAt(i).selected = false;
-
-		}
+		
+		dataManager.deleteSelection();
+		
 		/*
 		 * for (int i = 0; i < dataManager.Experiments.size(); i++) { for (int j =
 		 * 0; j < globalView.dataManager.RowCount; j++) { if
@@ -543,11 +536,7 @@ this.repaint();
 
 	}
 
-	public void selectNode(CoordinateNode nodeC) {
-		ClusterNode node = nodeC.node;
-		node.selectNode();
-	}
-
+	
 	public void mouseClicked(MouseEvent e) {
 
 		point1 = e.getPoint();
@@ -712,11 +701,11 @@ this.repaint();
             int x = (int)Math.floor((e.getPoint().getX()  - block.x)/this.pixelSize);
             int y = (int)Math.floor((e.getPoint().getY()  - block.y)/this.pixelSize);
             
-            Variable var = block.Experiments.elementAt(x);
+            ISelectable var = block.Experiments.elementAt(x);
            
 				String s = "<HTML><BODY BGCOLOR = 'WHITE'><FONT FACE = 'Verdana'><STRONG>";
 			
-				s += "<FONT FACE = 'Arial'><TR><TD>" + var.name
+				s += "<FONT FACE = 'Arial'><TR><TD>" + var.getName()
 						+ "  </TD><TD> ";
 
 
@@ -764,8 +753,8 @@ this.repaint();
 
 	class Block {
 
-		Vector<Variable> Experiments;
-		Vector<Gene> Genes;
+		Vector<ISelectable> Experiments;
+		Vector<ISelectable> Genes;
 		Seurat seurat;
 
 		int x, y;
@@ -784,8 +773,8 @@ this.repaint();
 		
 		
 
-		public Block(Seurat seurat, Vector<Variable> Experiments,
-				Vector<Gene> Genes) {
+		public Block(Seurat seurat, Vector<ISelectable> Experiments,
+				Vector<ISelectable> Genes) {
 			this.seurat = seurat;
 			this.Experiments = Experiments;
 			this.Genes = Genes;
@@ -798,6 +787,7 @@ this.repaint();
 			int x1,x2,y1,y2;
 			int width = Experiments.size() * pixelSize;
 			int height = Genes.size() * pixelSize / Approx;
+			
 			
 			
 			if (xx1>x+width || xx2<x || y + height < yy1 || y >yy2) return;

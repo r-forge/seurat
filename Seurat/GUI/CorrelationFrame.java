@@ -9,6 +9,16 @@ import java.awt.*;
 
 import Data.Variable; //import org.rosuda.JRclient.*;
 
+
+
+import Data.*;
+import javax.swing.*;
+
+import java.awt.event.*;
+import java.awt.*;
+
+import Data.Variable; //import org.rosuda.JRclient.*;
+
 class CorrelationFrame extends JFrame implements MatrixWindow, IPlot {
 	int pixelSize = 1;
 
@@ -305,10 +315,8 @@ class CorrelationPanel extends JPanel implements MouseListener,
 		for (int i = 0; i < correlations.length; i++) {
 			for (int j = 0; j < correlations.length; j++) {
 				count = 0;
-				for (int ii = i * this.Width; ii < Math.min((i + 1)
-						* this.Width, dataManager.getRowCount()); ii++) {
-					for (int jj = j * this.Width; jj < Math.min((j + 1)
-							* this.Width, dataManager.getRowCount()); jj++) {
+				for (int ii = i * this.Width; ii < Math.min((i + 1) * this.Width, data.length); ii++) {
+					for (int jj = j * this.Width; jj < Math.min((j + 1)	* this.Width, data.length); jj++) {
 						correlations[i][j] += corr[ii][jj];
 						count++;
 					}

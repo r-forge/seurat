@@ -6,7 +6,11 @@ import javax.swing.*;
 
 import java.awt.*;
 
+import Data.CGHVariable;
+import Data.Chromosome;
+import Data.Gene;
 import Data.GeneVariable;
+import Data.ISelectable;
 import Data.MyStringTokenizer;
 
 import java.util.zip.*;
@@ -25,12 +29,12 @@ public class GeneDescriptionFrame extends JFrame {
 
 	final double NA = 6.02E23;
 
-	public GeneDescriptionFrame(Seurat amlTool, FileDialog fileDialog) {
+	public GeneDescriptionFrame(Seurat amlTool, FileDialog fileDialog, JProgressBar progressBar) {
 		super("Gene Descriptor");
 		this.seurat = amlTool;
 		this.loadLogos();
 
-		openDescription(fileDialog);
+		openDescription(fileDialog,progressBar);
 
 		JPanel MainPanel = new JPanel();
 
@@ -51,7 +55,7 @@ public class GeneDescriptionFrame extends JFrame {
 
 		this.getContentPane().add(MainPanel, BorderLayout.CENTER);
 		this.setBounds(0, 450, 200, 300);
-		this.setVisible(true);
+		//this.setVisible(true);
 
 	}
 
@@ -86,7 +90,7 @@ public class GeneDescriptionFrame extends JFrame {
 		return arrayLogo;
 	}
 
-	public void openDescription(FileDialog fileDialog) {
+	public void openDescription(FileDialog fileDialog, JProgressBar progressBar) {
 
 		try {
 
@@ -102,7 +106,7 @@ public class GeneDescriptionFrame extends JFrame {
 			int col = 0;
 			while (stk.hasMoreTokens()) {
 				geneVariables.add(new GeneVariable(stk
-						.nextToken(), GeneVariable.Double,seurat.dataManager.Genes));
+						.nextToken(), GeneVariable.Double,null));
 				col++;
 			}
 
@@ -132,9 +136,10 @@ public class GeneDescriptionFrame extends JFrame {
 				String token;
 				
 				
-				
-				
-				
+				if (len%10 == 0) {progressBar.setValue((100*len/length));
+				progressBar.repaint();
+				seurat.update(seurat.getGraphics());
+				}
 				
 
 				for (int i = 0; i < col; i++) {
@@ -188,6 +193,10 @@ public class GeneDescriptionFrame extends JFrame {
 				len++;
 			}
 
+			
+			progressBar.setValue(0);
+			
+			
 			/**
 			 * *************************************File
 			 * Output*****************************************************************
@@ -213,7 +222,7 @@ public class GeneDescriptionFrame extends JFrame {
 					this.geneVariables.elementAt(j).isDiscrete = true;
 
 				}
-				if (j == this.geneVariables.size()-1) {
+				if (this.geneVariables.elementAt(j).isDiscrete && this.geneVariables.elementAt(j).testList()) {
 					this.geneVariables.elementAt(j).isList = true;
 					this.geneVariables.elementAt(j).calculateList();
 		
@@ -224,6 +233,8 @@ public class GeneDescriptionFrame extends JFrame {
 			}
 			
 			seurat.dataManager.geneVariables = geneVariables;
+			connectData();
+			
 
 		} catch (IOException e) {
 			System.out.println("Wrong file format  " + e);
@@ -231,6 +242,147 @@ public class GeneDescriptionFrame extends JFrame {
 
 	}
 
+	
+	public void connectData() {
+		//Connect Genes to Geneexpression
+		GeneVariable indexVar = geneVariables.elementAt(0);
+		
+		Vector<Gene> Genes = new Vector();
+		
+		for (int i = 0; i < indexVar.stringData.length; i++)
+		{
+			boolean found = false;
+			for (int j = i; j < seurat.dataManager.Genes.size(); j++) {
+				if (indexVar.stringData [i].equals(seurat.dataManager.Genes.elementAt(j).getName())) {
+					Genes.add(seurat.dataManager.Genes.elementAt(j));
+					found = true;
+					break;
+				} 
+			}
+			if (!found) {
+			for (int j = 0; j < Math.min(i,seurat.dataManager.Genes.size()); j++) {
+				if (indexVar.stringData [i].equals(seurat.dataManager.Genes.elementAt(j).getName())) {
+					Genes.add(seurat.dataManager.Genes.elementAt(j));
+					found = true;
+					break;
+				} 
+			}
+			}
+			
+			if (!found) Genes.add(null);
+			
+			
+		}
+		
+		
+		
+		GeneVariable chromosomeVar = null;
+		for (int i = 0; i < geneVariables.size(); i++) {
+			if (geneVariables.elementAt(i).name.contains(seurat.dataManager.ChromosomeNumber)) chromosomeVar = geneVariables.elementAt(i);
+		}
+		
+		chromosomeVar.sortBuffer();
+		
+		
+		GeneVariable nucleoVar = null;
+		for (int i = 0; i < geneVariables.size(); i++) {
+			if (geneVariables.elementAt(i).name.contains(seurat.dataManager.NucleotidePosition)) nucleoVar = geneVariables.elementAt(i);
+		}
+		
+		
+		
+		
+		for (int i = 0; i < Genes.size(); i++) {
+			if (Genes.elementAt(i) != null) {
+			    Gene gene = Genes.elementAt(i);
+			    gene.chrName = chromosomeVar.stringData [i];
+			    gene.nucleotidePosition = nucleoVar.doubleData [i];
+			    
+			 //   System.out.println(gene.chrName + "   " + gene.nucleotidePosition);
+			}
+		}
+		
+		
+		
+		for (int i = 0; i < geneVariables.size(); i++) {
+			geneVariables.elementAt(i).Genes = Genes;
+		}
+		
+		
+		
+		/**  Create Chromosomes, Clones, etc**/
+		/*
+		GeneVariable chromosomeVar = null;
+		for (int i = 0; i < geneVariables.size(); i++) {
+			if (geneVariables.elementAt(i).name.contains(seurat.dataManager.ChromosomeNumber)) chromosomeVar = geneVariables.elementAt(i);
+		}
+		
+		chromosomeVar.sortBuffer();
+		
+		
+		GeneVariable nucleoVar = null;
+		for (int i = 0; i < geneVariables.size(); i++) {
+			if (geneVariables.elementAt(i).name.contains(seurat.dataManager.NucleotidePosition)) nucleoVar = geneVariables.elementAt(i);
+		}
+		
+		
+		
+
+		if (seurat.dataManager.Chromosomes == null) {
+		   seurat.dataManager.Chromosomes = new Vector();
+		   for (int i = 0; i < chromosomeVar.stringBuffer.size(); i++) {
+			   String chr = chromosomeVar.stringBuffer.elementAt(i);
+			   chr = chr.replace("\"","");
+			   if (!chromosomeVar.stringBuffer.elementAt(i).contains("NA")) seurat.dataManager.Chromosomes.add(new Chromosome(chromosomeVar.stringBuffer.elementAt(i),seurat.dataManager));
+		   }
+		}
+		
+	
+		
+		for (int i = 0; i < chromosomeVar.Genes.size(); i++) {
+			Chromosome chr = seurat.dataManager.getChromosome(chromosomeVar.stringData [i]);
+		
+			chromosomeVar.Genes.elementAt(i).chromosome = chr;
+			if (chr != null) {
+				chr.Genes.add(chromosomeVar.Genes.elementAt(i));
+			}
+			
+		}
+		
+		
+		for (int i = 0; i < nucleoVar.Genes.size(); i++) {
+			double pos = nucleoVar.doubleData [i];
+			chromosomeVar.Genes.elementAt(i).nucleotidePosition = pos;
+			
+			
+		}
+		*/
+		
+		
+		
+		
+		
+		
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	public boolean doesntContain(Vector<String> buffer, String word) {
 		for (int i = 0; i < buffer.size(); i++) {
 			if (buffer.elementAt(i).equals(word))

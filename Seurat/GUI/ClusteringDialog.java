@@ -163,7 +163,7 @@ public class ClusteringDialog extends JFrame {
 				
 				
 
-				GlobalView globalView = new GlobalView(dialog.seurat,
+				GlobalViewAbstract globalView = new GlobalViewAbstract(dialog.seurat,
 						"Clustering", Experiments,Genes, true);
 				globalView.gPanel.nodeSpalten = nodeSpalten;
 				globalView.gPanel.nodeZeilen = nodeZeilen;

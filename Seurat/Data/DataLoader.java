@@ -8,22 +8,31 @@ import java.util.Vector;
 
 import java.awt.*;
 
+import javax.swing.JLabel;
+import javax.swing.JProgressBar;
+
+import GUI.Seurat;
+
 
 public class DataLoader {
 	
+	Seurat seurat;
 	
+	public DataLoader(Seurat seurat) {
+		this.seurat = seurat;
+	}
 	
 
     
 	
-	public void loadGeneExpressions(DataManager dataManager,BufferedReader bfr, String fileName,FileDialog fileDialog) {
+	public void loadGeneExpressions(DataManager dataManager,BufferedReader bfr, String fileName,FileDialog fileDialog, JProgressBar progressBar) {
 		
 
 
 
 		try {
 
-	
+			
 
 		
 
@@ -86,10 +95,21 @@ public class DataLoader {
 					if (line == null)
 						break;
 				}
+				
+				
+				
+		
 
 				MyStringTokenizer st = new MyStringTokenizer(line,col);
 				String token;
 			//	System.out.println(line);
+				
+				if (len%10 == 0) {progressBar.setValue((100*len/length));
+			      
+				//  progressBar.update(progressBar.getGraphics());
+				//	progressBar.repaint();
+				seurat.update(seurat.getGraphics());
+				}
 
 				for (int i = 0; i < col; i++) {
 					token = st.nextToken();
@@ -137,7 +157,7 @@ public class DataLoader {
 
 				len++;
 			}
-
+			progressBar.setValue(0);
 		
 
 			//dataManager.selectedRows = new boolean[dataManager.RowCount];

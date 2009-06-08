@@ -18,6 +18,8 @@ import javax.imageio.*;
 import org.rosuda.REngine.Rserve.RConnection;
 
 import Data.ClusterNode;
+import Data.Gene;
+import Data.Variable;
 
 
 import java.util.zip.*;
@@ -33,12 +35,17 @@ public class KMeansDialog extends JFrame {
 	
 	
 	JButton okBtn = new JButton("Ok");
+	
+	
+	/*"euclidean", "maximum", "manhattan", "canberra" "binary" "pearson", "correlation", "spearman" or "kendall"
+	 * */
+	
 
 	String[] ClusteringMethods = { "ward", "single", "complete", "average",
-			"mcquitty", "median", "centroid", "kmeans"};
+			"mcquitty", "kmeans"};
 
 	String[] Distance = { "euclidean", "maximum", "manhattan", "canberra",
-			"binary", "minkowski" };
+			"binary", "pearson",  "spearman" , "kendall"};
 
 	JComboBox boxColumns = new JComboBox(ClusteringMethods);
 
@@ -80,7 +87,7 @@ public class KMeansDialog extends JFrame {
 		this.dataManager = seurat.dataManager;
 		this.setBounds(100, 270, 350, 190);
 
-		
+			
 		this.Genes = Genes;
 		
 		this.Experiments = Exps;
@@ -152,8 +159,74 @@ public class KMeansDialog extends JFrame {
 
 				String methodRows = boxRows.getSelectedItem().toString();
 				String DistanceRows = boxDRows.getSelectedItem().toString();
-				int nR = Integer.parseInt(fieldR.getText());
-				int nC = Integer.parseInt(fieldC.getText());
+				
+				
+				int nR = 0;
+				int nC = 0;
+				
+				
+				if (!fieldR.getText().equals("")) nR= Integer.parseInt(fieldR.getText());
+				
+				if (!fieldC.getText().equals("")) nC= Integer.parseInt(fieldC.getText());
+				
+				
+				if (nR == 0 && nC == 0) {
+					
+					
+					calculateClustersZeilen(methodRows, DistanceRows);
+					
+					
+					Vector<Gene> Genes1 = new Vector();
+					int[] order = new int[orderZeilen.length];
+					for (int i = 0; i < orderZeilen.length; i++) {
+						order[orderZeilen[i]] = i;
+					}
+
+					for (int i = 0; i < order.length; i++) {
+						Genes1.add((Gene)dialog.Genes.elementAt(order[i]));
+					}
+					
+					
+					
+					
+					calculateClustersSpalten(methodColumns, DistanceColumns);
+					
+				
+					
+					
+					
+					Vector<Variable> Experiments1 = new Vector();
+					order = new int[orderSpalten.length];
+					for (int i = 0; i < orderSpalten.length; i++) {
+						order[orderSpalten[i]] = i;
+					}
+
+					for (int i = 0; i < order.length; i++) {
+						Experiments1.add((Variable)dialog.Experiments.elementAt(order[i]));
+					}
+					
+					
+				
+					GlobalViewAbstract globalView = new GlobalViewAbstract(dialog.seurat,
+							"Clustering", Experiments1,Genes1, true);
+
+					//GlobalView globalView = new GlobalView(dialog.seurat,
+				//			"Clustering", Experiments1,Genes1, true);
+					globalView.gPanel.nodeSpalten = nodeSpalten;
+					globalView.gPanel.nodeZeilen = nodeZeilen;
+					
+					
+					
+					globalView.applyNewPixelSize(globalView.pixelSize);
+
+					globalView.setLocation(350, 0);
+	                
+					dialog.setVisible(false);
+					return;
+				}
+				
+				
+				
 				
 				
 				/*
@@ -167,6 +240,9 @@ public class KMeansDialog extends JFrame {
 				 * DistanceRows);
 				 * 
 				 */
+				
+				
+			 long time = System.currentTimeMillis();
 				
 				Vector<Vector<ISelectable>> Gens = new Vector();
 				if (nR != 0) {
@@ -187,13 +263,15 @@ public class KMeansDialog extends JFrame {
 					Exps.add(Experiments);
 				}
 				
+				System.out.println((System.currentTimeMillis() - time)/1000);
+				
 					
 				dialog.seurat.dataManager.GeneClusters.add(new Clustering(methodRows + " , " + DistanceRows + " , "+nR, Gens));
 				dialog.seurat.dataManager.ExpClusters.add(new Clustering(methodColumns + " , " + DistanceColumns + " , "+nC, Exps));
 				
 				
 
-				Test globalView = new Test(dialog.seurat,
+				KMeansView globalView = new KMeansView(dialog.seurat,
 						"Clustering", Exps,Gens);
 				
 				globalView.setLocation(350, 0);
@@ -219,9 +297,14 @@ public class KMeansDialog extends JFrame {
 
 			RConnection rConnection = dataManager.getRConnection();
 			
+		
+			
+			
+			
 			//Vector<Variable> Experiments = dataManager.getExperiments();
 			
 			rConnection.voidEval("library(stats)");
+			rConnection.voidEval("require(amap)");
 			rConnection.assign("tempData", Experiments
 					.elementAt(0).getColumn(Genes));
 
@@ -234,17 +317,20 @@ public class KMeansDialog extends JFrame {
 			
 			if (!method.equals("kmeans")) {
 
-			rConnection.voidEval("h <- hclust(dist(tempData, method = '"
-					+ distance + "', p = " + 2 + " ), method = '" + method
-					+ "', members=NULL)"); 
-			
+		//	rConnection.voidEval("h <- hclust(dist(tempData, method = '"
+		//			+ distance + "', p = " + 2 + " ), method = '" + method
+		//			+ "', members=NULL)"); 
+				rConnection.voidEval("h <- hcluster(tempData, method = '"
+						+ distance + "', link = '" + method + "',diag=FALSE," +
+						"upper=FALSE, doubleprecision = TRUE, nbproc=2, members=NULL)"); 
 		
 			rConnection.voidEval("c <- cutree(h,k = " + n + ")");
 			
 			
 			}
 			else {
-				  rConnection.voidEval("cl <- kmeans(tempData,"+n+")");
+				  rConnection.voidEval("cl <- Kmeans(tempData,"+n+" ,method = '"
+						+ distance + "'     )");
 				  rConnection.voidEval("c <- cl$cluster");
 			}
 			
@@ -296,7 +382,7 @@ public class KMeansDialog extends JFrame {
 		int [] clusterArray = null;
 		int spaltenCount = Experiments.size();
 
-		
+	
 
 		boolean weiter = true;
 
@@ -323,12 +409,16 @@ public class KMeansDialog extends JFrame {
 
 				
 				
-			rConnection.voidEval("h <- hclust(dist(tempData, method = '"
-					+ distance + "', p = " + 2 + " ), method = '" + method
-					+ "', members=NULL)");
+		//	rConnection.voidEval("h <- hclust(dist(tempData, method = '"
+		//			+ distance + "', p = " + 2 + " ), method = '" + method
+		//			+ "', members=NULL)");
 
 			
-			
+
+					
+			rConnection.voidEval("h <- hcluster(tempData, method = '"
+			+ distance + "', link = '" + method + "',diag=FALSE," +
+			"upper=FALSE, doubleprecision = TRUE, nbproc=2, members=NULL)");
 			
 			
 			
@@ -340,7 +430,8 @@ public class KMeansDialog extends JFrame {
 			
 		}
 		else {
-			  rConnection.voidEval("cl <- kmeans(tempData,"+n+")");
+			rConnection.voidEval("cl <- Kmeans(tempData,"+n+" ,method = '"
+					+ distance + "'     )");
 			  rConnection.voidEval("c <- cl$cluster");
 		}
 			
@@ -385,8 +476,289 @@ public class KMeansDialog extends JFrame {
 		}
          return null;
 	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+
+
+	public void calculateClustersZeilen(String method, String distance) {
+		int[][] clusterArray = new int[1][1];
+		int[] geneClusters = new int[Genes.size()];
+		double [] height = null;
+		
+		
+		System.out.println(method + "  " + distance);
+		
+		try {
+
+			if (dataManager.getRConnection() == null)
+				dataManager.setRConnection(new RConnection());
+
+			RConnection rConnection = dataManager.getRConnection();
+			
+			
+			
+			rConnection.voidEval("library(stats)");
+			rConnection.voidEval("library(amap)");
+			
+			rConnection.assign("tempData", ((Variable)Experiments.elementAt(0)).getColumn());
+
+			for (int i = 1; i < Experiments.size(); i++) {
+				rConnection.assign("x",
+			((Variable)Experiments.elementAt(i)).getColumn());
+				rConnection.voidEval("tempData <- cbind(tempData, x)");
+
+			}
+			
+			
+	//		rConnection.voidEval("h <- hclust(dist(tempData, method = '"
+	//				+ distance + "', p = " + 2 + " ), method = '" + method
+	//				+ "', members=NULL)"); 
+			
+			rConnection.voidEval("h <- hcluster(tempData, method = '"
+					+ distance + "', link = '" + method + "',diag=FALSE," +
+					"upper=FALSE, doubleprecision = TRUE, nbproc=2, members=NULL)"); 
+			
+		
+		    height = rConnection.eval("h$height").asDoubles();
+		    
+		   // for (int i = 0; i < height.length; i++) System.out.println(height [i]);
+
+			clusterArray = new int[2][Genes.size()];
+
+			nodeZeilen = new ClusterNode(dataManager, false, Experiments, Genes);
+			nodeZeilen.cases = new Vector();
+			for (int i = 0; i < Genes.size(); i++) {
+				nodeZeilen.cases.add(new Integer(i));
+			}
+
+			for (int count = 1; count < Genes.size() - 1; count++) {
+
+				rConnection.voidEval("c <- cutree(h,k = " + count + ")");
+
+				System.out.println(count);
+				
+				for (int j = 0; j < Genes.size(); j++)  clusterArray[0][j] = rConnection.eval("c [[" + (j + 1) + "]]").asInteger();
+
+				rConnection.voidEval("c <- cutree(h,k = " + (count + 1)+ ")");
+
+				for (int j = 0; j < Genes.size(); j++) clusterArray[1][j] = rConnection.eval("c [[" + (j + 1) + "]]").asInteger();
+
+				int k = 0;
+				int geteilterNode = 0;
+				int newNode = 0;
+
+				for (int j = 0; j < Genes.size(); j++) {
+					if (clusterArray[0][j] != clusterArray[1][j]) {
+						k = j;
+						geteilterNode = clusterArray[0][j];
+						newNode = clusterArray[1][j];
+						break;
+					}
+				}
+				
+				ClusterNode oldNode = nodeZeilen.getClusterNode(k);
+
+				Vector<Integer> nodeR = new Vector();
+				Vector<Integer> nodeL = new Vector();
+
+				for (int j = 0; j < Genes.size(); j++) {
+					if (clusterArray[0][j] == geteilterNode) {
+						if (clusterArray[1][j] == geteilterNode)
+							nodeR.add(j);
+						else
+							nodeL.add(j);
+					}
+				}
+				
+				oldNode.nodeL = new ClusterNode(nodeL, dataManager, false, Experiments, Genes);
+				oldNode.nodeR = new ClusterNode(nodeR, dataManager, false, Experiments, Genes);
+                oldNode.currentHeight = height [height.length-count];
+				
+				
+			}
+			
+			
+		
 			
 
+			int count = Genes.size() - 1;
+
+			rConnection.voidEval("c <- cutree(h,k = " + count + ")");
+
+			for (int j = 0; j < Genes.size(); j++)
+				clusterArray[0][j] = rConnection.eval(
+						"c [[" + (j + 1) + "]]").asInteger();
+
+			for (int j = 0; j < Genes.size(); j++)
+				clusterArray[1][j] = j + 1;
+
+			int k = 0;
+			int geteilterNode = 0;
+			int newNode = 0;
+
+			for (int j = 0; j < Genes.size(); j++) {
+				if (clusterArray[0][j] != clusterArray[1][j]) {
+					k = j;
+					geteilterNode = clusterArray[0][j];
+					newNode = clusterArray[1][j];
+					break;
+				}
+			}
+
+			ClusterNode oldNode = nodeZeilen.getClusterNode(k);
+
+			Vector<Integer> nodeR = new Vector();
+			Vector<Integer> nodeL = new Vector();
+
+			for (int j = 0; j <  Genes.size(); j++) {
+				if (clusterArray[0][j] == geteilterNode) {
+					if (clusterArray[1][j] == geteilterNode)
+						nodeR.add(j);
+					else
+						nodeL.add(j);
+				}
+			}
+			oldNode.nodeL = new ClusterNode(nodeL, dataManager, false, Experiments, Genes);
+			oldNode.nodeR = new ClusterNode(nodeR, dataManager, false, Experiments, Genes);
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			JOptionPane.showMessageDialog(this, "Calculation failed.");
+		}
 		
+		
+		
+		
+		
+
+		
+		Vector<Integer> order = nodeZeilen.getOrder();
+		orderZeilen = new int[order.size()];
+		for (int i = 0; i < order.size(); i++) {
+			orderZeilen[order.elementAt(i)] = i;
+		}
+		
+		
+		nodeZeilen.calculateHeight(height [height.length-1]);
+		
+
+	}
+
+	public void calculateClustersSpalten(String method, String distance) {
+
+		int[][] clusterArray = new int[1][1];
+		int spaltenCount = Experiments.size();
+
+		int[] geneClusters = new int[spaltenCount];
+		double [] height = null;
+		boolean weiter = true;
+		
+
+		try {
+
+			
+			RConnection rConnection = dataManager.getRConnection();
+			
+			rConnection.assign("tempData", Genes.elementAt(0).getRow(Experiments));
+
+			for (int i = 1; i < Genes.size(); i++) {
+				rConnection.assign("x", Genes.elementAt(i).getRow(Experiments));
+				rConnection.voidEval("tempData <- cbind(tempData, x)");
+			}
+
+			//rConnection.voidEval("h <- hclust(dist(tempData, method = '"
+				//+ distance + "', p = " + 2 + " ), method = '" + method
+					//+ "', members=NULL)");
+			
+			rConnection.voidEval("h <- hcluster(tempData, method = '"
+					+ distance + "', link = '" + method + "',diag=FALSE," +
+					"upper=FALSE, doubleprecision = TRUE, nbproc=2, members=NULL)"); 
+			
+			  height = rConnection.eval("h$height").asDoubles();
+			  
+			  
+			  
+			clusterArray = new int[spaltenCount][spaltenCount];
+
+			for (int count = spaltenCount; count > 0; count--) {
+
+				rConnection.voidEval("c <- cutree(h,k = " + count + ")");
+
+				
+				for (int i = 1; i < spaltenCount + 1; i++)
+					geneClusters[i - 1] = rConnection.eval(
+							"c [[" + i + "]]").asInteger();
+				for (int i = 0; i < spaltenCount; i++) {
+					clusterArray[i][count - 1] = geneClusters[i];
+				}
+
+					}
+			} catch (Exception e) {
+			e.printStackTrace();
+			JOptionPane.showMessageDialog(this, "Calculation failed.");
+		}
+
+		nodeSpalten = new ClusterNode(dataManager, true, Experiments, Genes);
+		nodeSpalten.cases = new Vector();
+		for (int i = 0; i < spaltenCount; i++) {
+			nodeSpalten.cases.add(new Integer(i));
+		}
+
+		for (int i = 1; i < spaltenCount; i++) {
+			int k = 0;
+			int geteilterNode = 0;
+			int newNode = 0;
+			for (int j = 0; j < spaltenCount; j++) {
+				if (clusterArray[j][i] != clusterArray[j][i - 1]) {
+					k = j;
+					geteilterNode = clusterArray[j][i - 1];
+					newNode = clusterArray[j][i];
+					break;
+				}
+			}
+
+		
+			ClusterNode oldNode = nodeSpalten.getClusterNode(k);
+			Vector<Integer> nodeR = new Vector();
+			Vector<Integer> nodeL = new Vector();
+			for (int j = 0; j < spaltenCount; j++) {
+				if (clusterArray[j][i - 1] == geteilterNode) {
+					if (clusterArray[j][i] == geteilterNode)
+						nodeR.add(j);
+					else
+						nodeL.add(j);
+				}
+			}
+			oldNode.nodeL = new ClusterNode(nodeL, dataManager, true, Experiments, Genes);
+			oldNode.nodeR = new ClusterNode(nodeR, dataManager, true, Experiments, Genes);
+		     oldNode.currentHeight = height [height.length-i];
+	}
+
+		Vector<Integer> order = nodeSpalten.getOrder();
+		orderSpalten = new int[order.size()];
+		for (int i = 0; i < order.size(); i++) {
+			orderSpalten[order.elementAt(i)] = i;
+		}
+		
+		
+		nodeSpalten.calculateHeight(height [height.length-1]);
+
+	}
+
 
 }

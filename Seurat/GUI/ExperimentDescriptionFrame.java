@@ -25,12 +25,12 @@ public class ExperimentDescriptionFrame extends JFrame {
 
 	final double NA = Math.PI;
 
-	public ExperimentDescriptionFrame(Seurat amlTool, FileDialog fileDialog) {
+	public ExperimentDescriptionFrame(Seurat amlTool, FileDialog fileDialog,JProgressBar progressBar) {
 		super("Experiment Descriptor");
 		this.seurat = amlTool;
 		this.loadLogos();
 
-		openDescription(fileDialog);
+		openDescription(fileDialog, progressBar);
 
 		JPanel MainPanel = new JPanel();
 
@@ -51,7 +51,10 @@ public class ExperimentDescriptionFrame extends JFrame {
 
 		this.getContentPane().add(MainPanel, BorderLayout.CENTER);
 		this.setBounds(0, 450, 200, 300);
-		this.setVisible(true);
+		//this.setVisible(true);
+		
+		
+		seurat.dataManager.descriptionVariables = descriptionVariables;
 
 	}
 
@@ -86,7 +89,7 @@ public class ExperimentDescriptionFrame extends JFrame {
 		return arrayLogo;
 	}
 
-	public void openDescription(FileDialog fileDialog) {
+	public void openDescription(FileDialog fileDialog,JProgressBar progressBar) {
 
 		try {
 
@@ -128,6 +131,14 @@ public class ExperimentDescriptionFrame extends JFrame {
 			int len = 0;
 			while ((line = bfr.readLine()) != null) {
 
+				
+				if (len%10 == 0) {progressBar.setValue((100*len/length));
+				progressBar.repaint();
+				seurat.update(seurat.getGraphics());
+				}
+				
+				
+				
 				MyStringTokenizer myStk = new MyStringTokenizer(line);
 				String token;
 
@@ -169,6 +180,8 @@ public class ExperimentDescriptionFrame extends JFrame {
 
 				len++;
 			}
+			
+			progressBar.setValue(0);
 
 			/**
 			 * *************************************File

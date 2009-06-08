@@ -49,6 +49,40 @@ public class Histogram extends JFrame implements IPlot {
 
 	}
 
+	
+	
+	
+	
+	public Histogram(Seurat amlTool, ISelectable object) {
+		super(object.getName());
+		this.name = object.getName();
+
+		this.amlTool = amlTool;
+
+		panel = new HistogramPanel(this, amlTool,  object.getVariables(),name, object.getDoubleData());
+
+		this.getContentPane().setLayout(new BorderLayout());
+		this.getContentPane().add(panel, BorderLayout.CENTER);
+
+		this.setBounds(400, 400, 200, 200);
+		this.setVisible(true);
+
+		amlTool.windows.add(this);
+
+		JMenuItem item = new JMenuItem(name);
+		amlTool.windowMenu.add(item);
+
+		item.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				histogram.setVisible(true);
+			}
+		});
+
+		this.addKeyListener(panel);
+
+	}
+	
+	
 	public void updateSelection() {
 		// TODO Auto-generated method stub
 		panel.updateSelection();
@@ -170,6 +204,9 @@ class HistogramPanel extends JPanel implements KeyListener, MouseListener,
 	public void keyPressed(KeyEvent e) {
 		 
 		    if (e.getKeyCode() == 38) {
+		    	
+		    		
+		    	
             int count = balken.length;
             this.width = (max - anchor)/count;
             
@@ -178,7 +215,9 @@ class HistogramPanel extends JPanel implements KeyListener, MouseListener,
             
             
             this.calculateBalken(width);
-            this.updateSelection();
+            removeColoring();	
+            seurat.applyNewPixelSize(seurat.settings.PixelSize);
+			seurat.repaintWindows();
 		    }
 		    
 		    
@@ -193,7 +232,9 @@ class HistogramPanel extends JPanel implements KeyListener, MouseListener,
 	            if (count == 1)  this.width = (max - anchor)*1.1;
 	            
 	            this.calculateBalken(width);
-	            this.updateSelection();
+	            removeColoring();	
+                seurat.applyNewPixelSize(seurat.settings.PixelSize);
+				seurat.repaintWindows();
 			    }
 		    
 		    
@@ -241,7 +282,10 @@ class HistogramPanel extends JPanel implements KeyListener, MouseListener,
 			// for (int i = 0; i < balken.length; i++) {
 
 			for (int j = 0; j < this.data.length; j++) {
-				if (this.getVariable(j).isSelected()) {
+				boolean selected = false;
+                if (this.getVariable(j) != null) selected = this.getVariable(j).isSelected();
+
+                if (selected) {
 					int num = ((int) Math.floor((data[j] - anchor) / width));
 					if (num>=0) count[num]++;
 				}
@@ -263,8 +307,12 @@ class HistogramPanel extends JPanel implements KeyListener, MouseListener,
 			int countNA = 0;
 
 			for (int j = 0; j < data.length; j++) {
+				
+				
+				boolean selected = false;
+                if (this.getVariable(j) != null) selected = this.getVariable(j).isSelected();
 
-				if (this.getVariable(j).isSelected()) {
+                if (selected) {
 
 					if (data[j] != NA) {
 						int num = ((int) Math.floor((data[j] - anchor) / width));
@@ -672,8 +720,12 @@ class HistogramPanel extends JPanel implements KeyListener, MouseListener,
 
 			seurat.dataManager.deleteSelection();
 			
-			seurat.dataManager.selectAll();
-			for (int i = 0; i < variables.size(); i++) variables.elementAt(i).unselect(true); 
+			if (variables.elementAt(0).isGene() || variables.elementAt(0).isClone()) {
+				seurat.dataManager.selectExperiments(); 
+			}
+			if (variables.elementAt(0).isVariable() || variables.elementAt(0).isCGHVariable()) {
+				seurat.dataManager.selectGenesClones(); 
+		   }
 		
 			
 			
@@ -736,15 +788,17 @@ class HistogramPanel extends JPanel implements KeyListener, MouseListener,
 			seurat.dataManager.deleteSelection();
 			
 			seurat.dataManager.selectAll();
-			for (int i = 0; i < variables.size(); i++) variables.elementAt(i).unselect(true); 
+			for (int i = 0; i < variables.size(); i++) {
+				if (variables.elementAt(i)!=null) variables.elementAt(i).unselect(true); 
+			}
 		
 			for (int j = 0; j < data.length; j++) {
 				if (data[j] != NA) {
 					int num = (int) Math.floor((data[j] - min) / width);
-					if (selectedBalken[num])
+					if (selectedBalken[num]&& this.getVariable(j)!=null)
 						this.getVariable(j).select(true);
 				} else {
-					if (isNASelected)
+					if (isNASelected && this.getVariable(j)!=null)
 						this.getVariable(j).select(true);
 
 				}
@@ -804,6 +858,41 @@ class HistogramPanel extends JPanel implements KeyListener, MouseListener,
 			});
 			menu.add(item);
 
+			
+			
+			
+			item = new JMenuItem("Add Colors");
+
+			item.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					colorShift += 0.1;
+					if (colorShift > 1)
+						colorShift -= 1;
+					brush();
+					seurat.applyNewPixelSize(seurat.settings.PixelSize);
+					seurat.repaintWindows();
+				
+				}
+			});
+			if (variables.elementAt(0) instanceof Variable) menu.add(item);
+			
+			
+			
+			item = new JMenuItem("Remove Colors");
+
+			item.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+                removeColoring();	
+                seurat.applyNewPixelSize(seurat.settings.PixelSize);
+				seurat.repaintWindows();
+            }
+			});
+			if (variables.elementAt(0) instanceof Variable) menu.add(item);
+			
+			
+			
+			
+			
 			
 
 			item = new JMenuItem("Dismiss");
@@ -986,10 +1075,10 @@ class HistogramPanel extends JPanel implements KeyListener, MouseListener,
 			for (int j = 0; j < data.length; j++) {
 				int num = (int) Math.floor((data[j] - min) / width);
 				if (num == i && this.getVariable(j) != null) {
-					if (((Variable) this.getVariable(j)).barchartsToColors
+					if (((Variable) this.getVariable(j)).getBarchartToColors()
 							.indexOf(hist) == -1) {
 
-						((Variable) this.getVariable(j)).colors.add(color[i]);
+						((Variable) this.getVariable(j)).getColors().add(color[i]);
 
 						int count = 0;
 
@@ -1008,14 +1097,14 @@ class HistogramPanel extends JPanel implements KeyListener, MouseListener,
 								+ " - " + round((min + this.width * (i + 1)))
 								+ ")";
 
-						((Variable) this.getVariable(j)).colorNames.add(name);
-						((Variable) this.getVariable(j)).barchartsToColors
+						((Variable) this.getVariable(j)).getColorNames().add(name);
+						((Variable) this.getVariable(j)).getBarchartToColors()
 								.add(hist);
 					} else {
 
-						int index = ((Variable) this.getVariable(j)).barchartsToColors
+						int index = ((Variable) this.getVariable(j)).getBarchartToColors()
 								.indexOf(hist);
-						((Variable) this.getVariable(j)).colors.set(index,
+						((Variable) this.getVariable(j)).getColors().set(index,
 								color[i]);
 
 					}
@@ -1030,12 +1119,12 @@ class HistogramPanel extends JPanel implements KeyListener, MouseListener,
 	public void removeColoring() {
 
 		for (int i = 0; i < this.variables.size(); i++) {
-			int index = ((Variable) this.getVariable(i)).barchartsToColors
+			int index = ((Variable) this.getVariable(i)).getBarchartToColors()
 					.indexOf(hist);
 			if (index != -1) {
-				((Variable) this.getVariable(i)).colors.remove(index);
-				((Variable) this.getVariable(i)).colorNames.remove(index);
-				((Variable) this.getVariable(i)).barchartsToColors
+				((Variable) this.getVariable(i)).getColors().remove(index);
+				((Variable) this.getVariable(i)).getColorNames().remove(index);
+				((Variable) this.getVariable(i)).getBarchartToColors()
 						.remove(index);
 			}
 		}

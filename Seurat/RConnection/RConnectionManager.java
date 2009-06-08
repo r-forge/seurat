@@ -26,6 +26,7 @@ public class RConnectionManager {
 		//System.out.println("result="+Srs.checkLocalRserve());
 		try {
 		    RConnection c=new RConnection();
+		    int x;
 		    c.shutdown();
 		} catch (Exception x) {};
 		this.startRServeUnterWindows();

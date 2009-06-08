@@ -1,6 +1,7 @@
 package GUI;
 
 import java.util.*;
+
 import Data.*;
 
 import java.io.*;
@@ -53,14 +54,22 @@ public class SeriationDialog extends JFrame {
 	
 	SeriationDialog dialog;
 	
+Vector<ISelectable> Experiments;
+	
+	Vector<ISelectable> Genes;
+	
 	
 
-	public SeriationDialog(Seurat seurat) {
+	public SeriationDialog(Seurat seurat,Vector Genes, Vector Exps) {
 		super("Seriation");
 		this.seurat = seurat;
 		this.dialog = this;
 		
-		this.dataManager = seurat.dataManager;
+        this.Genes = Genes;
+        
+        this.dataManager = seurat.dataManager;
+		
+		this.Experiments = Exps;
 		
 		this.setBounds(100, 300, 240, 140);
          this.setResizable(false);
@@ -120,12 +129,12 @@ public class SeriationDialog extends JFrame {
 			dataManager.rConnection.voidEval("require(seriation)");
 			
 			
-			rConnection.assign("tempData", dataManager.Experiments
-					.elementAt(0).getColumn());
+			rConnection.assign("tempData", Experiments
+					.elementAt(0).getColumn(Genes));
 
-			for (int i = 1; i < this.dataManager.Experiments.size(); i++) {
-				dataManager.rConnection.assign("x", dataManager.Experiments
-						.elementAt(i).getColumn());
+			for (int i = 1; i < Experiments.size(); i++) {
+				dataManager.rConnection.assign("x", Experiments
+						.elementAt(i).getColumn(Genes));
 				dataManager.rConnection.voidEval("tempData <- cbind(tempData, x)");
 				
 
@@ -143,10 +152,10 @@ public class SeriationDialog extends JFrame {
 				
 						
 			
-			dataManager.rConnection.assign("tempData", dataManager.getRowData(0));
+			dataManager.rConnection.assign("tempData", Genes.elementAt(0).getRow(Experiments));
 
-			for (int i = 1; i < this.dataManager.Genes.size(); i++) {
-				dataManager.rConnection.assign("x", dataManager.getRowData(i));
+			for (int i = 1; i < Genes.size(); i++) {
+				dataManager.rConnection.assign("x", Genes.elementAt(i).getRow(Experiments));
 				dataManager.rConnection.voidEval("tempData <- cbind(tempData, x)");
 
 			}
@@ -161,31 +170,31 @@ public class SeriationDialog extends JFrame {
 					.asIntegers();
 				
 			
-			Vector<Gene> Genes = new Vector();
+			Vector<ISelectable> G = new Vector();
 			
-			for (int i = 0; i < dataManager.Genes.size(); i++) {
-				Genes.add(dataManager.Genes.elementAt(orderZeilen[i]-1));
+			for (int i = 0; i < Genes.size(); i++) {
+				G.add(Genes.elementAt(orderZeilen[i]-1));
 			}
 			
-			seurat.dataManager.seriationsGenes.add(Genes);
+			seurat.dataManager.seriationsGenes.add(G);
 			seurat.dataManager.seriationGeneNames.add(method + " "+Distance);
 			
 			
 			
-			Vector<Variable> Experiments = new Vector();
+			Vector<ISelectable> E = new Vector();
 			
 
-			for (int i = 0; i < dataManager.Experiments.size(); i++) {
-				Experiments.add(dataManager.Experiments.elementAt(orderSpalten[i]-1));
+			for (int i = 0; i < Experiments.size(); i++) {
+				E.add(Experiments.elementAt(orderSpalten[i]-1));
 			}
 			
-			seurat.dataManager.seriationsExperiments.add(Experiments);
+			seurat.dataManager.seriationsExperiments.add(E);
 			seurat.dataManager.seriationExperimentNames.add(method + " " + Distance);
 			
 			
 
-			GlobalView globalView = new GlobalView(seurat, method, Experiments,Genes,false);
-
+			GlobalViewAbstract globalView = new GlobalViewAbstract(seurat, method, E,G,false);
+            globalView.applyNewPixelSize(globalView.pixelSize);
 		
 			globalView.setLocation(350, 0);
 			globalView.setVisible(true);
