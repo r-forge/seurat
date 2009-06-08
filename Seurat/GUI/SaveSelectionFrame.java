@@ -15,11 +15,12 @@ import Data.GeneVariable;
 
 public class SaveSelectionFrame extends JFrame {
 
-	JCheckBox expressionBox = new JCheckBox("  save gene expression dataset  ",
+	JCheckBox expressionBox = new JCheckBox("  Gene Expressions  ",
 			true);
 	JCheckBox experimentsBox = new JCheckBox(
-			"  save experiments descriptions  ");
-	JCheckBox genesBox = new JCheckBox("  save gene annotations  ");
+			"  Experiments Descriptions  ");
+	JCheckBox genesBox = new JCheckBox("  Gene Annotations  ");
+	JCheckBox cghBox = new JCheckBox("  CGH Data   ");
 	Seurat seurat;
 	SaveSelectionFrame zeiger = this;
 
@@ -43,8 +44,16 @@ public class SaveSelectionFrame extends JFrame {
 			genesBox.setEnabled(false);
 		else
 			genesBox.setSelected(true);
+		
+		
+		if (seurat.dataManager.cghVariables == null)
+			cghBox.setEnabled(false);
+		else
+			cghBox.setSelected(true);
+		
 
 		panel.add(genesBox);
+		panel.add(cghBox);
 		this.getContentPane().add(panel, BorderLayout.CENTER);
 
 		panel = new JPanel();
@@ -141,6 +150,29 @@ public class SaveSelectionFrame extends JFrame {
 					
 					
 				}
+				
+				
+				
+				
+				
+				if (cghBox.isSelected()) {
+					FileDialog fileDialog = new FileDialog(zeiger.seurat, "Save CGH Data", 1);
+					fileDialog.setVisible(true);
+			
+					
+					BufferedWriter bfr = null;
+					bfr = new BufferedWriter(new FileWriter(fileDialog
+								.getDirectory()
+								+ "/" + fileDialog.getFile()));
+					
+			
+					zeiger.seurat.dataManager.saveCGH(bfr);
+					
+					
+				}
+				
+
+				
 				
 				
 				

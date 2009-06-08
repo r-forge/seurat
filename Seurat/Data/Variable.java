@@ -21,7 +21,7 @@ public class Variable implements ISelectable,NodeCase{
 
 	public double mean;
 
-	static final int Double = 1, String = 2;
+	public static final int Double = 1, String = 2;
 
 	// type double
 
@@ -42,13 +42,13 @@ public class Variable implements ISelectable,NodeCase{
 	
 	public Vector<CGHVariable> cghVars = new Vector();
 	
-	public Vector<Color> colors = new Vector();
-	public Vector<String> colorNames = new Vector();
-	public Vector<IPlot> barchartsToColors = new Vector();
+	private Vector<Color> colors = new Vector();
+	private Vector<String> colorNames = new Vector();
+	private Vector<IPlot> barchartsToColors = new Vector();
 	
 
 	public boolean isGene() {
-		return true;
+		return false;
 	}
 
 	public Variable(DataManager dataManager,String name, int type, int ID) {
@@ -64,7 +64,7 @@ public class Variable implements ISelectable,NodeCase{
 		//	isSelected[i] = true;
 		//}
 		
-		
+		/*
 		
 		if (weiter && dataManager.cghVariables != null) {
 			
@@ -75,9 +75,10 @@ public class Variable implements ISelectable,NodeCase{
 			String var = new StringTokenizer(dataManager.cghVariables.elementAt(i).name,".").nextToken();
 			
 			
+			
 			if (name.equals(var)) dataManager.cghVariables.elementAt(i).select(false);
 		}
-		}
+		}*/
 		
 		
 		
@@ -87,6 +88,7 @@ if (weiter) {
 			
 			for (int i =0; i < cghVars.size(); i++) {
 				cghVars.elementAt(i).select(false);
+				
 			}
 			
 			}
@@ -113,7 +115,7 @@ if (weiter) {
 		//for (int i = 0; i < isSelected.length; i++) {
 			//isSelected[i] = false;
 	//	}
-		
+		/*
 		
 		if (weiter && dataManager.cghVariables != null) {
 		
@@ -125,7 +127,7 @@ for (int i =0; i < dataManager.cghVariables.size(); i++) {
 			if (name.equals(var)) dataManager.cghVariables.elementAt(i).unselect(false);
 		}
 
-		}
+		}*/
 
 		
 		
@@ -261,6 +263,62 @@ for (int i =0; i < dataManager.cghVariables.size(); i++) {
 		return min;
 	}
 
+	
+	public int getType() {
+		// TODO Auto-generated method stub
+		
+		
+		return type;
+	}
+	
+	
+	public String [] getStringData() {
+		// TODO Auto-generated method stub
+		return stringData;
+	}
+
+	public Vector<ISelectable> getVariables() {
+		// TODO Auto-generated method stub
+		
+		Vector<ISelectable> v = new Vector();
+		for (int i = 0; i < dataManager.Genes.size(); i++) {
+			v.add(dataManager.Genes.elementAt(i));
+		}
+		return v;
+	}
+
+	public double[] getDoubleData() {
+		// TODO Auto-generated method stub
+		
+		
+		return doubleData;
+	}
+
+	public boolean isClone() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	public boolean isCGHVariable() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	public Vector<Color> getColors() {
+		// TODO Auto-generated method stub
+		return colors;
+	}
+
+	public Vector<java.lang.String> getColorNames() {
+		// TODO Auto-generated method stub
+		return colorNames;
+	}
+
+	public Vector<IPlot> getBarchartToColors() {
+		// TODO Auto-generated method stub
+		return barchartsToColors;
+	}
+	
 	
 	
 

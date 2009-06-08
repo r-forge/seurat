@@ -6,6 +6,7 @@ import javax.swing.*;
 import java.awt.event.*;
 import java.awt.*;
 
+import Data.DescriptionVariable;
 import Data.ISelectable;
 import Data.Variable;
 
@@ -48,6 +49,40 @@ public class Barchart extends JFrame implements IPlot {
 		this.setVisible(true);
 
 	}
+	
+	
+	public Barchart(Seurat seurat,ISelectable object) {
+		super(object.getName());
+		this.seurat = seurat;
+		this.name = object.getName();
+		panel = new BarchartPanel(this, seurat, name, object.getVariables(), object.getStringData());
+
+		this.getContentPane().setLayout(new BorderLayout());
+		this.getContentPane().add(new JScrollPane(panel), BorderLayout.CENTER);
+		this.setBounds(400, 400, 250, Math.min(panel.balken.size()
+				* panel.BinHeigth * 2 + panel.abstandOben + 40, 600));
+
+		this.setVisible(true);
+		this.addKeyListener(panel);
+
+		seurat.windows.add(this);
+
+		item = new JMenuItem(name);
+		seurat.windowMenu.add(item);
+
+		item.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				setVisible(true);
+			}
+		});
+
+		panel.calculateAbstandLinks();
+		this.setVisible(true);
+
+	}
+	
+	
+	
 
 	public void updateSelection() {
 		panel.updateSelection();
@@ -142,6 +177,9 @@ class BarchartPanel extends JPanel implements KeyListener, MouseListener,
 		this.seurat = seurat;
 		this.variables = variables;
 		this.barchart = barchart;
+		
+		
+		
 
 		this.calculateBalken();
 
@@ -260,20 +298,20 @@ class BarchartPanel extends JPanel implements KeyListener, MouseListener,
 			for (int j = 0; j < data.length; j++) {
 				int num = indexOf(data[j]);
 				if (i == num && this.getVariable(j) != null) {
-					if (((Variable) this.getVariable(j)).barchartsToColors
+					if (((Variable) this.getVariable(j)).getBarchartToColors()
 							.indexOf(barchart) == -1) {
 
-						((Variable) this.getVariable(j)).colors.add(balken
+						((Variable) this.getVariable(j)).getColors().add(balken
 								.elementAt(i).color);
-						((Variable) this.getVariable(j)).colorNames.add(balken
+						((Variable) this.getVariable(j)).getColorNames().add(balken
 								.elementAt(i).name);
-						((Variable) this.getVariable(j)).barchartsToColors
+						((Variable) this.getVariable(j)).getBarchartToColors()
 								.add(barchart);
 					} else {
 
-						int index = ((Variable) this.getVariable(j)).barchartsToColors
+						int index = ((Variable) this.getVariable(j)).getBarchartToColors()
 								.indexOf(barchart);
-						((Variable) this.getVariable(j)).colors.set(index,
+						((Variable) this.getVariable(j)).getColors().set(index,
 								balken.elementAt(i).color);
 
 					}
@@ -288,12 +326,12 @@ class BarchartPanel extends JPanel implements KeyListener, MouseListener,
 	public void removeColoring() {
 
 		for (int i = 0; i < this.variables.size(); i++) {
-			int index = ((Variable) this.getVariable(i)).barchartsToColors
+			int index = ((Variable) this.getVariable(i)).getBarchartToColors()
 					.indexOf(barchart);
 			if (index != -1) {
-				((Variable) this.getVariable(i)).colors.remove(index);
-				((Variable) this.getVariable(i)).colorNames.remove(index);
-				((Variable) this.getVariable(i)).barchartsToColors
+				((Variable) this.getVariable(i)).getColors().remove(index);
+				((Variable) this.getVariable(i)).getColorNames().remove(index);
+				((Variable) this.getVariable(i)).getBarchartToColors()
 						.remove(index);
 			}
 		}
@@ -328,9 +366,12 @@ class BarchartPanel extends JPanel implements KeyListener, MouseListener,
 		}
 
 		seurat.dataManager.deleteSelection();
-		seurat.dataManager.selectAll();
-		for (int i = 0; i < variables.size(); i++) variables.elementAt(i).unselect(true); 
+	
+	
+			
 		
+		boolean selected = false;	
+			
 		for (int i = 0; i < selectedBalken.length; i++) {
 
 			if (selectedBalken[i]) {
@@ -338,9 +379,20 @@ class BarchartPanel extends JPanel implements KeyListener, MouseListener,
 					int num = indexOf(data[j]);
 					if (i == num && this.getVariable(j) != null) {
 						this.getVariable(j).select(true);
+						selected = true;
 					}
 				}
 			}
+		}
+		
+		if (selected) { 
+		if (variables.elementAt(0).isGene() || variables.elementAt(0).isClone()) {
+			seurat.dataManager.selectExperiments(); 
+		}
+		else {
+			seurat.dataManager.selectGenesClones(); 
+	   }
+		
 		}
 
 	}
@@ -356,6 +408,8 @@ class BarchartPanel extends JPanel implements KeyListener, MouseListener,
 
 		if (!(e.getButton() == MouseEvent.BUTTON3 || e.isControlDown())) {
 
+			
+			seurat.dataManager.deleteSelection();
 			if (point1 != null && point2 != null) {
 
 				addSelection(point1, point2);
@@ -426,6 +480,39 @@ class BarchartPanel extends JPanel implements KeyListener, MouseListener,
 			sortMenu.add(item);
 
 			menu.add(sortMenu);
+			
+			
+			item = new JMenuItem("Add Colors");
+
+			item.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					colorShift += 0.1;
+					if (colorShift > 1)
+						colorShift -= 1;
+					brush();
+					seurat.applyNewPixelSize(seurat.settings.PixelSize);
+					seurat.repaintWindows();
+				
+				}
+			});
+			if (variables.elementAt(0) instanceof Variable) menu.add(item);
+			
+			
+			
+			item = new JMenuItem("Remove Colors");
+
+			item.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+                removeColoring();	
+                seurat.applyNewPixelSize(seurat.settings.PixelSize);
+				seurat.repaintWindows();
+            }
+			});
+			if (variables.elementAt(0) instanceof Variable) menu.add(item);
+			
+			
+			
+			
 
 			item = new JMenuItem("Dismiss");
 
@@ -439,6 +526,7 @@ class BarchartPanel extends JPanel implements KeyListener, MouseListener,
 			menu.show(this, e.getX(), e.getY());
 
 		}
+		
 
 	}
 

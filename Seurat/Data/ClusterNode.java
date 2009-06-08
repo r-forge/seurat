@@ -238,6 +238,8 @@ public class ClusterNode {
 	
 	public void selectNode() {
 		
+		
+		
 		if (this.isCol) {
 		
 		for (int i = 0; i < this.cases.size(); i++) {
@@ -262,8 +264,6 @@ public class ClusterNode {
 				int index = cases.elementAt(i);
 				Genes.elementAt(index).select(true);
 				//dataManager.selectRow(index);
-				
-				
 				
 				
 				

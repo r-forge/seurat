@@ -1,11 +1,13 @@
 package Data;
 
+import java.awt.Color;
 import java.util.Vector;
+
+import GUI.IPlot;
 
 public class Gene implements ISelectable,NodeCase{
 	public String Name;
 	
-	Vector<Clone> clones;
 	
 	public int ID;
 	
@@ -15,6 +17,11 @@ public class Gene implements ISelectable,NodeCase{
 	
 	public Vector<Clone> CLONES = new Vector();
 	
+	public Chromosome chromosome;
+	
+	public String chrName;
+	
+	public double nucleotidePosition;
 	
 	
 	public Gene(String ID,int Index,DataManager dataManager) {
@@ -34,6 +41,7 @@ public class Gene implements ISelectable,NodeCase{
 		if ( weiter) {
 		for (int i = 0; i < CLONES.size(); i++) {
 			CLONES.elementAt(i).select(false);
+			//System.out.println(	CLONES.elementAt(i).getName());
 		}
 		
 		}
@@ -123,6 +131,59 @@ public class Gene implements ISelectable,NodeCase{
 	public double getMin() {
 		// TODO Auto-generated method stub
 		return 0;
+	}
+	
+	
+	public int getType() {
+		// TODO Auto-generated method stub
+	
+		
+		return -1;
+	}
+
+	public String[] getStringData() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public Vector<ISelectable> getVariables() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public double[] getDoubleData() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public boolean isGene() {
+		// TODO Auto-generated method stub
+		return true;
+	}
+
+	public boolean isClone() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	public boolean isCGHVariable() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	public Vector<Color> getColors() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public Vector<String> getColorNames() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public Vector<IPlot> getBarchartToColors() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

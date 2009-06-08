@@ -31,8 +31,8 @@ class ZoomView extends JFrame implements MatrixWindow,IPlot {
 	
 	DataManager dataManager;
 	
-	Vector<Variable> Experiments;
-	Vector<Gene> Genes;
+	Vector<ISelectable> Experiments;
+	Vector<ISelectable> Genes;
 
 
 	
@@ -59,11 +59,11 @@ class ZoomView extends JFrame implements MatrixWindow,IPlot {
 		
 			try {
 				
-				Variable var = Experiments.elementAt(i);
+				Variable var = (Variable)Experiments.elementAt(i);
 				
-			for (int j = var.colors.size() - 1; j >= 0; j--) {
+			for (int j = var.getColors().size() - 1; j >= 0; j--) {
 
-				colorsHight = var.colors.size() * (2 * this.pixelSize + 1) + 4;
+				colorsHight = var.getColors().size() * (2 * this.pixelSize + 1) + 4;
 
 			
 			}
@@ -89,7 +89,7 @@ class ZoomView extends JFrame implements MatrixWindow,IPlot {
 			this
 					.setSize(
 							Experiments.size() * pixelSize + gPanel.abstandLinks +  18, 30+
-							upShift + 38 + Genes.size()* pixelSize);
+							upShift + 40 + Genes.size()* pixelSize);
 
 		} else
 			this
@@ -367,8 +367,9 @@ public void updateSelection() {
 					cellColor[i][j] = c;
 
 				} else {
-					double koeff = Math.pow(value / Experiments.elementAt(i).getMin(), 1);
-
+					double koeff = value / Experiments.elementAt(i).getMin();
+					if (Experiments.elementAt(i).getMin() == 0) koeff = 0;
+					
 					Color c = (Color.getHSBColor((float) 0.33,
 							(float) fNeg(koeff), 1));
 
@@ -541,21 +542,11 @@ public void updateSelection() {
 			y2 += Width;
 		if (x1 == x2)
 			x2 += 1;
+		
+		
+		dataManager.deleteSelection();
 
-		for (int i = 0; i < this.seurat.dataManager.Experiments.size(); i++) {
-			dataManager.Experiments.elementAt(i).selected = false;
-
-			//for (int j = 0; j < dataManager.Genes.size(); j++) {
-
-			//	this.dataManager.Experiments.elementAt(i).isSelected[j] = false;
-			//}
-
-		}
-
-		for (int i = 0; i < dataManager.Genes.size(); i++) {
-			dataManager.Genes.elementAt(i).selected = false;
-
-		}
+		
 	
 
 		for (int i = 0; i < Experiments.size(); i++) {
@@ -601,26 +592,23 @@ public void updateSelection() {
 	public String getToolTipText(MouseEvent e) {
 
 		if (e.isControlDown()) {
-			int exp = this.getExpAtPoint(e.getPoint());
-			int gene = this.getGeneAtPoint(e.getPoint());
+			ISelectable exp = this.getExpAtPoint(e.getPoint());
+			ISelectable gene = this.getGeneAtPoint(e.getPoint());
 
-			if (exp != -1 && gene != -1) {
-				Variable var = seurat.dataManager.Experiments.elementAt(exp);
-
+			if (exp != null && gene != null) {
+				
 				String s = "<HTML><BODY BGCOLOR = 'WHITE'><FONT FACE = 'Verdana'><STRONG>";
-				// s += "<FONT FACE = 'Arial'><TR><TD>"+var.doubleData []+ "
-				// </TD><TD> " + glyph.getElementAsString(i) + "</TD></TR>";
-				s += "<FONT FACE = 'Arial'><TR><TD>" + var.name
+			
+				s += "<FONT FACE = 'Arial'><TR><TD>" + exp.getName()
 						+ "  </TD><TD> ";
+				
+				s += "<FONT FACE = 'Arial'><TR><TD>" + gene.getName()
+				+ "  </TD><TD> ";
 
-				for (int i = 0; i < seurat.dataManager.ExperimentDescr.size(); i++) {
-					s += "<FONT FACE = 'Arial'><TR><TD>"
-							+ seurat.dataManager.ExperimentDescr.elementAt(i).stringData[gene]
-							+ "  </TD><TD> ";
-
-				}
-				String value = var.getRealValue(gene) + "";
-				if (var.getRealValue(gene) == seurat.dataManager.NA)
+				
+				
+				String value = exp.getRealValue(gene.getID()) + "";
+				if (exp.getRealValue(gene.getID()) == seurat.dataManager.NA)
 					value = "NA";
 				s += "<FONT FACE = 'Arial'><TR><TD>" + value + "  </TD><TD> ";
 
@@ -635,19 +623,18 @@ public void updateSelection() {
 							* this.pixelSize && e.getY() <= this.upShift
 					&& e.getY() >= this.abstandOben) {
 
-				exp = (e.getX() - this.abstandLinks) / this.pixelSize;
-
+				
 				// System.out.println("svdsv " + exp);
 
-				if (exp >= 0) {
+				if (exp != null) {
 					
 					
 					try {
 						
 						
 
-					Variable var = (Variable)this.Experiments.elementAt(exp);
-					int index = var.colors.size() - 1
+					Variable var = (Variable)exp;
+					int index = var.getColors().size() - 1
 							- (this.upShift - 2 - e.getY())
 							/ (2 * this.pixelSize + 1);
 
@@ -657,7 +644,7 @@ public void updateSelection() {
 					
 					
 					try {
-						name = ((Barchart)var.barchartsToColors
+						name = ((Barchart)var.getBarchartToColors()
 								.elementAt(index)).name;
 					}
                     catch (Exception e1) {
@@ -665,7 +652,7 @@ public void updateSelection() {
                     } 			
                     
                     try {
-						name = ((Histogram)var.barchartsToColors
+						name = ((Histogram)var.getBarchartToColors()
 								.elementAt(index)).name;
 					}
                     catch (Exception e2) {
@@ -677,7 +664,7 @@ public void updateSelection() {
 					
 					s += "<FONT FACE = 'Arial'><TR><TD>"
 							+ name + "<TR><TD>"
-									+ var.colorNames.elementAt(index) 
+									+ var.getColorNames().elementAt(index) 
 							+ "  </TD><TD> ";
 
 					return s;
@@ -698,39 +685,39 @@ public void updateSelection() {
 
 	
 	
-	public int getExpAtPoint(Point p) {
+	public ISelectable getExpAtPoint(Point p) {
 		int x = (int) Math.round(p.getX());
 		int y = (int) Math.round(p.getY());
 
 		if (x < abstandLinks)
-			return -1;
+			return null;
 		if (y < abstandOben)
-			return -1;
+			return null;
 
 		x = (x - abstandLinks) / this.pixelSize;
 		y = (y - abstandOben) / this.pixelSize;
 
 		
 
-		return Experiments.elementAt(x).getID();
+		return Experiments.elementAt(x);
 	}
 
 	
 
 
-	public int getGeneAtPoint(Point p) {
+	public ISelectable getGeneAtPoint(Point p) {
 		int x = (int) Math.round(p.getX());
 		int y = (int) Math.round(p.getY());
 
 		if (x < abstandLinks)
-			return -1;
+			return null;
 		if (y < upShift)
-			return -1;
+			return null;
 
 		x = (x - abstandLinks) / this.pixelSize;
 		y = (y - upShift) / this.pixelSize;
 
-		return Genes.elementAt(y).getID();
+		return Genes.elementAt(y);
 	}
 
 	
@@ -757,11 +744,11 @@ public void updateSelection() {
 				
 			Variable var = (Variable)Experiments.elementAt(i);
 
-			for (int j = var.colors.size() - 1; j >= 0; j--) {
+			for (int j = var.getColors().size() - 1; j >= 0; j--) {
 
-				colorsHight = var.colors.size() * (2 * this.pixelSize + 1) + 4;
+				colorsHight = var.getColors().size() * (2 * this.pixelSize + 1) + 4;
 
-				g.setColor(var.colors.elementAt(j));
+				g.setColor(var.getColors().elementAt(j));
 
 				g.fillRect(abstandLinks + i * this.pixelSize, 2 + abstandOben
 						+ j * (2 * this.pixelSize + 1), Math.max(pixelSize, 2),

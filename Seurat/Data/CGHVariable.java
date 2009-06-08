@@ -1,8 +1,10 @@
 package Data;
 
+import java.awt.Color;
 import java.util.StringTokenizer;
 import java.util.Vector;
 
+import GUI.IPlot;
 import GUI.Seurat;
 
 public class CGHVariable implements ISelectable{
@@ -117,7 +119,7 @@ public class CGHVariable implements ISelectable{
 
 	public java.lang.String getName() {
 		// TODO Auto-generated method stub
-		return null;
+		return name;
 	}
 
 	public double getRealValue(int id) {
@@ -128,7 +130,7 @@ public class CGHVariable implements ISelectable{
 	public double getValue(int id) {
 		// TODO Auto-generated method stub
 		if (doubleData [id] != NA) return doubleData [id];
-		return mean;
+		return 0;
 	}
 
 	public boolean isSelected() {
@@ -145,7 +147,7 @@ public class CGHVariable implements ISelectable{
 		// TODO Auto-generated method stub
 		isSelected = true;
 		
-		
+		/*
 		if (weiter)
 	
 		{	
@@ -154,11 +156,11 @@ public class CGHVariable implements ISelectable{
 		for (int i =0; i < seurat.dataManager.Experiments.size(); i++) {
 			if (seurat.dataManager.Experiments.elementAt(i).name.equals(var)) seurat.dataManager.Experiments.elementAt(i).select(false);
 		}
-		}
+		}*/
 		
 		
 		
-if (weiter) {
+        if (weiter) {
 		
 			
 			for (int i =0; i < vars.size(); i++) {
@@ -176,7 +178,7 @@ if (weiter) {
 		// TODO Auto-generated method stub
 		isSelected = false;
 		
-
+/*
 		if (weiter) {
 		String var = new StringTokenizer(name,".").nextToken();
 	
@@ -184,7 +186,7 @@ if (weiter) {
 			if (seurat.dataManager.Experiments.elementAt(i).name.equals(var)) seurat.dataManager.Experiments.elementAt(i).unselect(false);
 		}
 		
-		}
+		}*/
 		
 		
 		
@@ -203,6 +205,49 @@ if (weiter) {
 		
 		
 	}
+	
+	
+	
+	public static Vector<String> sortChromosomes(Vector<String> stringBuffer) {
+
+		Vector<String> newBuffer = new Vector();
+		for (int i = 0; i < stringBuffer.size(); i++) {
+			String s = stringBuffer.elementAt(i);
+			int j = 0;
+			while (j < newBuffer.size()
+					&& compareLexico(s, newBuffer.elementAt(j))) {
+				j++;
+			}
+			newBuffer.insertElementAt(s, j);
+
+		}
+
+		return newBuffer;
+		
+	}
+
+	public static boolean compareLexico(String a, String b) {
+		int i = 0;
+
+		String tA = a.replace("\"","");
+		String tB = b.replace("\"","");
+		if (tA.equals("X") || tA.equals("x")) tA = "23";
+		if (tB.equals("X") || tB.equals("x")) tB = "23";
+
+		if (tA.equals("Y") || tA.equals("y")) tA = "24";
+		if (tB.equals("Y") || tB.equals("y")) tB = "24";
+		
+		if (tA.equals("NA") || tB.equals("NA")) return true;
+		
+		
+		int aa = Integer.parseInt(tA);
+		int bb = Integer.parseInt(tB);
+		
+		if (aa < bb) return false;
+		return true;
+	}
+	
+	
 	
 	
 	
@@ -251,6 +296,68 @@ if (weiter) {
 	public double getMin() {
 		// TODO Auto-generated method stub
 		return min;
+	}
+
+	public int getType() {
+		// TODO Auto-generated method stub
+		if (isDiscrete) return 2;
+		if (isDouble) return 1;
+		if (isList) return 3;
+		
+		return -1;
+	}
+
+	public String [] getStringData() {
+		// TODO Auto-generated method stub
+		return stringData;
+	}
+
+	public Vector<ISelectable> getVariables() {
+		// TODO Auto-generated method stub
+		
+		Vector<ISelectable> v = new Vector();
+		for (int i = 0; i < seurat.dataManager.CLONES.size(); i++) {
+			v.add(seurat.dataManager.CLONES.elementAt(i));
+		}
+		return v;
+	}
+
+	public double[] getDoubleData() {
+		// TODO Auto-generated method stub
+		return doubleData;
+	}
+
+	public boolean isGene() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	public boolean isClone() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	public boolean isCGHVariable() {
+		// TODO Auto-generated method stub
+		return true;
+	}
+
+	public Vector<Color> getColors() {
+		// TODO Auto-generated method stub
+		if (vars.size() == 1) return vars.elementAt(0).getColors(); 
+		return null;
+	}
+
+	public Vector<java.lang.String> getColorNames() {
+		// TODO Auto-generated method stub
+		if (vars.size() == 1) return vars.elementAt(0).getColorNames(); 
+		return null;
+	}
+
+	public Vector<IPlot> getBarchartToColors() {
+		// TODO Auto-generated method stub
+		if (vars.size() == 1) return vars.elementAt(0).getBarchartToColors(); 
+		return null;
 	}
 	
 	

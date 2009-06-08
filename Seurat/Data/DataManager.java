@@ -40,13 +40,16 @@ public class DataManager {
 	
 	
 	public int RowCount;
+	
+	
+	public Vector<DescriptionVariable> descriptionVariables;
 
 //	public Object rConnection;
 	
 	
-	public Vector<Vector<Gene>> seriationsGenes = new Vector();
+	public Vector<Vector<ISelectable>> seriationsGenes = new Vector();
 	
-	public Vector<Vector<Variable>> seriationsExperiments =new Vector();
+	public Vector<Vector<ISelectable>> seriationsExperiments =new Vector();
 	
 	public Vector<String> seriationGeneNames = new Vector();
 	
@@ -68,6 +71,10 @@ public class DataManager {
 	public String NucleotidePosition = "NucleotidePosition";
 	public String ChrStart = "ChrStart";
 	public String ChrEnd = "ChrEnd";
+	public String ChrCen = "ChromosomeCen";
+	public String CloneMidPoint = "CloneMidpoint";
+	public String CloneCytoBand = "Mapping";
+	public String States = ".States";
 	
 	
 	public DataManager()
@@ -77,6 +84,18 @@ public class DataManager {
 		
 	}	
 	
+	
+	
+	public Vector<CGHVariable> getStates() {
+		Vector v = new Vector();
+		
+		for (int i= 0; i < cghVariables.size(); i++) {
+			CGHVariable var = cghVariables.elementAt(i);
+			if (var.name.contains(States)) v.add(var);
+			
+		}
+		return v;
+	}
 	
 	
 	/**
@@ -128,6 +147,14 @@ public class DataManager {
 	
 	
 	
+	
+	
+	public Chromosome getChromosome(String name) {
+		for (int i = 0; i < Chromosomes.size() ; i++) {
+			if (Chromosomes.elementAt(i).name.equals(name)) return Chromosomes.elementAt(i);
+		}
+		return null;
+	}
 	
 	
 	
@@ -212,6 +239,58 @@ public class DataManager {
 			e.printStackTrace();
 		}
 	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	/**
+	 * Saves selected CGH Data
+	 * */
+	public void saveCGH(BufferedWriter bfr) {
+		// Speichern Variablennamen
+		try {
+			
+			for (int i = 0; i < cghVariables.size(); i++) {
+				CGHVariable var= cghVariables.elementAt(i);
+				
+				if (var.isSelected || var.vars == null) bfr.write(var.name+"	");
+			//	 System.out.print(Genes.elementAt(i).name+"	"); 
+			}
+			//System.out.println();
+			
+		
+			bfr.write('\n');
+		
+			for (int i = 0; i< CLONES.size(); i++) {
+				if (CLONES.elementAt(i).isSelected()) {
+					
+		
+		           for (int j = 0; j< cghVariables.size(); j++) {
+		        	   CGHVariable var= cghVariables.elementAt(j);
+						
+		        	   if (var.isSelected || var.vars == null) bfr.write(var.stringData [i]+"	");
+				  //System.out.print(Genes.elementAt(i).stringData [j]+"	"); 
+			}
+			
+		bfr.write('\n');
+		
+			}     
+		
+		}
+		
+		bfr.close();
+		
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
 	
 	
 	
@@ -363,6 +442,77 @@ public class DataManager {
 		
 		
 	}
+	
+	
+
+	public void selectGenesClones() {
+		if (Experiments != null) {
+		
+		
+		
+		for (int i = 0; i < this.Genes.size(); i++) {
+			Genes.elementAt(i).select(false);
+		}
+		
+		}
+		
+		
+		
+		if (cghVariables != null) {
+			
+			
+			
+			for (int i = 0; i < this.CLONES.size(); i++) {
+				CLONES.elementAt(i).select(false);
+			}
+			
+			}
+			
+		
+		
+	}
+	
+	
+
+	public void selectExperiments() {
+		if (Experiments != null) {
+		for (int i = 0; i < this.Experiments.size(); i++) {
+			Experiments.elementAt(i).select(false);
+		}
+		
+		
+	
+		}
+		
+		
+		
+		if (cghVariables != null) {
+			for (int i = 0; i < this.cghVariables.size(); i++) {
+				cghVariables.elementAt(i).select(false);
+			}
+			
+		
+			}
+			
+		
+		
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	
 	
 	public void selectAll() {
