@@ -193,7 +193,7 @@ Vector<ISelectable> Experiments;
 			
 			
 
-			GlobalViewAbstract globalView = new GlobalViewAbstract(seurat, method, E,G,false);
+			GlobalView globalView = new GlobalView(seurat, method, E,G,false);
             globalView.applyNewPixelSize(globalView.pixelSize);
 		
 			globalView.setLocation(350, 0);

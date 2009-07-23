@@ -377,7 +377,7 @@ class BarchartPanel extends JPanel implements KeyListener, MouseListener,
 			if (selectedBalken[i]) {
 				for (int j = 0; j < data.length; j++) {
 					int num = indexOf(data[j]);
-					if (i == num && this.getVariable(j) != null) {
+					if (i == num) {
 						this.getVariable(j).select(true);
 						selected = true;
 					}
@@ -385,13 +385,19 @@ class BarchartPanel extends JPanel implements KeyListener, MouseListener,
 			}
 		}
 		
+		
+		
+		
 		if (selected) { 
 		if (variables.elementAt(0).isGene() || variables.elementAt(0).isClone()) {
 			seurat.dataManager.selectExperiments(); 
 		}
 		else {
 			seurat.dataManager.selectGenesClones(); 
-	   }
+	    }
+		
+		
+		
 		
 		}
 
@@ -647,7 +653,7 @@ class BarchartPanel extends JPanel implements KeyListener, MouseListener,
 
 			for (int j = 0; j < this.data.length; j++) {
 				if (this.data[j].equals(s)) {
-					if (getVariable(j) != null && getVariable(j).isSelected())
+					if (getVariable(j).isSelected())
 						selectedCount++;
 					gesamtExperInBalken++;
 				}

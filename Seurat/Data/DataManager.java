@@ -37,6 +37,8 @@ public class DataManager {
     public Vector<CGHVariable> cghVariables;
     
     public Vector<Clone> CLONES;
+    
+    public Vector<AnnGene> AnnGenes;
 	
 	
 	public int RowCount;
@@ -151,7 +153,8 @@ public class DataManager {
 	
 	public Chromosome getChromosome(String name) {
 		for (int i = 0; i < Chromosomes.size() ; i++) {
-			if (Chromosomes.elementAt(i).name.equals(name)) return Chromosomes.elementAt(i);
+			//System.out.println("* "+Chromosomes.elementAt(i).name);
+			if (Chromosomes.elementAt(i).name.replace("\"","").equals(name.replace("\"",""))) return Chromosomes.elementAt(i);
 		}
 		return null;
 	}
@@ -297,7 +300,7 @@ public class DataManager {
 	
 	
 	
-	
+	/*
 	
 	public void clearSelection() {
 		
@@ -319,7 +322,7 @@ public class DataManager {
 		//}
 		
 	}
-
+*/
 	public void selectVariables() {
 		if (Experiments != null) {
 		for (int i = 0; i < this.Experiments.size(); i++) {
@@ -423,6 +426,12 @@ public class DataManager {
 			Genes.elementAt(i).unselect(false);
 		}
 		
+		}
+		
+		if (AnnGenes != null) {
+			for (int i =0; i < AnnGenes.size(); i++) {
+				AnnGenes.elementAt(i).unselect(false);
+			}
 		}
 		
 		

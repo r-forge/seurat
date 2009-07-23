@@ -5,7 +5,7 @@ import java.util.Vector;
 
 import GUI.IPlot;
 
-public class Gene implements ISelectable,NodeCase{
+public class AnnGene implements ISelectable,NodeCase{
 	public String Name;
 	
 	
@@ -17,16 +17,19 @@ public class Gene implements ISelectable,NodeCase{
 	
 	public Vector<Clone> CLONES = new Vector();
 	
+	public Vector<Clone> GENES = new Vector();
+	
 	public Chromosome chromosome;
 	
 	public String chrName;
 	
 	public double nucleotidePosition;
 	
-	public AnnGene annGene;
+	public Gene gene;
 	
 	
-	public Gene(String ID,int Index,DataManager dataManager) {
+	
+	public AnnGene(String ID,int Index,DataManager dataManager) {
 		this.Name = ID;
 		this.ID = Index;
 		this.dataManager = dataManager;
@@ -43,11 +46,11 @@ public class Gene implements ISelectable,NodeCase{
 		if ( weiter) {
 		for (int i = 0; i < CLONES.size(); i++) {
 			CLONES.elementAt(i).select(false);
-			
 			//System.out.println(	CLONES.elementAt(i).getName());
 		}
 		
-		if (annGene != null) annGene.select(false);
+		
+		if (gene != null) gene.select(false);
 		
 		}
 	}
@@ -63,10 +66,11 @@ public class Gene implements ISelectable,NodeCase{
 		
 		for (int i = 0; i < CLONES.size(); i++) {
 			CLONES.elementAt(i).unselect(false);
-			
 		}
 		
-		if (annGene != null) annGene.unselect(false);
+		if (gene != null) gene.unselect(false);
+		
+		
 		}
 	}
 	
@@ -85,15 +89,6 @@ public class Gene implements ISelectable,NodeCase{
 	}
 	
 	
-	
-	
-	public double[] getRow(Vector<ISelectable> Experiments) {
-		double[] rowData = new double[Experiments.size()];
-		for (int i = 0; i < rowData.length; i++) {
-			rowData[i] = Experiments.elementAt(i).getValue(ID);
-		}
-		return rowData;
-	}
 	
 	
 	
@@ -190,6 +185,11 @@ public class Gene implements ISelectable,NodeCase{
 	}
 
 	public Vector<IPlot> getBarchartToColors() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public double[] getRow(Vector<ISelectable> rows) {
 		// TODO Auto-generated method stub
 		return null;
 	}

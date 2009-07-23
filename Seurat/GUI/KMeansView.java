@@ -37,6 +37,9 @@ class KMeansView extends JFrame implements MatrixWindow, IPlot {
 	int oldPixelCount;
 
 
+int abstandUnten = 2;
+	
+	long timeResized;
 	
 	
 	
@@ -81,8 +84,8 @@ class KMeansView extends JFrame implements MatrixWindow, IPlot {
 		  
 		 if (seurat.SYSTEM == seurat.WINDOWS) {
 		  
-		  this .setSize( shiftX + 17, shiftY + 38 );
-		   } else this .setSize(shiftX + 2,shiftY + 23 );
+		  this .setSize( shiftX + 17, shiftY + 38 +abstandUnten);
+		   } else this .setSize(shiftX + 2,shiftY + 23 + abstandUnten );
 		 
 		 updateSelection();
 		 
@@ -136,6 +139,12 @@ class KMeansView extends JFrame implements MatrixWindow, IPlot {
 			public void componentResized(ComponentEvent e) {
 				
 				
+				long newTimeResized = System.currentTimeMillis();
+				if (newTimeResized - timeResized > 200) {
+				
+				timeResized = newTimeResized;
+				
+				
 				  int Approx = 1;
 				  boolean weiter = true;
 				  
@@ -163,7 +172,7 @@ class KMeansView extends JFrame implements MatrixWindow, IPlot {
 				  
 				  plot.applyNewPixelSize(panel.pixelSize);
 				  
-
+				}
 			}
 
 		});
@@ -568,7 +577,7 @@ this.repaint();
 		
 		if (!(e.getButton() == MouseEvent.BUTTON3) && e.getClickCount() == 2) {
 		
-		GlobalViewAbstract g = new GlobalViewAbstract(seurat, "GlobalView", this.getBlockInThePoint(e.getPoint()).Experiments, this.getBlockInThePoint(e.getPoint()).Genes,false);
+		GlobalView g = new GlobalView(seurat, "GlobalView", this.getBlockInThePoint(e.getPoint()).Experiments, this.getBlockInThePoint(e.getPoint()).Genes,false);
         g.applyNewPixelSize(g.pixelSize);
 		}
 		
@@ -578,7 +587,7 @@ this.repaint();
 		if (e.getButton() == MouseEvent.BUTTON3 || e.isControlDown()) {
             Block block = this.getBlockInThePoint(e.getPoint());
 			
-			new KMeansDialog(seurat,block.Genes,block.Experiments);
+			new ClusteringDialog(seurat,block.Genes,block.Experiments);
 		}
 
 	}

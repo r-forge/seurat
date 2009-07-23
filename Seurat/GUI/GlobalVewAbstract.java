@@ -10,7 +10,7 @@ import java.awt.*;
 
 import Data.*;
 
-class GlobalViewAbstract extends JFrame implements MatrixWindow, IPlot {
+class GlobalView extends JFrame implements MatrixWindow, IPlot {
 	int pixelSize = 2;
 
 	Seurat seurat;
@@ -23,7 +23,7 @@ class GlobalViewAbstract extends JFrame implements MatrixWindow, IPlot {
 
 	JMenuItem item = new JMenuItem("Clustering");
 
-	GlobalViewAbstract globalView = this;
+	GlobalView globalView = this;
 
 	String methodColumns, methodRows;
 
@@ -37,6 +37,11 @@ class GlobalViewAbstract extends JFrame implements MatrixWindow, IPlot {
 	JLabel infoLabel;
 	
 	boolean resize = true;
+	
+	int abstandUnten = 2;
+	
+	
+	long timeResized;
 	
 	
 	JPanel infoPanel;
@@ -70,26 +75,33 @@ class GlobalViewAbstract extends JFrame implements MatrixWindow, IPlot {
 		
 		infoLabel.setText("Aggregation: 1 : " + gPanel.Width);
 	
-	
+	    
+		
+		int newWidth = 0,newHeight = 0;
+		int oldWidth = this.getWidth();
+		int oldHeight = this.getHeight();
 		
 		if (seurat.SYSTEM == seurat.WINDOWS) {
 
-			this.setSize(
-					panelW + 5+14,
-					panelH+ 26+11
-					+ infoPanel.getHeight()
-					);
+			newWidth = 		panelW + 5+14;
+			newHeight = 		panelH+ 26+11	+ infoPanel.getHeight() + abstandUnten;
 
-		} else
-			this.setSize(
-							panelW + 5,
-							panelH+ 26
-							+ infoPanel.getHeight()
-						);
+		} else {
+		   newWidth = 		panelW + 5;
+		   newHeight = 		panelH+ 26 + infoPanel.getHeight() + abstandUnten;
+		//   newHeight = 		panelH+ 16 + infoPanel.getHeight() + abstandUnten;
+		}
+		
+		
+	
+			this.setSize(newWidth,newHeight);
+		
+		
+		
 		
 
 		updateSelection();
-		
+		if (gPanel.nodeZeilen != null) gPanel.calculateTree();
 		
 	}
 	
@@ -99,7 +111,7 @@ class GlobalViewAbstract extends JFrame implements MatrixWindow, IPlot {
 	
 	
 
-	public GlobalViewAbstract(Seurat seurat, String name, Vector Experiments,
+	public GlobalView(Seurat seurat, String name, Vector Experiments,
 			Vector Genes, boolean clustering) {
 		super(name);
 
@@ -176,6 +188,8 @@ class GlobalViewAbstract extends JFrame implements MatrixWindow, IPlot {
 			panel.abstandLinks = 150;
 			panel.abstandOben = 150;
             panel.upShift = panel.abstandOben;
+            
+            panel.calculateIndexes();
 		}
 		
 		
@@ -269,8 +283,11 @@ this.getContentPane().add(p, BorderLayout.CENTER);
 			public void componentResized(ComponentEvent e) {
 
 				
-				//if (resize) {
-				
+				long newTimeResized = System.currentTimeMillis();
+				if (newTimeResized - timeResized > 200) {
+					
+					
+					timeResized = newTimeResized;
 				
 					
 				
@@ -299,8 +316,8 @@ this.getContentPane().add(p, BorderLayout.CENTER);
 				
 				
 				
-
-				gPanel.calculateMatrixValues();
+		gPanel.calculateMatrixValues();
+			
 
 				// Apply New PixelSize
 
@@ -312,12 +329,16 @@ this.getContentPane().add(p, BorderLayout.CENTER);
 				
 				
 
-				//}
-			//	else resize = true;
+				}
 				
 				
-			}
-
+			
+			
+		}
+			
+				
+				
+				
 		});
 
 		
@@ -397,7 +418,7 @@ class GlobalViewAbstractPanel extends JPanel implements MouseListener, IPlot,
 
 	double[] Min, Max;
 
-	GlobalViewAbstract globalView;
+	GlobalView globalView;
 
 	Color SelectionColor = Color.black;
 
@@ -412,9 +433,12 @@ class GlobalViewAbstractPanel extends JPanel implements MouseListener, IPlot,
 	
 
 	boolean[][] isCellSelected;
+	
+	int [] IndexCols, IndexRows;
+	
 
 
-	public GlobalViewAbstractPanel(Seurat seurat, GlobalViewAbstract globalView, int pixelSize,
+	public GlobalViewAbstractPanel(Seurat seurat, GlobalView globalView, int pixelSize,
 			Vector Experiments, Vector Genes) {
 
 		this.seurat = seurat;
@@ -439,9 +463,43 @@ class GlobalViewAbstractPanel extends JPanel implements MouseListener, IPlot,
 		this.addMouseListener(this);
 		this.addMouseMotionListener(this);
 		
+		
+		//if (globalView.clustering) calculateIndexes();
+		
 		// createRowsAndColumns();
 	}
 
+	
+	public void calculateIndexes() {
+		
+		int max = 0;
+		for (int i = 0; i < Columns.size(); i++) {
+			if (max < Columns.elementAt(i).getID()) max = Columns.elementAt(i).getID();
+		}
+		
+		IndexCols = new int [max+1];
+		for (int i = 0; i < Columns.size(); i++) {
+	       IndexCols [Columns.elementAt(i).getID()]  = i;		
+		}
+		
+		
+	    max = 0;
+		for (int i = 0; i < Rows.size(); i++) {
+			if (max < Rows.elementAt(i).getID()) max = Rows.elementAt(i).getID();
+		}
+		
+		IndexRows = new int [max+1];
+		for (int i = 0; i < Rows.size(); i++) {
+	       IndexRows [Rows.elementAt(i).getID()] = i;		
+		}
+		
+		
+		
+	}
+	
+	
+	
+	
 	
 	public void setInfo(String info) {
 		this.info = info;
@@ -652,7 +710,11 @@ class GlobalViewAbstractPanel extends JPanel implements MouseListener, IPlot,
 			}
 		}
 
-		if (clustering && nodesR != null) calculateTree(); 
+		if (clustering && nodesR != null) {
+			updateClustering(nodeZeilen); 
+			updateClustering(nodeSpalten);
+			
+		}
 		
 		
 		this.repaint();
@@ -698,7 +760,7 @@ class GlobalViewAbstractPanel extends JPanel implements MouseListener, IPlot,
 
 				if (Math.max(point1.x, point2.x) < this.abstandLinks
 						&& Math.max(point1.y, point2.y) < this.abstandOben) {
-					dataManager.clearSelection();
+					dataManager.deleteSelection();
 					seurat.repaintWindows();
 					point1 = null;
 					point2 = null;
@@ -749,19 +811,23 @@ class GlobalViewAbstractPanel extends JPanel implements MouseListener, IPlot,
 	public void selectInTree(int xx1, int yy1, int xx2, int yy2) {
 		dataManager.deleteSelection();
 
+		boolean Spalten = false;
+		
 		
 		for (int i = 0; i < this.nodesC.size(); i++) {
 			CoordinateNode nd = nodesC.elementAt(i);
 			for (int j = 0; j < nd.Lines.size(); j++) {
 				Line line = nd.Lines.elementAt(j);
-				if (containsLineInRect(line.x1,line.y1,line.x2,line.y2,xx1, yy1, xx2, yy2)) {
+				if (containsLineInRect(line.x1+abstandLinks,line.y1,line.x2+abstandLinks,line.y2,xx1, yy1, xx2, yy2)) {
 				
-					nd.node.selectNode();}
+					nd.node.selectNode();
+					Spalten = true;
+				}
 			}
 		}
 		
 		
-		
+		boolean Zeilen = false;
 		
 		for (int i = 0; i < this.nodesR.size(); i++) {
 			CoordinateNode nd = nodesR.elementAt(i);
@@ -769,11 +835,29 @@ class GlobalViewAbstractPanel extends JPanel implements MouseListener, IPlot,
 				Line line = nd.Lines.elementAt(j);
 				if (containsLineInRect(line.x1,line.y1,line.x2,line.y2,xx1, yy1, xx2, yy2)) {
 				
-					nd.node.selectNode();}
+					nd.node.selectNode();
+					
+				    Zeilen = true;
+				}
 			}
 		}
 		
 		
+		
+		
+		if (Zeilen && !Spalten) {
+			for (int i = 0; i < Columns.size(); i++) {
+				Columns.elementAt(i).select(true);
+			}
+		} 
+		
+		
+		
+		if (!Zeilen && Spalten) {
+			for (int i = 0; i < Rows.size(); i++) {
+				Rows.elementAt(i).select(true);
+			}
+		} 
 		
 		
 		
@@ -828,8 +912,12 @@ class GlobalViewAbstractPanel extends JPanel implements MouseListener, IPlot,
 	public void calculateTree() {
 		this.nodesC = new Vector();
 		this.nodesR = new Vector();
+		
+        
 
+		System.out.println(">Calculation Rows Tree starts...");
 		calculateClusteringRows(nodeZeilen);
+		System.out.println(">Calculation Columns Tree starts...");
 		calculateClusteringColumns(nodeSpalten);
 	}
 	
@@ -846,19 +934,7 @@ class GlobalViewAbstractPanel extends JPanel implements MouseListener, IPlot,
 		if (x1 == x2)
 			x2 += 1;
 		
-		
-		
-		
-		
-
-		
-		
-		
-		
-		
-		
-		
-		
+	
 		
 		
 		
@@ -890,6 +966,9 @@ class GlobalViewAbstractPanel extends JPanel implements MouseListener, IPlot,
 
 				}
 			}
+			
+			
+			
 		}
 
 		if (Math.max(xx1, xx2) < this.abstandLinks) {
@@ -902,6 +981,9 @@ class GlobalViewAbstractPanel extends JPanel implements MouseListener, IPlot,
 
 				
 			}
+				
+				
+				
 		}
 
 		this.repaint();
@@ -942,7 +1024,7 @@ class GlobalViewAbstractPanel extends JPanel implements MouseListener, IPlot,
 	public void selectBranch(Point p) {
 		CoordinateNode node = null;
 		int distance = 100000;
-		dataManager.clearSelection();
+		dataManager.deleteSelection();
 		
 /*
 		if (p.y < this.abstandOben) {
@@ -1032,7 +1114,7 @@ class GlobalViewAbstractPanel extends JPanel implements MouseListener, IPlot,
 		point1 = e.getPoint();
 		
 	    if (e.getClickCount() == 2) {
-	    	dataManager.clearSelection();
+	    	dataManager.deleteSelection();
 	        seurat.repaintWindows();
 	    }
 		
@@ -1062,7 +1144,7 @@ class GlobalViewAbstractPanel extends JPanel implements MouseListener, IPlot,
 					
 					
 					
-					GlobalViewAbstract globalView = new GlobalViewAbstract(seurat, "Global View", subExps, subGenes,  false);
+					GlobalView globalView = new GlobalView(seurat, "Global View", subExps, subGenes,  false);
                    globalView.applyNewPixelSize(globalView.pixelSize);
 				}
 			});
@@ -1174,7 +1256,7 @@ class GlobalViewAbstractPanel extends JPanel implements MouseListener, IPlot,
 					
 					
 					
-					new KMeansDialog(seurat,Rows, Columns);
+					new ClusteringDialog(seurat,Rows, Columns);
 					
 				}
 			});
@@ -1623,7 +1705,10 @@ class GlobalViewAbstractPanel extends JPanel implements MouseListener, IPlot,
 		
 			
 			if (clustering && nodesR == null) {
+				System.out.println(">Calculation Tree starts...");
 				calculateTree();
+				System.out.println("Tree calculated.");
+				
 			} 
 
 			
@@ -1941,6 +2026,7 @@ class GlobalViewAbstractPanel extends JPanel implements MouseListener, IPlot,
 		
 if (nodesC != null && paintDendrCols) {
 			
+	System.out.println("Paint Columns...");
 			
 			for (int i = 0; i < nodesC.size(); i++) {
 				CoordinateNode node = nodesC.elementAt(i);
@@ -1952,7 +2038,7 @@ if (nodesC != null && paintDendrCols) {
 				
 				for (int j = 0; j < node.Lines.size(); j++) {
 					Line line = node.Lines.elementAt(j);
-					g.drawLine(line.x1,line.y1,line.x2,line.y2);
+					g.drawLine(abstandLinks+line.x1,line.y1,abstandLinks+line.x2,line.y2);
 				}
 				
 				
@@ -1966,6 +2052,17 @@ if (nodesC != null && paintDendrCols) {
 
 
 	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 
 	
 	public void calculateClusteringRows(ClusterNode node) {
@@ -1974,14 +2071,14 @@ if (nodesC != null && paintDendrCols) {
 
 		if (node.nodeL != null && node.nodeR != null) {
 
-			int pos = getYCoordinate(node.cases);
+			int pos = getYCoordinate(node.Cases);
 			int x = (int)Math.round(this.abstandLinks - this.abstandLinks * node.currentHeight);
 
 			
 		    if (node.nodeL != null) {
 
 	
-				int posL = getYCoordinate(node.nodeL.cases);
+				int posL = getYCoordinate(node.nodeL.Cases);
 				int xL = (int)Math.round(this.abstandLinks - this.abstandLinks * node.nodeL.currentHeight);
 						
 				
@@ -1989,7 +2086,9 @@ if (nodesC != null && paintDendrCols) {
 				nodeC.Lines.add(new Line(x,pos,x,posL));
 				nodeC.Lines.add(new Line(x,posL,xL,posL));
 				
-				if (node.nodeL.isSelectedG()) nodeC.isSelected = true;
+				node.nodeL.cNode = nodeC;
+				
+				if (node.nodeL.isSelected()) nodeC.isSelected = true;
 				
 				this.nodesR.add(nodeC);
 			
@@ -2002,7 +2101,7 @@ if (nodesC != null && paintDendrCols) {
 			if (node.nodeR != null) {
 
 
-				int posR = getYCoordinate(node.nodeR.cases);
+				int posR = getYCoordinate(node.nodeR.Cases);
 				int xR = (int)Math.round(this.abstandLinks - this.abstandLinks * node.nodeR.currentHeight);
 				
 				
@@ -2011,7 +2110,9 @@ if (nodesC != null && paintDendrCols) {
 				nodeC.Lines.add(new Line(x,posR,xR,posR));
 				this.nodesR.add(nodeC);
 				
-				if (node.nodeR.isSelectedG()) nodeC.isSelected = true;
+				node.nodeR.cNode= nodeC;
+				
+				if (node.nodeR.isSelected()) nodeC.isSelected = true;
 
 				calculateClusteringRows(node.nodeR);
 			}
@@ -2021,6 +2122,58 @@ if (nodesC != null && paintDendrCols) {
 		
 
 	}
+	
+	
+	
+	
+	
+	
+	
+
+	public void updateClustering(ClusterNode node) {
+
+		
+
+        if (node.isSelected()) {
+            if (node.cNode != null) node.cNode.isSelected = true;	
+        }
+        else {
+        	 if (node.cNode != null) node.cNode.isSelected = false;	
+        }
+		
+		if (node.nodeL != null && node.nodeR != null) {
+
+			
+			
+		    if (node.nodeL != null) {
+		    	updateClustering(node.nodeL);
+
+			}
+		    
+
+		    if (node.nodeR != null) {
+		    	updateClustering(node.nodeR);
+
+			}
+		
+
+		} 
+
+		
+
+	}
+	
+	
+	
+	
+	
+
+	
+	
+	
+	
+	
+	
 	
 	
 	
@@ -2041,14 +2194,14 @@ if (nodesC != null && paintDendrCols) {
 
 		if (node.nodeL != null && node.nodeR != null) {
 
-			int pos = getXCoordinate(node.cases);
+			int pos = getXCoordinate(node.Cases)-abstandLinks;
 			int y = (int)Math.round(this.abstandOben - this.abstandOben * node.currentHeight);
 
 
 			if (node.nodeL != null) {
 				
 
-				int posL = getXCoordinate(node.nodeL.cases);
+				int posL = getXCoordinate(node.nodeL.Cases)-abstandLinks;
 				int yL = (int)Math.round(this.abstandOben - this.abstandOben * node.nodeL.currentHeight);
 				
 			
@@ -2057,7 +2210,9 @@ if (nodesC != null && paintDendrCols) {
 				nodeC.Lines.add(new Line(posL, y, posL, yL));
 				this.nodesC.add(nodeC);
 				
-				if (node.nodeL.isSelectedV()) nodeC.isSelected = true;
+				node.nodeL.cNode= nodeC;
+				
+				if (node.nodeL.isSelected()) nodeC.isSelected = true;
 				
 				calculateClusteringColumns(node.nodeL);
 			}
@@ -2065,7 +2220,7 @@ if (nodesC != null && paintDendrCols) {
 			if (node.nodeR != null) {
 
 
-				int posR = getXCoordinate(node.nodeR.cases);
+				int posR = getXCoordinate(node.nodeR.Cases)-abstandLinks;
 				int yR = (int)Math.round(this.abstandOben - this.abstandOben * node.nodeR.currentHeight);
 				
 				
@@ -2074,8 +2229,9 @@ if (nodesC != null && paintDendrCols) {
 			//	nodeC.Lines.add(new Line(pos, y, posR, yR));
 				this.nodesC.add(nodeC);
 				
+				node.nodeR.cNode = nodeC;
 				
-				if (node.nodeR.isSelectedV()) nodeC.isSelected = true;
+				if (node.nodeR.isSelected()) nodeC.isSelected = true;
 
 				calculateClusteringColumns(node.nodeR);
 			}
@@ -2213,20 +2369,26 @@ if (nodesC != null && paintDendrCols) {
 
 	}
 
-	public int getYCoordinate(Vector<Integer> Cases) {
+	public int getYCoordinate(Vector<ISelectable> Cases) {
 		int pos = 0;
 		for (int i = 0; i < Cases.size(); i++) {
-			pos += this.getIndexOfGeneInHeatMap(Cases.elementAt(i));
+		//	pos += this.getIndexOfGeneInHeatMap(Cases.elementAt(i).getID());
+			pos += this.IndexRows [Cases.elementAt(i).getID()];
 		}
 		int max = 	upShift + (Rows.size() / this.Width) * this.pixelSize - this.pixelSize/2/this.Width;
 		return Math.min((upShift + pos * this.pixelSize / (this.Width * Cases.size()) + this.pixelSize/2/this.Width),max);
 	}
 
-	public int getXCoordinate(Vector<Integer> Cases) {
+	public int getXCoordinate(Vector<ISelectable> Cases) {
 		int pos = 0;
 		for (int i = 0; i < Cases.size(); i++) {
-			pos += getIndexOfExperimentInHeatMap(Cases.elementAt(i).intValue())
-					* this.pixelSize;
+			//pos += getIndexOfExperimentInHeatMap(Cases.elementAt(i).getID())
+				//	* this.pixelSize;
+			
+			System.out.println(Cases.elementAt(i));
+			pos += IndexCols [Cases.elementAt(i).getID()]
+			* this.pixelSize;
+
 		}
 
 		return (this.abstandLinks + pos / Cases.size() + this.pixelSize/2);

@@ -91,7 +91,7 @@ public class CGHViewer extends JFrame {
 				}
 				
 				
-				GlobalViewAbstract v = new GlobalViewAbstract(seurat,"Heatmap states", vars,
+				GlobalView v = new GlobalView(seurat,"Heatmap states", vars,
 						CLONES, false);
 				v.applyNewPixelSize(seurat.settings.PixelSize);
 			
@@ -116,7 +116,7 @@ public class CGHViewer extends JFrame {
 				}
 				
 				
-				new GlobalViewAbstract(seurat,"Heatmap states", vars,
+				new GlobalView(seurat,"Heatmap states", vars,
 						CLONES, false);
 			
 			}
@@ -137,7 +137,7 @@ public class CGHViewer extends JFrame {
 				}
 				
 				
-				GlobalViewAbstract v = new GlobalViewAbstract(seurat,"Heatmap states", vars,
+				GlobalView v = new GlobalView(seurat,"Heatmap states", vars,
 						CLONES, false);
 				v.applyNewPixelSize(seurat.settings.PixelSize);
 			
@@ -397,6 +397,7 @@ public class CGHViewer extends JFrame {
 				if (cghVar.name.indexOf(var.name.replace("\"",""))!=-1) {
 					cghVar.vars.add(var);
 					var.cghVars.add(cghVar);
+			//		System.out.println("Connected:   "+cghVar.name);
 				}
 			}
 			
@@ -499,11 +500,11 @@ public class CGHViewer extends JFrame {
 		
 		
 		
-		
+		/*
 		
 		if (chromosomeVar != null && nucleoVar != null) { 
 			
-			/**Verbindung Ÿber die Expressionen**/
+			/**Verbindung Ÿber die Expressionen
 		
 		for (int i = 0; i < seurat.dataManager.Genes.size(); i++ ) {
 		
@@ -540,7 +541,7 @@ public class CGHViewer extends JFrame {
 						clone.chromosome.chrEnd = end;
 						clone.chromosome.chrCen = cen;
 						
-					//	System.out.println(start + " " + end + " " + " " + pos + " " +seurat.dataManager.Chromosomes.elementAt(j).name);
+						System.out.println(start + " " + end + " " + " " + pos + " " +seurat.dataManager.Chromosomes.elementAt(j).name);
 						
 						if (pos <=end && pos>=start) {
 							clone.Genes.add(gene);
@@ -557,17 +558,20 @@ public class CGHViewer extends JFrame {
 		}
 		}
 		else {/**Connection via Genannotations*/
+			
+	    
 			for (int i = 0; i < seurat.dataManager.Genes.size(); i++ ) {
 				
 				Gene gene = seurat.dataManager.Genes.elementAt(i);
 				double pos = gene.nucleotidePosition;
+				//System.out.println(gene.getName()+ "   " + pos);
 				
 				
-				if (gene.chromosome != null) {
+				if (gene.chrName != null) {
+					System.out.println("-->"+gene.chrName);
 					
-					
-					Chromosome chromosome = seurat.dataManager.getChromosome(gene.chromosome.name);
-					
+					Chromosome chromosome = seurat.dataManager.getChromosome(gene.chrName);
+					if (chromosome != null) {
 					
 				
 				for (int k = 0; k < chromosome.Clones.size(); k++) {
@@ -583,23 +587,25 @@ public class CGHViewer extends JFrame {
 							clone.chromosome.chrEnd = end;
 							clone.chromosome.chrCen = cen;
 							
-						//	System.out.println(start + " " + end + " " + " " + pos + " " +seurat.dataManager.Chromosomes.elementAt(j).name);
+						//	System.out.println(start + " " + end + " " + " " + pos + " " + gene.getName());
 							
 							if (pos <=end && pos>=start) {
 								clone.Genes.add(gene);
+								clone.AnnGenes.add(gene.annGene);
 								gene.CLONES.add(clone);
+								gene.annGene.CLONES.add(clone);
 							}
 						}
 						
 					}
 					
-	
+				   }
 			}		
 				
 			
 			
 			
-		}
+		
 		
 		
 		

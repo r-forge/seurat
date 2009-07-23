@@ -7,38 +7,25 @@ public class ClusterNode {
 
 	public ClusterNode nodeL;
 
-	public Vector<Integer> cases;
+	//public Vector<Integer> cases;
 
 	public int ClusterNumber = 1;
-
-	//DataManager dataManager;
-
-	public double Weight = -1;
-	
-	public boolean isCol;
 
 
 	public double currentHeight;
 	
-	Vector<ISelectable> Experiments;
+	public Vector<ISelectable> Cases;
 	
-	Vector<ISelectable> Genes;
+	public CoordinateNode cNode;
 	
-	public ClusterNode(Vector<Integer> cases, DataManager dataManager,boolean isCol, Vector Experiments, Vector Genes) {
-		this.cases = cases;
-		//this.dataManager = dataManager;
-		this.isCol = isCol;
-		this.Experiments = Experiments;
-		this.Genes = Genes;
+	
+	public ClusterNode(Vector<ISelectable> cases) {
+		this.Cases = cases;
 	}
 
-	public ClusterNode(DataManager dataManager,boolean isCol, Vector Experiments, Vector Genes) {
-		//this.dataManager = dataManager;
-		this.isCol = isCol;
-		this.Experiments = Experiments;
-		this.Genes = Genes;
-	}
 
+	
+	/*
 	public void calculateWeights() {
 
 		if (nodeR == null && nodeR == null) {
@@ -58,6 +45,8 @@ public class ClusterNode {
 
    }
 	
+	*/
+	
 	
 	
 	public void calculateHeight(double height) {
@@ -67,7 +56,7 @@ public class ClusterNode {
 		
 	}
 
-	
+	/*
 
 	public void sort() {
 		if (nodeR == null && nodeR == null) {
@@ -94,8 +83,10 @@ public class ClusterNode {
 
 		}
 
-	}
-
+	}*/
+	
+	
+/*
 	public void printWeights(String s) {
 		if (nodeR == null && nodeR == null) {
 		} else {
@@ -107,7 +98,7 @@ public class ClusterNode {
 
 		}
 
-	}
+	}*/
 
 	public Vector<ClusterNode> getLeafList() {
 
@@ -127,6 +118,8 @@ public class ClusterNode {
 		}
 
 	}
+	
+	/*
 
 	public void output(String s) {
 		System.out.println();
@@ -145,12 +138,17 @@ public class ClusterNode {
 		else
 			System.out.println(s + "null");
 	}
+	
+	
+	*/
 
-	public Vector<Integer> getOrder() {
+	public Vector<ISelectable> getOrder() {
 
 		if (nodeR == null && nodeL == null) {
-			Vector<Integer> order = new Vector();
-			order.add(cases.elementAt(0));
+			Vector<ISelectable> order = new Vector();
+			
+			
+			order.add(Cases.firstElement());
 			return order;
 		}
 
@@ -165,10 +163,10 @@ public class ClusterNode {
 	}
 
 	
-	public ClusterNode(int ClusterNumber, int i) {
+	public ClusterNode(int ClusterNumber, ISelectable item) {
 		this.ClusterNumber = ClusterNumber;
-		cases = new Vector();
-		cases.add(new Integer(i));
+		Cases = new Vector();
+		Cases.add(item);
 	}
 
 	public ClusterNode(int ClusterNumber, ClusterNode nodeR, ClusterNode nodeL) {
@@ -179,19 +177,21 @@ public class ClusterNode {
 	}
 
 	public void loadCases() {
-		cases = new Vector();
-		for (int i = 0; i < nodeR.cases.size(); i++) {
-			cases.add(nodeR.cases.elementAt(i));
+		Cases = new Vector();
+		for (int i = 0; i < nodeR.Cases.size(); i++) {
+			Cases.add(nodeR.Cases.elementAt(i));
 		}
-		for (int i = 0; i < nodeL.cases.size(); i++) {
-			cases.add(nodeL.cases.elementAt(i));
+		for (int i = 0; i < nodeL.Cases.size(); i++) {
+			Cases.add(nodeL.Cases.elementAt(i));
 		}
 	}
 
+	
+	/*
 	public ClusterNode getClusterNode(int i) {
 		if (nodeL == null) {
-			for (int j = 0; j < cases.size(); j++) {
-				if (cases.elementAt(j) == i)
+			for (int j = 0; j < Cases.size(); j++) {
+				if (Cases.elementAt(j) == i)
 					return this;
 
 			}
@@ -201,7 +201,7 @@ public class ClusterNode {
 		if (node == null)
 			return nodeR.getClusterNode(i);
 		return node;
-	}
+	}*/
 
 	public int getTiefe() {
 		if (nodeL == null)
@@ -209,6 +209,8 @@ public class ClusterNode {
 		else
 			return Math.max(nodeL.getTiefe() + 1, nodeR.getTiefe() + 1);
 	}
+	
+	/*
 
 	public boolean isSelectedV() {
 		for (int i = 0; i < cases.size(); i++) {
@@ -226,7 +228,9 @@ public class ClusterNode {
 	public boolean isSelectedG() {
 		for (int i = 0; i < cases.size(); i++) {
 			int row = cases.elementAt(i);
+			
 
+		//	System.out.println(row + "  "+Genes.elementAt(row));
 			if (Genes.elementAt(row).isSelected()) return true;
 		//	for (int k = 0; k < dataManager.getExperiments().size(); k++) {
 			//	if (dataManager.getExperiments().elementAt(k).isSelected[row])
@@ -235,47 +239,30 @@ public class ClusterNode {
 		}
 		return false;
 	}
+	*/
+	
+	
+	
+	public boolean isSelected() {
+		for (int i = 0; i < Cases.size(); i++) {
+			
+			if (Cases.elementAt(i).isSelected()) return true;
+		}
+		return false;
+	}
+	
+	
 	
 	public void selectNode() {
 		
 		
 		
-		if (this.isCol) {
 		
-		for (int i = 0; i < this.cases.size(); i++) {
-			int index = cases.elementAt(i);
-			Experiments.elementAt(index).select(true);
-			//Variable var = dataManager.getExperiments().elementAt(index);
-			//  for (int j = 0; j < var.isSelected.length; j++) {
-				//  var.isSelected [j] = true;
-			  //}
-		//	var.select(true);
-		}
-			for (int i = 0; i < Genes.size(); i++)  {
-				Genes.elementAt(i).select(true);
-			}
-			
+		for (int i = 0; i < this.Cases.size(); i++) {
+			Cases.elementAt(i).select(true);
 			
 		}
-		else {
 			
-			
-			for (int i = 0; i < this.cases.size(); i++) {
-				int index = cases.elementAt(i);
-				Genes.elementAt(index).select(true);
-				//dataManager.selectRow(index);
-				
-				
-				
-			}
-			
-			
-			for (int i = 0; i < Experiments.size(); i++)  {
-				Experiments.elementAt(i).select(true);
-			}
-			
-			
-		}
 		
 	}
 	

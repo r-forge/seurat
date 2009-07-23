@@ -446,7 +446,7 @@ class CorrelationPanel extends JPanel implements MouseListener,
 
 	public void mouseClicked(MouseEvent e) {
 		 if (e.getClickCount() == 2) {
-		    	dataManager.clearSelection();
+		    	dataManager.deleteSelection();
 		        seurat.repaintWindows();
 		    }
 			

@@ -305,7 +305,7 @@ class ComparePanel extends JPanel implements KeyListener, MouseListener,
 
 	public void addSelection(Point point1, Point point2) {
 		
-		seurat.dataManager.clearSelection();
+		seurat.dataManager.deleteSelection();
 		
 		
 		for (int i = 0; i < points.size(); i++) {
