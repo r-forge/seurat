@@ -14,6 +14,7 @@ import java.awt.*;
 import javax.swing.table.*;
 import javax.swing.border.*;
 import javax.swing.event.*;
+
 import java.awt.datatransfer.*;
 import javax.imageio.*;
 
@@ -44,6 +45,10 @@ import java.awt.image.BufferedImage;
 import java.awt.*;
 
 import javax.swing.table.*;
+import javax.swing.text.Style;
+import javax.swing.text.StyleConstants;
+import javax.swing.text.html.HTMLEditorKit;
+import javax.swing.text.html.StyleSheet;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.DefaultTreeModel;
@@ -52,6 +57,10 @@ import javax.swing.border.*;
 import javax.swing.event.*;
 import java.awt.datatransfer.*;
 import javax.imageio.*;
+
+import edu.stanford.ejalbert.BrowserLauncher;
+import edu.stanford.ejalbert.exception.BrowserLaunchingInitializingException;
+import edu.stanford.ejalbert.exception.UnsupportedOperatingSystemException;
 import Data.Gene;
 import Data.MyStringTokenizer;
 import Data.Variable;
@@ -135,7 +144,7 @@ public class Seurat extends JFrame {
 
 	public Seurat() {
 		super("Seurat");
-		this.setBounds(0, 0, 530, 500);
+		this.setBounds(0, 0, 320, 400);
 		
 		System.out.println((System.getProperties().getProperty("os.name")));
 		
@@ -225,7 +234,7 @@ public class Seurat extends JFrame {
 		JPanel west = new JPanel();
 		west.setBorder(BorderFactory.createEtchedBorder());
 		west.setBackground(Color.WHITE);
-		west.setPreferredSize(new Dimension(240,200));
+		//west.setPreferredSize(new Dimension(240,200));
 		
 		
 		//west.setLayout(new GridLayout(2,1));
@@ -244,9 +253,9 @@ public class Seurat extends JFrame {
 		west.setLayout(new BorderLayout());
 		west.add(new JScrollPane(tree),BorderLayout.CENTER);
 		
-		MainPanel.add(west,BorderLayout.WEST);
+		MainPanel.add(west,BorderLayout.CENTER);
 		//MainPanel.add(datasetsPane, BorderLayout.EAST);
-		MainPanel.add(middlePanel, BorderLayout.CENTER);
+	//	MainPanel.add(middlePanel, BorderLayout.CENTER);
 		
 		
 		
@@ -266,33 +275,34 @@ public class Seurat extends JFrame {
 			     public void mousePressed(MouseEvent e) {
 			         int selRow = tree.getRowForLocation(e.getX(), e.getY());
 			         TreePath selPath = tree.getPathForLocation(e.getX(), e.getY());
-			         if(selRow != -1) {
-			             if(e.getClickCount() == 1) {
+			         if(selRow != -1 && e.getClickCount() == 2) {
 			            	 
 			            	    Object obj = tree.getLastSelectedPathComponent();
 				                 
 				                 if (obj instanceof DataTreeNode) {
+				                	 
 				                	 ISelectable object = ((DataTreeNode)obj).object;
 				                	 
 				                	 
-			            	      if (object.isVariable()) {
+			            	         if (object.isVariable()) {
 				                	
-			            	    	 if ( ((Variable)object).isExperiment) createExperimentInfo((Variable)object);
+			            	    	     if ( ((Variable)object).isExperiment) createExperimentInfo((Variable)object);
 		                        		 return;
-		                     	 }
+		                     	     }
 		                	 
 		                	 
-		                	     if (object.isGene()) {
+		                	         if (object.isGene()) {
 		                		// System.out.println(object.getName() + "  " +object.getType());
 		                	 	
-		                		 createGeneInfo((Gene)object);
-		                		 return;
-		                	      }
+		                		      createGeneInfo((Gene)object);
+		                		      return;
+		                	          }
+		                	     
+		                	     
 				                 }
-			             }
-			             else if(e.getClickCount() == 2) {
+			            
 			                 //myDoubleClick(selRow, selPath);
-			                 Object obj = tree.getLastSelectedPathComponent();
+			                //obj = tree.getLastSelectedPathComponent();
 			                 
 			                 if (obj instanceof DataTreeNode) {
 			                	 ISelectable object = ((DataTreeNode)obj).object;
@@ -312,27 +322,24 @@ public class Seurat extends JFrame {
 			                		 
 			                	 }
 			                	 
-			     
-			                  	 
-			                	
-				                	 
-				                	 if (object instanceof Chromosome) {
+			    	 
+			                	 if (object instanceof Chromosome) {
 					                		// System.out.println(object.getName() + "  " +object.getType());
 					                	 	
-					                		  System.out.println("Chromosome");
+					                	//	  System.out.println("Chromosome");
 					                		  Vector Cases = seurat.dataManager.getStates();
 					                		  Vector<Chromosome> v = new Vector();
 					                		  v.add((Chromosome)object);
 					                		  
 					                		  new ChrView(seurat, "Cariogramm", v,Cases);
 					                		 return;
-					                	 }
+					               }
 				                	 
-				                	 
+			                     	 
 				                	 
 				                	 cleanMiddlePanel();
 				                
-			                 }	 
+			                 	 
 				                	 
 				                	 
 				                	 
@@ -351,100 +358,6 @@ public class Seurat extends JFrame {
 		   
 		   
 		   
-		
-		//***///
-		/*
-		 MouseListener ml = new MouseAdapter() {
-		     public void mousePressed(MouseEvent e) {
-		         int selRow = datasetsTree.getRowForLocation(e.getX(), e.getY());
-		         TreePath selPath = datasetsTree.getPathForLocation(e.getX(), e.getY());
-		         if(selRow != -1) {
-		             if(e.getClickCount() == 1) {
-		                
-		             }
-		             else if(e.getClickCount() == 2) {
-		                 //myDoubleClick(selRow, selPath);
-		                 Object obj =datasetsTree.getLastSelectedPathComponent();
-		                 try {
-		                	 ISelectable object = ((DataTreeNode)obj).object;
-		             
-		                	
-		                	 if (object.getType() == 1) {
-		                		 new Histogram(seurat, object);
-		                	 }
-		                	
-		                	 if (object.getType() == 2) {
-		                		new Barchart(seurat, object);
-		                	 }
-		                // Liste
-		                	 if (object.getType() == 3) {
-		                		 
-		                	 }
-		                 }
-		                 catch (Exception ee){
-		                	 
-		                 }
-		                 
-		             }
-		         }
-		     }
-		 };
-		 datasetsTree.addMouseListener(ml);
-		 
-		 
-		 
-		 
-		 
-		 
-		
-			
-		 ml = new MouseAdapter() {
-		     public void mousePressed(MouseEvent e) {
-		         int selRow = objectsTree.getRowForLocation(e.getX(), e.getY());
-		         TreePath selPath = objectsTree.getPathForLocation(e.getX(), e.getY());
-		         if(selRow != -1) {
-		             if(e.getClickCount() == 1) {
-		                
-		             }
-		             else if(e.getClickCount() == 2) {
-		                 //myDoubleClick(selRow, selPath);
-		                 Object obj =objectsTree.getLastSelectedPathComponent();
-		                 try {
-		                	 ISelectable object = ((ObjectTreeNode)obj).object;
-		                	//System.out.println("sdg");
-		          
-		                	 if (object.isVariable()) {
-		                		// System.out.println(object.getName() + "  " +object.getType());
-		                		 createExperimentInfo((Variable)object);
-		                		 return;
-		                	 }
-		                	 
-		                	 
-		                	 if (object.isGene()) {
-		                		// System.out.println(object.getName() + "  " +object.getType());
-		                		 createGeneInfo((Gene)object);
-		                		 return;
-		                	 }
-		                	 
-		                	 cleanMiddlePanel();
-		                	 
-		                	
-		                 }
-		                 catch (Exception ee){
-		                	 
-		                 }
-		                 
-		             }
-		         }
-		     }
-		 };
-		 objectsTree.addMouseListener(ml);
-		 
-		 */
-		 
-		 
-		
-		
 		
 		
 		
@@ -477,6 +390,8 @@ public class Seurat extends JFrame {
 		
 
 		JMenuItem openDescription = new JMenuItem("Open Experiment Descriptor File");
+	//	openDescription.setEnabled(false);
+		
 		openDescription.addActionListener(new ActionListener() {
 
 			public void actionPerformed(ActionEvent e) {
@@ -540,6 +455,8 @@ infoPanel.remove(progressBar);
 		
 		
 		JMenuItem geneDescription = new JMenuItem("Open Gene Descriptor File");
+		//geneDescription.setEnabled(false);
+		
 		geneDescription.addActionListener(new ActionListener() {
 
 			public void actionPerformed(ActionEvent e) {
@@ -806,7 +723,7 @@ infoPanel.remove(progressBar);
 				}
 				
 				
-				GlobalViewAbstract frame = new GlobalViewAbstract(seurat, "GlobalView",
+				GlobalView frame = new GlobalView(seurat, "GlobalView",
 						Experiments,Genes,false);
 				frame.applyNewPixelSize(frame.pixelSize);
 				//GlobalView frame = new GlobalView(seurat, "GlobalView",
@@ -845,7 +762,7 @@ infoPanel.remove(progressBar);
 		item.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				//new ClusteringDialog(seurat);
-				new KMeansDialog(seurat,seurat.dataManager.Genes, seurat.dataManager.Experiments);
+				new ClusteringDialog(seurat,seurat.dataManager.Genes, seurat.dataManager.Experiments);
 			}
 		});
 		plotsMenu.add(item);
@@ -975,7 +892,7 @@ numIcon = new PicCanvas(new ImageIcon(this.readGif("alpha.gif"))
 			if (dataManager.Genes.elementAt(i) != null) anzahlGenes++;
 		}
 		
-		s+= " Genes: " + selectedGenes+"/"+anzahlGenes + " ("+  (double)(selectedGenes*10000/anzahlGenes)/100  +"%)";
+		s+= "Genes: " + selectedGenes+"/"+anzahlGenes + " ("+  (double)(selectedGenes*10000/anzahlGenes)/100  +"%)";
 		
 		}
 		
@@ -987,12 +904,14 @@ numIcon = new PicCanvas(new ImageIcon(this.readGif("alpha.gif"))
 		
 		}
 		
-		s+= "     Samples: " + selectedExps+"/"+anzahlExps + " ("+  (double)(selectedExps*10000/anzahlExps)/100  +"%)";
+		s+= "   Samples: " + selectedExps+"/"+anzahlExps + " ("+  (double)(selectedExps*10000/anzahlExps)/100  +"%)";
 		
 		
 		}
 		
 		int selectedCGHs = 0;
+		String clones = null;
+		
 		if (dataManager.CLONES != null) { 
 		int anzahlCGHs = dataManager.CLONES.size();
 		for (int i = 0; i < dataManager.CLONES.size(); i++) {
@@ -1000,7 +919,7 @@ numIcon = new PicCanvas(new ImageIcon(this.readGif("alpha.gif"))
 			
 		}
 		
-		s+= "     Clones: " + selectedCGHs+"/"+anzahlCGHs + " ("+  (double)(selectedCGHs*10000/anzahlCGHs)/100  +"%)";
+		clones = "Clones: " + selectedCGHs+"/"+anzahlCGHs + " ("+  (double)(selectedCGHs*10000/anzahlCGHs)/100  +"%)";
 		
 
 		
@@ -1008,9 +927,36 @@ numIcon = new PicCanvas(new ImageIcon(this.readGif("alpha.gif"))
 		
 		  MainPanel.remove(infoPanel);
 		  MainPanel.add(infoPanel,BorderLayout.SOUTH);
-		infoPanel.removeAll();
-		infoPanel.add(new JLabel(s));
-		seurat.update(seurat.getGraphics());
+	      infoPanel.removeAll();
+		  JLabel infoLabel = new JLabel(s);
+		  //infoLabel.setFont(new Font("Calibri",Font.PLAIN,12));
+		
+		  if (clones != null) {
+			  
+			  infoPanel.setPreferredSize(new Dimension(this.getWidth(),50));
+			  infoPanel.setLayout(new GridLayout(2,1));
+			  JPanel p1 = new JPanel();
+			  p1.setLayout(new FlowLayout(FlowLayout.LEFT));
+			  p1.add(infoLabel);
+			  infoPanel.add(p1);
+			  
+			  
+			  infoLabel = new JLabel(clones);
+			//  infoLabel.setFont(new Font("Calibri",Font.PLAIN,12));
+			  
+			  
+			  p1 = new JPanel();
+			  p1.setLayout(new FlowLayout(FlowLayout.LEFT));
+			  p1.add(infoLabel);
+			  infoPanel.add(p1);
+			  
+			  
+		  } 
+		  
+		  else infoPanel.add(infoLabel);
+	
+		  
+		  seurat.update(seurat.getGraphics());
 		infoPanel.repaint();
 		infoPanel.paint(infoPanel.getGraphics());
 		infoPanel.updateUI();
@@ -1208,44 +1154,183 @@ numIcon = new PicCanvas(new ImageIcon(this.readGif("alpha.gif"))
 	
 	
 	public void createExperimentInfo(Variable exp) {
-		this.middlePanel.removeAll();
+	/*	JPanel middlePanel = new JPanel();
 		
 		
 		if (dataManager.descriptionVariables != null) {
 		
-		JPanel pp = new JPanel();
-	    pp.setBackground(Color.WHITE);
-	    pp.setLayout(new GridLayout(dataManager.descriptionVariables.size(),1));
-	    this.middlePanel.setLayout(new BorderLayout());
-		this.middlePanel.add(new JScrollPane(pp));	
 	
+	
+		
+		
+		String text = "";
+		
+		
+		int m = 0;
+		
+        for (int i = 0 ; i < dataManager.descriptionVariables .size(); i++) {
+			
+			DescriptionVariable var = dataManager.descriptionVariables.elementAt(i);
+		
+			
+			
+			if (m < var.getName().length()) m = var.getName().length(); 
+			
+       }
 		
 		for (int i = 0 ; i < dataManager.descriptionVariables .size(); i++) {
 			
 			DescriptionVariable var = dataManager.descriptionVariables.elementAt(i);
 			
-			JLabel label  = new JLabel(var.getName() + ": " );
-			label.setPreferredSize(new Dimension(140,20));
-			JPanel p = new JPanel();
-		    p.setBackground(Color.WHITE);
-		    p.setLayout(new FlowLayout(FlowLayout.LEFT));
 		
-			p.add(label);
-			label  = new JLabel(var.stringData [exp.getID()]);
-			p.add(label);
-			pp.add(p);
+			
+			
+			text += var.getName() + ":";
+			int k = m - var.getName().length();
+			for (int j = 0; j < k; j++) 
+				text+=" ";
+			
+			text+="\t"+var.stringData [exp.getID()]+ "\n";
+		
+			
+			
+			
+			
+		
 		}
-		}
 		
 		
-		 infoLabel.setText("");
+		
+		
+		JTextArea pp = new JTextArea(text);
+	    pp.setBackground(Color.WHITE);
+	  //  pp.setLayout(new GridLayout(dataManager.descriptionVariables.size(),1));
+	    middlePanel.setLayout(new BorderLayout());
+		middlePanel.add(new JScrollPane(pp));	
+		
+		
+		
+		 //infoLabel.setText("");
 		 
+	
 		
 		   
-		   MainPanel.remove(infoPanel);
-		   MainPanel.add(infoPanel,BorderLayout.SOUTH);
-		   seurat.setVisible(true);
-		   seurat.update(seurat.getGraphics());
+		Info info = new Info(seurat,exp.getName());   
+		info.getContentPane().add(middlePanel,BorderLayout.CENTER);
+		info.setVisible(true);
+		}*/
+		
+		
+		
+		
+		
+		
+		
+		
+
+		JEditorPane editorPane = new JEditorPane("text/html","");
+		 StyleSheet css = ((HTMLEditorKit)
+				 editorPane.getEditorKit()).getStyleSheet();
+				        Style style = css.getStyle("body");
+				        JTextField tempField = new JTextField();
+				        editorPane.setBorder(tempField.getBorder());
+				        StyleConstants.setRightIndent(style, (float) (2.0));
+				        StyleConstants.setLeftIndent(style, (float) (2.0));
+				        StyleConstants.setSpaceBelow(style, (float) (-2.0));
+				        StyleConstants.setSpaceAbove(style, (float) (-2.0));
+				        StyleConstants.setFontFamily(style,
+				 tempField.getFont().getFamily());
+				        StyleConstants.setFontSize(style,
+				 tempField.getFont().getSize());
+		
+		
+		
+		
+		
+		if (dataManager.descriptionVariables != null) {
+			
+			
+		
+
+		String text = "<html><body><font face='Arial'><font color='#20000'><table border='0' ALIGN=LEFT>";
+			
+			
+		
+		int m = 0;
+		
+        for (int i = 0 ; i < dataManager.descriptionVariables.size(); i++) {
+			
+        	DescriptionVariable var = dataManager.descriptionVariables.elementAt(i);	
+			if (m < var.getName().length()) m = var.getName().length(); 
+			
+       }
+        
+        
+		
+		for (int i = 0 ; i < dataManager.descriptionVariables.size(); i++) {
+			
+			DescriptionVariable var = dataManager.descriptionVariables.elementAt(i);
+				
+			text += "<tr ALIGN=LEFT><th ALIGN=LEFT><FONT FACE = 'Courier New'><h4>"+var.getName() + ":</th>";
+		//	int k = m - var.getName().length();
+		//	for (int j = 0; j < k; j++) 
+		//		text+=" ";
+			
+			text+="<th ALIGN=LEFT><FONT FACE = 'Courier New'><h4>"+var.stringData [exp.getID()]+ "</th></tr>";
+			
+		}	
+		
+		text+="</body></html>";
+		
+		 editorPane.setEditable(false);
+	       editorPane.addHyperlinkListener(new HyperlinkListener() {
+	           public void hyperlinkUpdate(HyperlinkEvent e) {
+	               if (e.getEventType() ==
+	HyperlinkEvent.EventType.ACTIVATED) {
+	                   System.out.println("Open browser: " + e.getURL());
+	                   try {
+						BrowserLauncher launcher = new BrowserLauncher();
+						launcher.openURLinBrowser(""+e.getURL());
+						
+					} catch (BrowserLaunchingInitializingException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					} catch (UnsupportedOperatingSystemException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+	               }
+	           }
+	       });
+	       
+	       
+	       
+	       
+		editorPane.setText(text);
+		
+		
+		
+		/*
+		JTextArea pp = new JTextArea(text);
+	    pp.setBackground(Color.WHITE);
+	  //  pp.setLayout(new GridLayout(dataManager.descriptionVariables.size(),1));
+	    middlePanel.setLayout(new BorderLayout());
+		middlePanel.add(new JScrollPane(pp));*/	
+		
+		   
+		   
+			Info info = new Info(seurat,exp.getName());   
+			info.getContentPane().add(new JScrollPane(editorPane),BorderLayout.CENTER);
+			info.setSize(new Dimension(400,600));
+			info.setVisible(true);
+			
+			
+		}
+		
+		
+		
+		
+		
 		
 		
 	}
@@ -1254,7 +1339,22 @@ numIcon = new PicCanvas(new ImageIcon(this.readGif("alpha.gif"))
 	
 	
 	public void createGeneInfo(Gene gene) {
-		this.middlePanel.removeAll();
+		//this.middlePanel.removeAll();
+		
+		JEditorPane editorPane = new JEditorPane("text/html","");
+		 StyleSheet css = ((HTMLEditorKit)
+				 editorPane.getEditorKit()).getStyleSheet();
+				        Style style = css.getStyle("body");
+				        JTextField tempField = new JTextField();
+				        editorPane.setBorder(tempField.getBorder());
+				        StyleConstants.setRightIndent(style, (float) (2.0));
+				        StyleConstants.setLeftIndent(style, (float) (2.0));
+				        StyleConstants.setSpaceBelow(style, (float) (-2.0));
+				        StyleConstants.setSpaceAbove(style, (float) (-2.0));
+				        StyleConstants.setFontFamily(style,
+				 tempField.getFont().getFamily());
+				        StyleConstants.setFontSize(style,
+				 tempField.getFont().getSize());
 		
 		
 		
@@ -1262,39 +1362,84 @@ numIcon = new PicCanvas(new ImageIcon(this.readGif("alpha.gif"))
 		
 		if (dataManager.geneVariables != null) {
 			
-			JPanel pp = new JPanel();
-		    pp.setBackground(Color.WHITE);
-		    pp.setLayout(new GridLayout(dataManager.geneVariables.size(),1));
-		    this.middlePanel.setLayout(new BorderLayout());
-			this.middlePanel.add(new JScrollPane(pp));	
 			
+		
+
+		String text = "<html><body><font face='Arial'><font color='#20000'><table border='0' ALIGN=LEFT>";
+		
+		
+		int m = 0;
+		
+        for (int i = 0 ; i < dataManager.geneVariables.size(); i++) {
 			
-		for (int i = 0 ; i < dataManager.geneVariables .size(); i++) {
+        	GeneVariable var = dataManager.geneVariables.elementAt(i);	
+			if (m < var.getName().length()) m = var.getName().length(); 
+			
+       }
+        
+        
+		
+		for (int i = 0 ; i < dataManager.geneVariables.size(); i++) {
+			
 			GeneVariable var = dataManager.geneVariables.elementAt(i);
-			JLabel label  = new JLabel(var.getName() + ": " );
-			label.setPreferredSize(new Dimension(140,20));
-			JPanel p = new JPanel();
-		    p.setBackground(Color.WHITE);
-		    p.setLayout(new FlowLayout(FlowLayout.LEFT));
-			 p.setLayout(new FlowLayout(FlowLayout.LEFT));
-			p.add(label);
-			label  = new JLabel(var.stringData [gene.getID()]);
-			p.add(label);
-			pp.add(p);
-		}
-		}
+				
+			text += "<tr ALIGN=LEFT><th ALIGN=LEFT><h4>"+var.getName() + ":</th>";
+		//	int k = m - var.getName().length();
+		//	for (int j = 0; j < k; j++) 
+		//		text+=" ";
+			
+			if (!var.isLink) text+="<th ALIGN=LEFT><h4>"+var.stringData [gene.getID()]+ "</th></tr>";
+			else {
+				text+="<th ALIGN=LEFT><h4><a href='"  +var.stringData [gene.getID()].replace("\"","")+ "'> "+var.stringData [gene.getID()].replace("\"","")+"</a></th></tr>";
+			}
+		}	
+		
+		text+="</body></html>";
+		
+		 editorPane.setEditable(false);
+	       editorPane.addHyperlinkListener(new HyperlinkListener() {
+	           public void hyperlinkUpdate(HyperlinkEvent e) {
+	               if (e.getEventType() ==
+	HyperlinkEvent.EventType.ACTIVATED) {
+	                   System.out.println("Open browser: " + e.getURL());
+	                   try {
+						BrowserLauncher launcher = new BrowserLauncher();
+						launcher.openURLinBrowser(""+e.getURL());
+						
+					} catch (BrowserLaunchingInitializingException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					} catch (UnsupportedOperatingSystemException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+	               }
+	           }
+	       });
+	       
+	       
+	       
+	       
+		editorPane.setText(text);
 		
 		
-		 infoLabel.setText("");
-		 
+		
+		/*
+		JTextArea pp = new JTextArea(text);
+	    pp.setBackground(Color.WHITE);
+	  //  pp.setLayout(new GridLayout(dataManager.descriptionVariables.size(),1));
+	    middlePanel.setLayout(new BorderLayout());
+		middlePanel.add(new JScrollPane(pp));*/	
 		
 		   
-		   MainPanel.remove(infoPanel);
-		   MainPanel.add(infoPanel,BorderLayout.SOUTH);
-		   seurat.setVisible(true);
-		   seurat.update(seurat.getGraphics());
-		
-		
+		   
+			Info info = new Info(seurat,gene.getName());   
+			info.getContentPane().add(new JScrollPane(editorPane),BorderLayout.CENTER);
+			info.setSize(new Dimension(500,700));
+			info.setVisible(true);
+			
+			
+		}
 	}
 	
 	

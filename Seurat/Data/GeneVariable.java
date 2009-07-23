@@ -28,19 +28,19 @@ public class GeneVariable implements ISelectable{
 
 	public String[] stringData;
 	
-	public Vector<Gene> Genes;
+	public Vector<AnnGene> AnnGenes;
 	
 	public int [] bufferCount; 
 	
 	public Vector<Vector<Integer>> geneMitListValue;
 	
-
+    public boolean isLink = false;
 	
 
 	public GeneVariable(String name, int type, Vector variables) {
 		this.name = name;
 		this.type = type;
-		this.Genes = variables;
+		this.AnnGenes = variables;
 	}
 
 	
@@ -256,8 +256,8 @@ public class GeneVariable implements ISelectable{
 		// TODO Auto-generated method stub
 		
 		Vector<ISelectable> v = new Vector();
-		for (int i = 0; i < Genes.size(); i++) {
-			v.add(Genes.elementAt(i));
+		for (int i = 0; i < AnnGenes.size(); i++) {
+			v.add(AnnGenes.elementAt(i));
 		}
 		return v;
 	}

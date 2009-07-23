@@ -33,6 +33,10 @@ class KMeansPlot extends JFrame implements MatrixWindow, IPlot {
 
 	Vector<Vector<ISelectable>> Experiments;
 	Vector<Vector<ISelectable>> Genes;
+	
+	int abstandUnten = 3;
+	
+	long timeResized;
 
 	int oldPixelCount;
 
@@ -76,9 +80,9 @@ class KMeansPlot extends JFrame implements MatrixWindow, IPlot {
 		  
 		 if (seurat.SYSTEM == seurat.WINDOWS) {
 		  
-		  this .setSize( shiftX + 17, shiftY + 38 );
+		  this .setSize( shiftX + 17, shiftY + 38 +abstandUnten);
 		   } 
-		 else this .setSize(shiftX + 2,shiftY + 23 );
+		 else this .setSize(shiftX + 2,shiftY + 25 +abstandUnten);
 		 
 		 updateSelection();
 		 
@@ -89,6 +93,9 @@ class KMeansPlot extends JFrame implements MatrixWindow, IPlot {
 			Vector<Vector<ISelectable>> Experiments, Vector<Vector<ISelectable>> Genes) {
 		super(name);
 
+		System.out.println("KmeansPlot " + name);
+		
+		
 		this.seurat = seurat;
 		this.dataManager = seurat.dataManager;
 		this.Experiments = Experiments;
@@ -135,6 +142,12 @@ class KMeansPlot extends JFrame implements MatrixWindow, IPlot {
 			public void componentResized(ComponentEvent e) {
 				
 				
+				long newTimeResized = System.currentTimeMillis();
+				if (newTimeResized - timeResized > 200) {
+				
+				timeResized = newTimeResized;
+				
+				
 				  int Approx = 1;
 				  boolean weiter = true;
 				  
@@ -159,7 +172,7 @@ class KMeansPlot extends JFrame implements MatrixWindow, IPlot {
 				  
 				  plot.applyNewPixelSize(panel.pixelSize);
 				  
-
+				}
 			}
 
 		});

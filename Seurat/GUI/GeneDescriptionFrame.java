@@ -6,6 +6,7 @@ import javax.swing.*;
 
 import java.awt.*;
 
+import Data.AnnGene;
 import Data.CGHVariable;
 import Data.Chromosome;
 import Data.Gene;
@@ -28,6 +29,11 @@ public class GeneDescriptionFrame extends JFrame {
 
 
 	final double NA = 6.02E23;
+	
+	
+	
+	
+	
 
 	public GeneDescriptionFrame(Seurat amlTool, FileDialog fileDialog, JProgressBar progressBar) {
 		super("Gene Descriptor");
@@ -105,8 +111,10 @@ public class GeneDescriptionFrame extends JFrame {
 			MyStringTokenizer stk = new MyStringTokenizer(line);
 			int col = 0;
 			while (stk.hasMoreTokens()) {
-				geneVariables.add(new GeneVariable(stk
-						.nextToken(), GeneVariable.Double,null));
+				GeneVariable geneVar = new GeneVariable(stk
+						.nextToken(), GeneVariable.Double,null);
+				if (geneVar.getName().contains("@")) geneVar.isLink = true;
+				geneVariables.add(geneVar);
 				col++;
 			}
 
@@ -247,14 +255,22 @@ public class GeneDescriptionFrame extends JFrame {
 		//Connect Genes to Geneexpression
 		GeneVariable indexVar = geneVariables.elementAt(0);
 		
-		Vector<Gene> Genes = new Vector();
+		Vector<AnnGene> AnnGenes = new Vector();
+		for (int i = 0; i < indexVar.stringData.length; i++) {
+			AnnGene gene = new AnnGene(indexVar.stringData [i],i,seurat.dataManager);
+			AnnGenes.add(gene);
+		}
+		
+		seurat.dataManager.AnnGenes = AnnGenes;
+		
 		
 		for (int i = 0; i < indexVar.stringData.length; i++)
 		{
 			boolean found = false;
 			for (int j = i; j < seurat.dataManager.Genes.size(); j++) {
 				if (indexVar.stringData [i].equals(seurat.dataManager.Genes.elementAt(j).getName())) {
-					Genes.add(seurat.dataManager.Genes.elementAt(j));
+					AnnGenes.elementAt(i).gene = (seurat.dataManager.Genes.elementAt(j));
+					seurat.dataManager.Genes.elementAt(j).annGene = AnnGenes.elementAt(i);
 					found = true;
 					break;
 				} 
@@ -262,14 +278,15 @@ public class GeneDescriptionFrame extends JFrame {
 			if (!found) {
 			for (int j = 0; j < Math.min(i,seurat.dataManager.Genes.size()); j++) {
 				if (indexVar.stringData [i].equals(seurat.dataManager.Genes.elementAt(j).getName())) {
-					Genes.add(seurat.dataManager.Genes.elementAt(j));
+					AnnGenes.elementAt(i).gene = (seurat.dataManager.Genes.elementAt(j));
+					seurat.dataManager.Genes.elementAt(j).annGene = AnnGenes.elementAt(i);
 					found = true;
 					break;
 				} 
 			}
 			}
 			
-			if (!found) Genes.add(null);
+			//if (!found) Genes.add(null);
 			
 			
 		}
@@ -292,20 +309,27 @@ public class GeneDescriptionFrame extends JFrame {
 		
 		
 		
-		for (int i = 0; i < Genes.size(); i++) {
-			if (Genes.elementAt(i) != null) {
-			    Gene gene = Genes.elementAt(i);
+		for (int i = 0; i < AnnGenes.size(); i++) {
+			
+			    AnnGene gene = AnnGenes.elementAt(i);
 			    gene.chrName = chromosomeVar.stringData [i];
+			    
 			    gene.nucleotidePosition = nucleoVar.doubleData [i];
 			    
+			    if (gene.gene != null) {
+			    	 gene.gene.chrName = chromosomeVar.stringData [i];
+					    
+					    gene.gene.nucleotidePosition = nucleoVar.doubleData [i];
+			    } 
+			    
 			 //   System.out.println(gene.chrName + "   " + gene.nucleotidePosition);
-			}
+		
 		}
 		
 		
 		
 		for (int i = 0; i < geneVariables.size(); i++) {
-			geneVariables.elementAt(i).Genes = Genes;
+			geneVariables.elementAt(i).AnnGenes = AnnGenes;
 		}
 		
 		

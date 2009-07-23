@@ -11,6 +11,7 @@ public class Clone implements ISelectable{
 	public String NAME;
 	
 	public Vector<Gene> Genes = new Vector();
+	public Vector<AnnGene> AnnGenes = new Vector();
 	
 	public int ID;
 	
@@ -40,7 +41,9 @@ public class Clone implements ISelectable{
 		if (weiter) 
 		for (int i = 0; i < Genes.size(); i++) {
 		
-		    Genes.elementAt(i).select(false);	
+		    Genes.elementAt(i).select(false);
+		    AnnGenes.elementAt(i).select(false);	
+		    
 		}
 	}
 	
@@ -67,7 +70,8 @@ public class Clone implements ISelectable{
 		if (weiter) 
 		{
 		for (int i = 0; i < Genes.size(); i++) {
-		    Genes.elementAt(i).unselect(false);	
+		    Genes.elementAt(i).unselect(false);
+		    AnnGenes.elementAt(i).unselect(false);	
 		}
 		}
 		

@@ -157,7 +157,7 @@ public class GeneVariableTable extends JTable implements MouseListener,
 							amlTool.geneFrame.geneVariables
 									.elementAt(row),
 									this.amlTool.geneFrame.geneVariables
-									.elementAt(row).Genes
+									.elementAt(row).AnnGenes
 									);
 					
 				}
@@ -167,7 +167,7 @@ public class GeneVariableTable extends JTable implements MouseListener,
 						.elementAt(row).isDiscrete) {
 				        	new Histogram(amlTool,
 							amlTool.geneFrame.geneVariables
-									.elementAt(row).Genes,
+									.elementAt(row).AnnGenes,
 							amlTool.geneFrame.geneVariables
 									.elementAt(row).name,
 							this.amlTool.geneFrame.geneVariables
@@ -177,7 +177,7 @@ public class GeneVariableTable extends JTable implements MouseListener,
 							this.amlTool.geneFrame.geneVariables
 									.elementAt(row).name,
 							this.amlTool.geneFrame.geneVariables
-									.elementAt(row).Genes,
+									.elementAt(row).AnnGenes,
 							this.amlTool.geneFrame.geneVariables
 									.elementAt(row).stringData);}
 		          }

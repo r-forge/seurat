@@ -637,7 +637,7 @@ public void selectPoint(int xx1, int yy1) {
 		point1 = e.getPoint();
 		
 	    if (e.getClickCount() == 2) {
-	    	dataManager.clearSelection();
+	    	dataManager.deleteSelection();
 	        seurat.repaintWindows();
 	    }else 
 	    {
@@ -647,7 +647,7 @@ public void selectPoint(int xx1, int yy1) {
 		
 		  }else {
 			  System.out.println("Select Point");
-			  dataManager.clearSelection();
+			  dataManager.deleteSelection();
 		      
 			  selectPoint(e.getX(), e.getY());
 			  seurat.repaintWindows();
