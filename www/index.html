@@ -4,12 +4,37 @@
     <title>
       Seurat: Visual analytics for the integrative analysis of microarray data
     </title>
- 
-    <!-- Evtl. weitere Kopfinformationen -->
+  <style type="text/css">
+  h1 {font-size: 30px; font-family: arial;}
+  h2 {font-size: 15px; font-family: courier;}
+  p {font-size: 8px; font-family: "times new roman";}
+  </style>
   </head>
- 
   <body>
-    Seurat: Visual analytics for the integrative analysis of microarray data
+    <div>
+		<h1> Seurat: Visual analytics for the integrative analysis of microarray data </h1>
+		<img src="images/seurat.png" alt="Seurat" width="719.5" height="424.5" /><br clear="all">		
+The Seurat software tool allows to perform interactive analysis of complex integrative datasets. At present Seurat can integrate gene expression data, gene annotations, clinical data and data arising from comparative genomic hybridization (CGH).
+To keep track of the different data sets loaded into the workspace, Seurat provides a data manager,which organizes the data in different objects, e.g. genes, samples and CGH clones.
+The manager allows to browse through data sets and objects and access the gene annotations and clinical data. The gene expression matrix is visualized by a heatmap, where the gene expression levels are represented by colors. 
+This completely interactive heatmap occupies a central position in Seurat and therefore is the starting point for exploratory analysis.
+To reorder the gene expression matrix, the user can choose from different clustering and seriation algorithms.
+Currently, Seurat provides agglomerative hierarchical clustering and kmeans partitioning but in general any clustering method available in R can be used.
+Clustering results are visualized within a new interactive heatmap display and in case of hierarchical clustering together with an interactive dendrogram. 
+Results of kmeans clusterings can be compared by a confusion matrix plot.
+This graphical tool displays objects falling into the same clusters by squares with sizes proportional to the number of objects.
+The clinical data as well as gene annotations can be selected from the data manager. 
+In this context the manager automatically distinguishes between categorical and continuous data.
+Depending on the scale of the data associated information is presented in either barcharts or histograms.
+Pre-processed array CGH data holding information about cytogenetic gains and losses can be explored with the chromosome browser.
+The chromosome browser provides a global view on all chromosomes of the human genome.
+The relative frequencies of gains and losses are visualized by histograms along the chromosomes.
+In addition each chromosome can be explored in single display.
+All of the described graphics are linked with each other, so any transient selection of objects in a graphical display will result in highlighting of the according objects in all other associated graphics. 
+In the heatmap menu the color settings of the heatmap can be changed.
+In addition it is possible to make selections persistent by assigning colors.
+	</div>
+ <a href="download/Seurat.zip">Download</a>
   </body>
 </html>
 
