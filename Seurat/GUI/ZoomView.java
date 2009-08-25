@@ -46,7 +46,7 @@ class ZoomView extends JFrame implements MatrixWindow,IPlot {
 		this.gPanel.setInfo(info);
 	}
 
-	public void applyNewPixelSize(int size) {
+	public void applyNewPixelSize(int size, int b) {
 		this.pixelSize = size;
 		this.gPanel.pixelSize = size;
 		
@@ -113,7 +113,7 @@ class ZoomView extends JFrame implements MatrixWindow,IPlot {
 
 		this.seurat = seurat;
 		this.dataManager = seurat.dataManager;
-		this.pixelSize = seurat.settings.PixelSize;
+		
 		this.getContentPane().setLayout(new BorderLayout());
 		ZoomViewPanel panel = new ZoomViewPanel(seurat, pixelSize,
 				Experiments, Genes);
@@ -170,7 +170,7 @@ class ZoomView extends JFrame implements MatrixWindow,IPlot {
 		
 		
 		
-    	this.applyNewPixelSize(this.pixelSize);
+    	this.applyNewPixelSize(this.pixelSize,1);
 		
 		
 		
@@ -209,6 +209,11 @@ class ZoomView extends JFrame implements MatrixWindow,IPlot {
 	}
 
 	public void removeColoring() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void applyNewPixelSize() {
 		// TODO Auto-generated method stub
 		
 	}

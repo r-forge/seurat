@@ -93,7 +93,7 @@ public class CGHViewer extends JFrame {
 				
 				GlobalView v = new GlobalView(seurat,"Heatmap states", vars,
 						CLONES, false);
-				v.applyNewPixelSize(seurat.settings.PixelSize);
+				v.applyNewPixelSize(seurat.settings.PixelW,seurat.settings.PixelH);
 			
 			}
 		});
@@ -139,7 +139,7 @@ public class CGHViewer extends JFrame {
 				
 				GlobalView v = new GlobalView(seurat,"Heatmap states", vars,
 						CLONES, false);
-				v.applyNewPixelSize(seurat.settings.PixelSize);
+				v.applyNewPixelSize(seurat.settings.PixelW,seurat.settings.PixelH);
 			
 			}
 		});
@@ -360,7 +360,7 @@ public class CGHViewer extends JFrame {
 			connectData();
 			
 			
-			
+			seurat.openCGHItem.setEnabled(false);
 
 		} catch (IOException e) {
 			System.out.println("Wrong file format  " + e);

@@ -1,4 +1,6 @@
 package GUI;
 public interface MatrixWindow {
-	public void applyNewPixelSize(int size);
+	public void applyNewPixelSize(int pixelW, int PixelH);
+	
+	public void applyNewPixelSize();
 }

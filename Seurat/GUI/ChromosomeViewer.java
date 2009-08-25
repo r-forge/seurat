@@ -35,7 +35,7 @@ class ChromosomeView extends JFrame implements MatrixWindow, IPlot, MouseListene
 	
 	
 	
-	public void applyNewPixelSize(int size) {
+	public void applyNewPixelSize() {
 	
 	
 
@@ -281,6 +281,17 @@ class ChromosomeView extends JFrame implements MatrixWindow, IPlot, MouseListene
 	public void updateSelection() {
 		// TODO Auto-generated method stub
 	        panel.updateSelection();	
+	}
+
+
+
+
+
+
+
+	public void applyNewPixelSize(int pixelW, int PixelH) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

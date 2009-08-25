@@ -34,7 +34,8 @@ public class ColorSettings extends JFrame{
 	JCheckBox box = new JCheckBox("  invert shading  ");
 	
 	
-	JTextField pixelSizeField = new JTextField("   ");
+	JTextField pixelWField = new JTextField("   ");
+	JTextField pixelHField = new JTextField("   ");
 	
 	FunctionPanel fPanel;
 
@@ -325,19 +326,32 @@ int dimX = 150, dimY = 20;
 		JPanel pixelSizePanel = new JPanel();
 		pixelSizePanel.setBorder(BorderFactory.createEtchedBorder());
 		
-		pixelSizeField.setText("   " + settings.PixelSize);
+		pixelWField.setText("   " + settings.PixelW);
 		JButton btn = new JButton("Change");
+		
+		pixelSizePanel.add(new JLabel("Pixel Width: "));
+		pixelSizePanel.add(pixelWField);
+		pixelSizePanel.add(btn);
+		
+		
+		
+		
+		pixelHField.setText("   " + settings.PixelH);
+		btn = new JButton("Change");
 		btn.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e) {
-				int PixelSize = Integer.parseInt(pixelSizeField.getText().replaceAll(" ", ""));
-				cSettings.seurat.applyNewPixelSize(PixelSize);
+				int PixelH = Integer.parseInt(pixelHField.getText().replaceAll(" ", ""));
+				int PixelW = Integer.parseInt(pixelWField.getText().replaceAll(" ", ""));
+				cSettings.seurat.applyNewPixelSize(PixelW,PixelH);
 				repaint();
 			}
 			
 		});
-		pixelSizePanel.add(new JLabel("Pixel Size: "));
-		pixelSizePanel.add(pixelSizeField);
+		
+		pixelSizePanel.add(new JLabel("Pixel Height: "));
+		pixelSizePanel.add(pixelHField);
 		pixelSizePanel.add(btn);
+		
 		
 		
 		invertColorPanel.add(pixelSizePanel,BorderLayout.SOUTH);

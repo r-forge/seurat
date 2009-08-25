@@ -31,14 +31,7 @@ class ChrView extends JFrame implements MatrixWindow, IPlot {
 	
 	
 	
-	public void applyNewPixelSize(int size) {
 	
-	
-
-		updateSelection();
-		
-		
-	}
 	
 	
 	
@@ -49,6 +42,10 @@ class ChrView extends JFrame implements MatrixWindow, IPlot {
 	public ChrView(Seurat seurat, String name, Vector<Chromosome> chr,
 			Vector<CGHVariable> Cases) {
 		super(name + " ");
+		
+		System.out.println("ChrView  ");
+		
+		
 
 		this.seurat = seurat;
 		this.dataManager = seurat.dataManager;
@@ -176,6 +173,16 @@ class ChrView extends JFrame implements MatrixWindow, IPlot {
 	public void removeColoring() {
 		// TODO Auto-generated method stub
 
+	}
+
+	public void applyNewPixelSize(int pixelW, int PixelH) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void applyNewPixelSize() {
+		// TODO Auto-generated method stub
+		updateSelection();
 	}
 
 }
@@ -329,7 +336,7 @@ class ChrPanel extends JPanel implements MouseListener, IPlot,
 		      posHist [i] = (int) Math.round(posDHist [i] * width / max);
 		      negHist [i] = (int) Math.round(negDHist [i] * width / max);
 		      posSelectionHist [i] = (int) Math.round(posSelectionDHist [i] * width / max);
-		      negSelectionHist [i] = (int) Math.round(negSelectionDHist [i] * width / max);
+		      negSelectionHist [i] = -(int) Math.round(negSelectionDHist [i] * width / max);
 		}
 		 
 
@@ -619,10 +626,15 @@ public void selectPoint(int xx1, int yy1) {
 	
 	
 	public void selectNegativeCGHs(Clone clone) {
+		
+		//System.out.println("Select Clone: " + clone.getName());
+		
 		for (int i = 0; i < Cases.size(); i++) {
 			CGHVariable var = Cases.elementAt(i);
 			if (var.getValue(clone.getID()) !=seurat.dataManager.NA &&  var.getValue(clone.getID())<0) {
 				var.select(true);
+				
+				
 			}
 		}
 	}
@@ -896,6 +908,8 @@ public void selectPoint(int xx1, int yy1) {
 					   1,
 			           negHist [j]
 			           );
+			
+		//	System.out.println(negSelectionHist [j]);
 			
 			g.setColor(Color.BLUE);
 			g.fillRect(abstandLinks + Position[j],

@@ -244,6 +244,9 @@ public class GeneDescriptionFrame extends JFrame {
 			connectData();
 			
 
+			seurat.openGeneAnnotationsItem.setEnabled(false);
+			
+			
 		} catch (IOException e) {
 			System.out.println("Wrong file format  " + e);
 		}

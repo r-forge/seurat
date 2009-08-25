@@ -181,9 +181,11 @@ public class ClusterNode {
 		for (int i = 0; i < nodeR.Cases.size(); i++) {
 			Cases.add(nodeR.Cases.elementAt(i));
 		}
+	
 		for (int i = 0; i < nodeL.Cases.size(); i++) {
 			Cases.add(nodeL.Cases.elementAt(i));
 		}
+		
 	}
 
 	
