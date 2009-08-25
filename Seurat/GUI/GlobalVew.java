@@ -11,7 +11,7 @@ import java.awt.*;
 import Data.*;
 
 class GlobalView extends JFrame implements MatrixWindow, IPlot {
-	int pixelSize = 2;
+	
 
 	Seurat seurat;
 
@@ -55,25 +55,27 @@ class GlobalView extends JFrame implements MatrixWindow, IPlot {
 	
 	
 	
-	public void applyNewPixelSize(int size) {
-		this.pixelSize = size;
-		this.gPanel.pixelSize = size;
+	public void applyNewPixelSize(int pixelW, int pixelH) {
+		
+		this.gPanel.pixelW = pixelW;
+		this.gPanel.pixelH = pixelH;
+		
 		int col = Experiments.size();
 
 		int row = Genes.size();
 		
 		
-		int panelW = gPanel.abstandLinks + col* pixelSize;
-		int panelH = gPanel.abstandOben+ row* pixelSize / gPanel.Width 
+		int panelW = gPanel.abstandLinks + col* pixelW;
+		int panelH = gPanel.abstandOben+ pixelH*( row/ gPanel.Aggregation )
 		+ this.dataManager.Experiments.elementAt(0).getBarchartToColors()
-		.size() * (2 * this.pixelSize + 2);
+		.size() * (2 * pixelH + 2);
 		
 
 		gPanel.setPreferredSize(new Dimension(panelW, panelH));
 		
 		
 		
-		infoLabel.setText("Aggregation: 1 : " + gPanel.Width);
+		infoLabel.setText("Aggregation: 1 : " + gPanel.Aggregation);
 	
 	    
 		
@@ -83,12 +85,15 @@ class GlobalView extends JFrame implements MatrixWindow, IPlot {
 		
 		if (seurat.SYSTEM == seurat.WINDOWS) {
 
-			newWidth = 		panelW + 5+14;
-			newHeight = 		panelH+ 26+11	+ infoPanel.getHeight() + abstandUnten;
+			newWidth = 	5+ 	panelW + 5+14;
+			newHeight = 	5+	panelH+ 26+11	+ infoPanel.getHeight() + abstandUnten;
 
 		} else {
-		   newWidth = 		panelW + 5;
-		   newHeight = 		panelH+ 26 + infoPanel.getHeight() + abstandUnten;
+		   newWidth = 	5+	panelW + 5;
+		   newHeight = 	5+	panelH+ 26 + infoPanel.getHeight() + abstandUnten;
+		   newHeight = (int)Math.min(newHeight,850);
+		   newWidth = (int)Math.min(newWidth,1600);
+		   
 		//   newHeight = 		panelH+ 16 + infoPanel.getHeight() + abstandUnten;
 		}
 		
@@ -101,7 +106,7 @@ class GlobalView extends JFrame implements MatrixWindow, IPlot {
 		
 
 		updateSelection();
-		if (gPanel.nodeZeilen != null) gPanel.calculateTree();
+	    gPanel.calculateTree();
 		
 	}
 	
@@ -119,7 +124,7 @@ class GlobalView extends JFrame implements MatrixWindow, IPlot {
 		this.dataManager = seurat.dataManager;
 		this.Experiments = Experiments;
 		this.Genes = Genes;
-		this.pixelSize = seurat.settings.PixelSize;
+		
 		this.getContentPane().setLayout(new BorderLayout());
 		JPanel p = new JPanel();
 		p.setBorder(BorderFactory.createEtchedBorder());
@@ -127,16 +132,18 @@ class GlobalView extends JFrame implements MatrixWindow, IPlot {
 			
 		
 		
-		GlobalViewAbstractPanel panel = new GlobalViewAbstractPanel(seurat, this, pixelSize,
+		GlobalViewAbstractPanel panel = new GlobalViewAbstractPanel(seurat, this,
 				Experiments, Genes);
 
+		
+		this.addKeyListener(panel);
 		
 		p.add(panel,BorderLayout.CENTER);
 		
 		
 		panel.setBorder(BorderFactory.createEtchedBorder());
 		infoPanel = new JPanel();
-		if (Experiments.size() < 116) infoPanel.setPreferredSize(new Dimension(300,45));
+	//	if (Experiments.size() < 116) infoPanel.setPreferredSize(new Dimension(300,45));
 		infoPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
 		infoPanel.setBorder(BorderFactory.createEtchedBorder());
 		this.getContentPane().add(infoPanel,BorderLayout.SOUTH);
@@ -160,14 +167,14 @@ class GlobalView extends JFrame implements MatrixWindow, IPlot {
 		 * 
 		 */
 		int Width = 1;
-		while ((count / Width) * this.pixelSize > 700) {
+		while ((count / Width) * panel.pixelH > 700) {
 			Width++;
 		}
 
 		panel.PixelCount = count / Width;
 		if (count % Width > 0)
 			panel.PixelCount++;
-		panel.Width = Width;
+		panel.Aggregation = Width;
 
 		int col = Experiments.size();
 
@@ -176,10 +183,10 @@ class GlobalView extends JFrame implements MatrixWindow, IPlot {
 		oldPixelCount = panel.PixelCount;
 
 		panel.setPreferredSize(new Dimension(panel.abstandLinks + col
-				* pixelSize, panel.abstandOben 
+				* panel.pixelW, panel.abstandOben 
 				+ row
-				* pixelSize
-				/ panel.Width
+				* panel.pixelH
+				/ panel.Aggregation
 			));
 		gPanel = panel;
 
@@ -190,16 +197,19 @@ class GlobalView extends JFrame implements MatrixWindow, IPlot {
             panel.upShift = panel.abstandOben;
             
             panel.calculateIndexes();
+            
+            
+          //  this.addKeyListener(gPanel);
 		}
 		
 		
-this.getContentPane().add(p, BorderLayout.CENTER);
+this.getContentPane().add(new JScrollPane(p), BorderLayout.CENTER);
 		
 		
 		
 		
 		
-		infoLabel = new JLabel("Aggregation: 1 : " + gPanel.Width);
+		infoLabel = new JLabel("Aggregation: 1 : " + gPanel.Aggregation);
 		Font myFont = new Font("SansSerif", 0, 10);
 
 		
@@ -282,7 +292,7 @@ this.getContentPane().add(p, BorderLayout.CENTER);
 			@Override
 			public void componentResized(ComponentEvent e) {
 
-				
+				/*
 				long newTimeResized = System.currentTimeMillis();
 				if (newTimeResized - timeResized > 200) {
 					
@@ -329,7 +339,7 @@ this.getContentPane().add(p, BorderLayout.CENTER);
 				
 				
 
-				}
+				}*/
 				
 				
 			
@@ -362,17 +372,29 @@ this.getContentPane().add(p, BorderLayout.CENTER);
 
 	}
 
+
+
+
+	public void applyNewPixelSize() {
+		// TODO Auto-generated method stub
+		this.applyNewPixelSize(gPanel.pixelW,gPanel.pixelH);
+	}
+
 }
 
 class GlobalViewAbstractPanel extends JPanel implements MouseListener, IPlot,
-		MouseMotionListener {
+		MouseMotionListener, KeyListener, ColorListener {
 	DataManager dataManager;
 
 	Seurat seurat;
 
-	int pixelSize = 1;
+	//int pixelSize = 1;
+	
+	int pixelW = 1;
+	int pixelH = 1;
+	
 
-	int abstandLinks = 1;
+	int abstandLinks = 2;
 
 	int abstandOben = 1;
 
@@ -412,11 +434,11 @@ class GlobalViewAbstractPanel extends JPanel implements MouseListener, IPlot,
 
 	int PixelCount = 10;
 
-	int Width = 1;
+	int Aggregation = 1;
 
 	double[][] data;
 
-	double[] Min, Max;
+	double [] Min, Max;
 
 	GlobalView globalView;
 
@@ -436,16 +458,26 @@ class GlobalViewAbstractPanel extends JPanel implements MouseListener, IPlot,
 	
 	int [] IndexCols, IndexRows;
 	
+	public int Model;
+	
 
 
-	public GlobalViewAbstractPanel(Seurat seurat, GlobalView globalView, int pixelSize,
-			Vector Experiments, Vector Genes) {
+	public GlobalViewAbstractPanel(Seurat seurat, GlobalView globalView, Vector Experiments, Vector Genes) {
 
+
+		
+		
 		this.seurat = seurat;
 		this.dataManager = seurat.dataManager;
 		this.globalView = globalView;
-		this.pixelSize = pixelSize;
+		//this.pixelSize = pixelSize;
 
+		//this.pixelW = pixelSize;
+		//this.pixelH = pixelSize;
+
+		Model = seurat.settings.Model;
+		
+		
 		clustering = false;
 
 		this.Columns = Experiments;
@@ -463,6 +495,8 @@ class GlobalViewAbstractPanel extends JPanel implements MouseListener, IPlot,
 		this.addMouseListener(this);
 		this.addMouseMotionListener(this);
 		
+		
+		this.addKeyListener(this);
 		
 		//if (globalView.clustering) calculateIndexes();
 		
@@ -530,7 +564,7 @@ class GlobalViewAbstractPanel extends JPanel implements MouseListener, IPlot,
 				selection = true;
 		}
 
-		if (seurat.settings.Model == 1) {
+		if (Model == 1) {
 
 			for (int i = 0; i < data.length; i++) {
 				for (int j = 0; j < PixelCount; j++) {
@@ -553,7 +587,7 @@ class GlobalViewAbstractPanel extends JPanel implements MouseListener, IPlot,
 
 						boolean selected = false;
 
-						for (int k = j * Width; k < (j + 1) * Width; k++) {
+						for (int k = j * Aggregation; k < (j + 1) * Aggregation; k++) {
 							if (k < Rows.size()) {
 								if (Columns.elementAt(i).isSelected() && Rows.elementAt(k).isSelected()) {
 									selected = true;
@@ -584,7 +618,7 @@ class GlobalViewAbstractPanel extends JPanel implements MouseListener, IPlot,
 
 						boolean selected = false;
 
-						for (int k = j * Width; k < (j + 1) * Width; k++) {
+						for (int k = j * Aggregation; k < (j + 1) * Aggregation; k++) {
 							if (k < Rows.size()) {
 								if (Columns.elementAt(i).isSelected() && Rows.elementAt(k).isSelected()) {
 									selected = true;
@@ -607,7 +641,7 @@ class GlobalViewAbstractPanel extends JPanel implements MouseListener, IPlot,
 
 		}
 
-		if (seurat.settings.Model == 2) {
+		if (Model == 2) {
 
 			for (int i = 0; i < data.length; i++) {
 				for (int j = 0; j < PixelCount; j++) {
@@ -637,7 +671,7 @@ class GlobalViewAbstractPanel extends JPanel implements MouseListener, IPlot,
 
 						boolean selected = false;
 
-						for (int k = j * Width; k < (j + 1) * Width; k++) {
+						for (int k = j * Aggregation; k < (j + 1) * Aggregation; k++) {
 							if (k < Rows.size()) {
 								if (Columns.elementAt(i).isSelected() && Rows.elementAt(k).isSelected()) {
 									selected = true;
@@ -685,7 +719,7 @@ class GlobalViewAbstractPanel extends JPanel implements MouseListener, IPlot,
 
 						boolean selected = false;
 
-						for (int k = j * Width; k < (j + 1) * Width; k++) {
+						for (int k = j * Aggregation; k < (j + 1) * Aggregation; k++) {
 							if (k < Rows.size()) {
 								if (Columns.elementAt(i).isSelected() && Rows.elementAt(k).isSelected()) {
 									selected = true;
@@ -711,8 +745,8 @@ class GlobalViewAbstractPanel extends JPanel implements MouseListener, IPlot,
 		}
 
 		if (clustering && nodesR != null) {
-			updateClustering(nodeZeilen); 
-			updateClustering(nodeSpalten);
+			if (nodeZeilen != null) updateClustering(nodeZeilen); 
+			if (nodeSpalten != null) updateClustering(nodeSpalten);
 			
 		}
 		
@@ -728,6 +762,17 @@ class GlobalViewAbstractPanel extends JPanel implements MouseListener, IPlot,
 	public void mouseReleased(MouseEvent e) {
 
 		point2 = e.getPoint();
+		
+		
+		if (point1 != null && point2 != null && (point1.getX() - point2.getX())*(point1.getY() - point2.getY())<0) {
+			Point p = point1;
+			point1 = point2;
+			point2 = p;
+			
+			
+		}
+		
+		
 		
 		
 		if (e.getButton() == MouseEvent.BUTTON3 || e.isControlDown()) {
@@ -869,10 +914,22 @@ class GlobalViewAbstractPanel extends JPanel implements MouseListener, IPlot,
 	
 	
 	public void selectRectangle(int xx1, int yy1, int xx2, int yy2) {
+		
+		/*
 		int x1 = Math.max(0, xx1 - abstandLinks) / this.pixelSize;
 		int x2 = Math.max(0, xx2 - abstandLinks) / this.pixelSize;
 		int y1 = Math.max(0, yy1 - upShift) * Width / this.pixelSize;
 		int y2 = Math.max(0, yy2 - upShift) * Width / this.pixelSize;
+		*/
+		
+		
+		int x1 = Math.max(0, xx1 - abstandLinks) / this.pixelW;
+		int x2 = Math.max(0, xx2 - abstandLinks) / this.pixelW;
+		int y1 = Math.max(0, yy1 - upShift) * Aggregation / this.pixelH;
+		int y2 = Math.max(0, yy2 - upShift) * Aggregation / this.pixelH;
+		
+		
+		
 		
 		/*
 		if (y1 == y2)
@@ -916,21 +973,31 @@ class GlobalViewAbstractPanel extends JPanel implements MouseListener, IPlot,
         
 
 		System.out.println(">Calculation Rows Tree starts...");
-		calculateClusteringRows(nodeZeilen);
+		if (nodeZeilen != null) calculateClusteringRows(nodeZeilen);
 		System.out.println(">Calculation Columns Tree starts...");
-		calculateClusteringColumns(nodeSpalten);
+		if (nodeSpalten != null) calculateClusteringColumns(nodeSpalten);
 	}
 	
 	
 	
 
 	public void selectTree(int xx1, int yy1, int xx2, int yy2) {
+		/*
 		int x1 = Math.max(0, xx1 - abstandLinks) / this.pixelSize;
 		int x2 = Math.max(0, xx2 - abstandLinks) / this.pixelSize;
 		int y1 = Math.max(0, yy1 - upShift) * Width / this.pixelSize;
 		int y2 = Math.max(0, yy2 - upShift) * Width / this.pixelSize;
+		*/
+		
+		
+		int x1 = Math.max(0, xx1 - abstandLinks) / this.pixelW;
+		int x2 = Math.max(0, xx2 - abstandLinks) / this.pixelW;
+		int y1 = Math.max(0, yy1 - upShift) * Aggregation / this.pixelH;
+		int y2 = Math.max(0, yy2 - upShift) * Aggregation / this.pixelH;
+		
+		
 		if (y1 == y2)
-			y2 += Width;
+			y2 += Aggregation;
 		if (x1 == x2)
 			x2 += 1;
 		
@@ -1080,7 +1147,7 @@ class GlobalViewAbstractPanel extends JPanel implements MouseListener, IPlot,
 		for (int i = 0; i < Columns.size(); i++) {
 			for (int j = 0; j < PixelCount; j++) {
 				int count = 0;
-				for (int k = j * Width; k < (j + 1) * Width; k++) {
+				for (int k = j * Aggregation; k < (j + 1) * Aggregation; k++) {
 					if (k < Rows.size()) {
 						data[i][j] += Columns.elementAt(i).getValue(Rows.elementAt(k).getID());
 						count++;
@@ -1145,13 +1212,13 @@ class GlobalViewAbstractPanel extends JPanel implements MouseListener, IPlot,
 					
 					
 					GlobalView globalView = new GlobalView(seurat, "Global View", subExps, subGenes,  false);
-                   globalView.applyNewPixelSize(globalView.pixelSize);
+                   globalView.applyNewPixelSize(pixelW,pixelH);
 				}
 			});
 			menu.add(item);
 			
 			
-			
+			menu.addSeparator();
 			
 			
 			
@@ -1275,14 +1342,17 @@ class GlobalViewAbstractPanel extends JPanel implements MouseListener, IPlot,
 			});
 			menu.add(item);
 			
+			
+			menu.addSeparator();
+			
 
 			item = new JMenuItem("Rows Correlation");
 			item.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
 					// createCorrelationGenes();
 
-					new CorrelationFrame(seurat, Rows, Columns, Width,
-							false, "Correlation Rows");
+					new CorrelationFrame(seurat, Rows, Columns, Aggregation,
+							false, "Correlation Rows",pixelH);
 				}
 			});
 			menu.add(item);
@@ -1295,11 +1365,50 @@ class GlobalViewAbstractPanel extends JPanel implements MouseListener, IPlot,
 					// createCorrelationExperiments();
 
 				new CorrelationFrame(seurat, Rows, Columns, 1, true,
-							"Correlation Columns");
+							"Correlation Columns",pixelW);
 
 				}
 			});
 			menu.add(item);
+			
+			menu.addSeparator();
+			
+			
+			JCheckBoxMenuItem box = new JCheckBoxMenuItem("invert color spectrum");
+			if (Model == 2) box.setSelected(true);
+			else box.setSelected(false);
+			menu.add(box);
+			
+			box.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					JCheckBoxMenuItem box = (JCheckBoxMenuItem)e.getSource();
+					if (box.isSelected()) {
+						Model = 2;
+					}
+					else Model = 1;
+						globalView.applyNewPixelSize();
+				
+				}
+				
+			});
+			
+			
+			item = new JMenuItem("set pixel dimension");
+			item.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					// createCorrelationExperiments();
+
+				    
+				    ColorDialog dialog =  new ColorDialog(seurat, (ColorListener)globalView.gPanel, Model, pixelW, pixelH);
+				    
+				    
+				    
+				}
+			});
+			menu.add(item);
+			
+			
+			
 
 			menu.show(this, e.getX(), e.getY());
 		}
@@ -1348,15 +1457,15 @@ class GlobalViewAbstractPanel extends JPanel implements MouseListener, IPlot,
 				
 				for (int j = var.getColors().size() - 1; j >= 0; j--) {
 
-					colorsHight = var.getColors().size() * (2 * this.pixelSize + 1) + 4;
+					colorsHight = var.getColors().size() * (2 * this.pixelH + 1) + 4;
 
 					//g.setColor(var.getColors().elementAt(j));
 
 					if (isPointInRect(e.getX(), e.getY(),
-							abstandLinks + i * this.pixelSize, 
-							2 + abstandOben + j * (2 * this.pixelSize + 1), 
-							abstandLinks + i * this.pixelSize+Math.max(pixelSize, 2),
-							2 + abstandOben + j * (2 * this.pixelSize + 1)+2 * pixelSize + 1)
+							abstandLinks + i * this.pixelW, 
+							2 + abstandOben + j * (2 * this.pixelH + 1), 
+							abstandLinks + i * this.pixelW+Math.max(pixelW, 2),
+							2 + abstandOben + j * (2 * this.pixelH + 1)+2 * pixelH + 1)
 					){
 						return var.getColorNames().elementAt(j);
 					}
@@ -1380,9 +1489,9 @@ class GlobalViewAbstractPanel extends JPanel implements MouseListener, IPlot,
 						+ "  </TD><TD> ";
 
 				int x = Math.max(0, e.getPoint().x - abstandLinks)
-						/ this.pixelSize;
+						/ this.pixelW;
 				int y = Math.max(0, e.getPoint().y - upShift)
-						/ (this.pixelSize);
+						/ (this.pixelH);
 
 				double valueD = 0;
 				boolean isNA = true;
@@ -1414,7 +1523,7 @@ class GlobalViewAbstractPanel extends JPanel implements MouseListener, IPlot,
 					value = valueD + "";
 				}
 
-				if (Width != 1) {
+				if (Aggregation != 1) {
 
 					value = this.data[x][y] + "";
 				}
@@ -1428,7 +1537,7 @@ class GlobalViewAbstractPanel extends JPanel implements MouseListener, IPlot,
 
 			if (e.getX() >= this.abstandLinks
 					&& e.getX() <= this.abstandLinks + this.Columns.size()
-							* this.pixelSize && e.getY() <= this.upShift
+							* this.pixelW && e.getY() <= this.upShift
 					&& e.getY() >= this.abstandOben) {
 
 				
@@ -1465,8 +1574,8 @@ class GlobalViewAbstractPanel extends JPanel implements MouseListener, IPlot,
 		if (y < upShift)
 			return null;
 
-		x = (x - abstandLinks) / this.pixelSize;
-		y = (y - upShift) / this.pixelSize;
+		x = (x - abstandLinks) / this.pixelW;
+		y = (y - upShift) / this.pixelH;
 
 
 		return Columns.elementAt(x);
@@ -1621,6 +1730,162 @@ class GlobalViewAbstractPanel extends JPanel implements MouseListener, IPlot,
 	
 	
 	
+	/**
+	 * 
+	 *  Hierarchical Clustering mit meiner Distanzfunktion
+	 * 
+	 * */
+	public void NewAlgorithm() {
+		
+		 Vector<ClusterNode> Nodes = new Vector();
+         for (int i = 0; i < Columns.size(); i++) {
+        	 Vector<ISelectable> cases = new Vector();
+        	 cases.add(Columns.elementAt(i));
+        	 ClusterNode nd = new ClusterNode(cases);
+        	 Nodes.add(nd);
+         }
+         
+         
+         
+        while (Nodes.size() != 1) {
+        	
+        	double [][] similarity = new double [Nodes.size()][Nodes.size()];
+        	
+        	for (int i = 0; i < similarity.length; i++) {
+        		for (int j = 0; j < similarity.length; j++) {
+        			if (i != j) {
+        				Vector cases = new Vector();
+        				for (int ii = 0; ii < Nodes.elementAt(i).Cases.size(); ii++) {
+        					cases.add(Nodes.elementAt(i).Cases.elementAt(ii));
+        				}
+        				
+        				for (int ii = 0; ii < Nodes.elementAt(j).Cases.size(); ii++) {
+        					cases.add(Nodes.elementAt(j).Cases.elementAt(ii));
+        				}
+        				
+        			
+            		    similarity [i][j] = similarity(cases,Columns);
+        			}
+        		}
+        	}
+        	
+        	
+        	int ii  = 0, jj = 1;
+        	double max = 0;
+        	for (int i = 0; i < similarity.length; i++) {
+        		for (int j = 0; j < similarity.length; j++) {
+        		
+        		     if (similarity [i][j] > max ) {
+        		    	 max = similarity [i][j];
+        		         ii = i;
+        		         jj = j;
+        		     }
+        		}
+        	}
+        	
+        	
+            Nodes = union(Nodes,ii,jj, Columns.size() - max);	
+     
+        }
+         
+         nodeZeilen = Nodes.firstElement();
+		
+     	nodeZeilen.calculateHeight(Columns.size());
+         
+         
+         
+         GlobalView globalView = new GlobalView(seurat,
+					"Clustering", nodeZeilen.getOrder(), Rows,true);
+
+			globalView.gPanel.nodeSpalten = nodeZeilen;
+			//globalView.gPanel.nodeZeilen = nodeZeilen;
+			
+			
+			
+			globalView.applyNewPixelSize(pixelW,pixelH);
+
+			globalView.setLocation(350, 0);
+         
+			
+			
+			
+			
+			
+		
+	}
+	
+	
+	
+	
+	
+	
+	public Vector<ClusterNode> union(Vector<ClusterNode> Nodes, int c1, int c2, double height) {
+		Vector<ClusterNode> newNodes = new Vector();
+		ClusterNode c1Node= Nodes.elementAt(c1);
+		ClusterNode c2Node = Nodes.elementAt(c2);
+		
+		for (int i = 0;i < Nodes.size(); i++) {
+			ClusterNode node = Nodes.elementAt(i);
+			if (i != c1 && i != c2) {
+				newNodes.add(node);
+			}
+		}
+		
+		
+			
+		ClusterNode newNode = new ClusterNode(-1,c1Node,c2Node);
+		newNode.currentHeight = height;
+		newNodes.add(newNode);
+	
+		
+		
+		return newNodes;
+		
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	/*
+	 *  Mein €hnlichkeitesmass
+	 * 
+	 * **/
+	
+	public double similarity(Vector<ISelectable> objects, Vector<ISelectable> vars) {
+		double e = 0.3;
+		double res = 0;
+		 for (int j = 0; j < vars.size(); j++) {
+		     boolean gleich = true;	
+		     double value = objects.elementAt(0).getRealValue(vars.elementAt(j).getID());
+		     
+		     for (int i = 0; i < objects.size(); i++) {
+	             if (Math.abs(objects.elementAt(i).getRealValue(vars.elementAt(j).getID()) - value) > e)
+	             {
+	                 gleich = false;	 
+	             }
+	        	 
+	         }
+		     
+		     if (gleich) res++;
+		     
+		 }
+	    
+		 
+		return res;
+		
+	}
+	
 	
 	
 
@@ -1633,8 +1898,8 @@ class GlobalViewAbstractPanel extends JPanel implements MouseListener, IPlot,
 		if (y < upShift)
 			return null;
 
-		x = (x - abstandLinks) / this.pixelSize;
-		y = (y - upShift) / this.pixelSize;
+		x = (x - abstandLinks) / this.pixelW;
+		y = (y - upShift) / this.pixelH;
 
 		int gene = 0;
 
@@ -1671,13 +1936,13 @@ class GlobalViewAbstractPanel extends JPanel implements MouseListener, IPlot,
 			
 			for (int j = var.getColors().size() - 1; j >= 0; j--) {
 
-				colorsHight = var.getColors().size() * (2 * this.pixelSize + 1) + 4;
+				colorsHight = var.getColors().size() * (2 * this.pixelH + 1) + 4;
 
 				g.setColor(var.getColors().elementAt(j));
 
-				g.fillRect(abstandLinks + i * this.pixelSize, 2 + abstandOben
-						+ j * (2 * this.pixelSize + 1), Math.max(pixelSize, 2),
-						2 * pixelSize + 1);
+				g.fillRect(abstandLinks + i * this.pixelW, 2 + abstandOben
+						+ j * (2 * this.pixelW + 1), Math.max(pixelW, 2),
+						2 * pixelH + 1);
 			}
 		}
 
@@ -1696,8 +1961,8 @@ class GlobalViewAbstractPanel extends JPanel implements MouseListener, IPlot,
 					g.setColor(cellColor [i][j]);
 					
 
-					g.fillRect(abstandLinks + i * this.pixelSize, upShift + j
-							* this.pixelSize, pixelSize, pixelSize);
+					g.fillRect(abstandLinks + i * this.pixelW, upShift + j
+							* this.pixelH, pixelW, pixelH);
 				
 
 			}
@@ -2375,8 +2640,8 @@ if (nodesC != null && paintDendrCols) {
 		//	pos += this.getIndexOfGeneInHeatMap(Cases.elementAt(i).getID());
 			pos += this.IndexRows [Cases.elementAt(i).getID()];
 		}
-		int max = 	upShift + (Rows.size() / this.Width) * this.pixelSize - this.pixelSize/2/this.Width;
-		return Math.min((upShift + pos * this.pixelSize / (this.Width * Cases.size()) + this.pixelSize/2/this.Width),max);
+		int max = 	upShift + (Rows.size() / this.Aggregation) * this.pixelH - this.pixelH/2/this.Aggregation;
+		return Math.min((upShift + pos * this.pixelH / (this.Aggregation * Cases.size()) + this.pixelH/2/this.Aggregation),max);
 	}
 
 	public int getXCoordinate(Vector<ISelectable> Cases) {
@@ -2387,11 +2652,11 @@ if (nodesC != null && paintDendrCols) {
 			
 			System.out.println(Cases.elementAt(i));
 			pos += IndexCols [Cases.elementAt(i).getID()]
-			* this.pixelSize;
+			* this.pixelW;
 
 		}
 
-		return (this.abstandLinks + pos / Cases.size() + this.pixelSize/2);
+		return (this.abstandLinks + pos / Cases.size() + this.pixelW/2);
 	}
 
 	public int getIndexOfExperimentInHeatMap(int ID) {
@@ -2464,10 +2729,10 @@ if (nodesC != null && paintDendrCols) {
 		for (int i = 0; i < correlations.length; i++) {
 			for (int j = 0; j < correlations.length; j++) {
 				int count = 0;
-				for (int ii = i * this.Width; ii < Math.min((i + 1)
-						* this.Width, Rows.size()); ii++) {
-					for (int jj = j * this.Width; jj < Math.min((j + 1)
-							* this.Width, Rows.size()); jj++) {
+				for (int ii = i * this.Aggregation; ii < Math.min((i + 1)
+						* this.Aggregation, Rows.size()); ii++) {
+					for (int jj = j * this.Aggregation; jj < Math.min((j + 1)
+							* this.Aggregation, Rows.size()); jj++) {
 						correlations[i][j] += corr[ii][jj];
 						count++;
 					}
@@ -2539,6 +2804,117 @@ if (nodesC != null && paintDendrCols) {
 	public void removeColoring() {
 		// TODO Auto-generated method stub
 
+	}
+
+
+	public void keyPressed(KeyEvent arg0) {
+		// TODO Auto-generated method stub
+		
+		
+		int panelH = this.dataManager.Experiments.elementAt(0).getBarchartToColors().size() * (2 * this.pixelH + 2);
+		
+		if (arg0.getKeyCode() == 38) {
+			
+			if (Aggregation < this.Rows.size()) Aggregation++;
+			
+			
+			this.PixelCount = this.Rows.size()/Aggregation;
+		//	this.setPreferredSize(new Dimension(abstandLinks + this.Columns.size()*pixelW,abstandOben + panelH+PixelCount*pixelH));
+			this.calculateMatrixValues();
+			
+			
+		    globalView.infoLabel.setText("Aggregation: 1 : " + Aggregation);
+		    globalView.applyNewPixelSize();
+			
+			
+			
+		}
+		
+		
+        if (arg0.getKeyCode() == 40) {
+        	
+        	
+        	if (Aggregation > 1) Aggregation--;
+        	
+			this.PixelCount = this.Rows.size()/Aggregation;
+	//		this.setPreferredSize(new Dimension(abstandLinks + this.Columns.size()*pixelW,abstandOben + panelH+PixelCount*pixelH));
+			
+			this.calculateMatrixValues();
+			
+			globalView.infoLabel.setText("Aggregation: 1 : " + Aggregation);
+			globalView.applyNewPixelSize();
+		}
+        
+        
+        if (arg0.getKeyCode() == 39) {
+            
+           pixelW++;
+        //   this.setPreferredSize(new Dimension(abstandLinks + this.Columns.size()*pixelW,abstandOben + panelH+PixelCount*pixelH));
+			
+     //      this.setPreferredSize(new Dimension(abstandLinks + this.Columns.size()*pixelW,abstandOben + panelH+PixelCount*pixelH));
+			
+           globalView.applyNewPixelSize();
+           
+        //   this.repaint();
+        }	
+        
+        
+        if (arg0.getKeyCode() == 37) {
+            
+           if (pixelW>1) pixelW--;
+         //  this.setPreferredSize(new Dimension(abstandLinks + this.Columns.size()*pixelW,abstandOben + panelH+PixelCount*pixelH));
+			
+           globalView.applyNewPixelSize();
+          // this.repaint();
+            }
+        	
+        	
+        
+		
+	}
+
+
+	public void keyReleased(KeyEvent arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	public void keyTyped(KeyEvent arg0) {
+		// TODO Auto-generated method stub
+		//System.out.println(arg0.getKeyCode());
+	}
+
+
+	public void applyColorValues(int pos, int pos2, int neg, int neg2) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	public void applyNewPixelSize(int pixelW, int pixelH) {
+		// TODO Auto-generated method stub
+		this.pixelW = pixelW;
+		this.pixelH = pixelH;
+	}
+
+
+	public void inverColors(boolean invert) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	public void setModel(int model) {
+		// TODO Auto-generated method stub
+		Model = model;
+		
+	}
+
+
+	public void applyNewPixelSize() {
+		// TODO Auto-generated method stub
+		globalView.applyNewPixelSize();
 	}
 
 	

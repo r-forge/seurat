@@ -11,11 +11,10 @@ import Data.*;
 import Settings.*;
 
 class KMeansView extends JFrame implements MatrixWindow, IPlot {
-	int pixelSize = 2;
-
+	
 	Seurat seurat;
 
-	TestPanel panel;
+	KmeansPanel panel;
 
 	// int[] orderZeilen;
 
@@ -43,10 +42,13 @@ int abstandUnten = 2;
 	
 	
 	
-	public void applyNewPixelSize(int size) {
+	public void applyNewPixelSize(int pixelW, int pixelH) {
 		
-		  this.pixelSize = size; 
-		  this.panel.pixelSize = size; 
+	
+		  this.panel.pixelW = pixelW; 
+		  this.panel.pixelH = pixelH; 
+		  
+		  
 		  int col = 0;
 		  
 		  int shiftX = 2;
@@ -55,7 +57,7 @@ int abstandUnten = 2;
 				Vector<ISelectable> exps = this.Experiments.elementAt(i);
 				
 				shiftX = shiftX
-				+ exps.size() * seurat.settings.PixelSize + 1;
+				+ exps.size() * seurat.settings.PixelW + 1;
 		  }
 		  
 		  
@@ -64,11 +66,11 @@ int abstandUnten = 2;
 		  for (int j = 0; j < Genes.size(); j++) {
 			  
 				shiftY = shiftY
-				+ (Genes.elementAt(j).size() * seurat.settings.PixelSize/ panel.Approx + 1);
+				+ (Genes.elementAt(j).size() * seurat.settings.PixelH/ panel.Approx + 1);
 		  
 		  }
 		  shiftY = shiftY
-			+ this.dataManager.Experiments.elementAt(0).getBarchartToColors().size() * (2 * this.pixelSize + 2);
+			+ this.dataManager.Experiments.elementAt(0).getBarchartToColors().size() * (2 * pixelH + 2);
 		  
 		  int row = Genes.size();
 		  
@@ -100,10 +102,9 @@ int abstandUnten = 2;
 		this.dataManager = seurat.dataManager;
 		this.Experiments = Experiments;
 		this.Genes = Genes;
-		this.pixelSize = seurat.settings.PixelSize;
+		
 		this.getContentPane().setLayout(new BorderLayout());
-		panel = new TestPanel(seurat, this, pixelSize,
-				Experiments, Genes);
+		panel = new KmeansPanel(seurat, this, Experiments, Genes);
 
 		this.addMouseListener(panel);
 
@@ -111,7 +112,7 @@ int abstandUnten = 2;
 
 
 		this.setBounds(200, 200, 800, 800);
-		this.applyNewPixelSize(seurat.settings.PixelSize);
+		this.applyNewPixelSize(seurat.settings.PixelW, seurat.settings.PixelH);
 
 		this.getContentPane().add(panel, BorderLayout.CENTER);
 		this.setVisible(true);
@@ -153,13 +154,13 @@ int abstandUnten = 2;
 				
 					  int shiftY = 2;
 					  shiftY = shiftY
-						+ plot.Experiments.elementAt(0).elementAt(0).getColors().size() * (2 * plot.seurat.settings.PixelSize + 2);
+						+ plot.Experiments.elementAt(0).elementAt(0).getColors().size() * (2 * panel.pixelH + 2);
 					
 					  
 					  for (int j = 0; j < plot.Genes.size(); j++) {
 						  
 							shiftY = shiftY
-							+ (plot.Genes.elementAt(j).size() * plot.seurat.settings.PixelSize / Approx + 1);
+							+ (plot.Genes.elementAt(j).size() * panel.pixelH / Approx + 1);
 					  
 					  }
                   
@@ -170,7 +171,7 @@ int abstandUnten = 2;
 				  
 				  panel.Approx = Approx;
 				  
-				  plot.applyNewPixelSize(panel.pixelSize);
+				  plot.applyNewPixelSize(panel.pixelW,panel.pixelH);
 				  
 				}
 			}
@@ -195,15 +196,21 @@ int abstandUnten = 2;
 
 	}
 
+	public void applyNewPixelSize() {
+		// TODO Auto-generated method stub
+		this.applyNewPixelSize(panel.pixelW,panel.pixelH);
+	}
+
 }
 
-class TestPanel extends JPanel implements MouseListener, IPlot,
+class KmeansPanel extends JPanel implements MouseListener, IPlot,
 		MouseMotionListener {
 	DataManager dataManager;
 
 	Seurat seurat;
 
-	int pixelSize = 1;
+	int pixelW;
+	int pixelH;
 
 	int abstandLinks = 1;
 
@@ -252,13 +259,12 @@ class TestPanel extends JPanel implements MouseListener, IPlot,
 	
 	int Approx = 1;
 
-	public TestPanel(Seurat seurat, KMeansView plot, int pixelSize,
-			Vector<Vector<ISelectable>> Experiments, Vector<Vector<ISelectable>> Genes) {
+	public KmeansPanel(Seurat seurat, KMeansView plot, Vector<Vector<ISelectable>> Experiments, Vector<Vector<ISelectable>> Genes) {
 
 		this.seurat = seurat;
 		this.dataManager = seurat.dataManager;
 		this.plot = plot;
-		this.pixelSize = pixelSize;
+		
 
 		this.Experiments = Experiments;
 		this.Genes = Genes;
@@ -321,7 +327,7 @@ class TestPanel extends JPanel implements MouseListener, IPlot,
 			int shiftY = 2;
 			
 			 shiftY = shiftY
-				+ this.dataManager.Experiments.elementAt(0).getBarchartToColors().size() * (2 * this.pixelSize + 2);
+				+ this.dataManager.Experiments.elementAt(0).getBarchartToColors().size() * (2 * this.pixelH + 2);
 			
 
 			for (int j = 0; j < Genes.size(); j++) {
@@ -401,7 +407,7 @@ class TestPanel extends JPanel implements MouseListener, IPlot,
 				
 				
 
-				shiftY = shiftY + genes.size() * seurat.settings.PixelSize/Approx
+				shiftY = shiftY + genes.size() * pixelH/Approx
 						+ 1;
 			}
 			
@@ -423,7 +429,7 @@ class TestPanel extends JPanel implements MouseListener, IPlot,
 			
 
 			shiftX = shiftX
-					+ exps.size() * seurat.settings.PixelSize + 1;
+					+ exps.size() * pixelW + 1;
 
 		}
 		
@@ -453,7 +459,7 @@ this.repaint();
 				Vector<ISelectable> exps = this.Experiments.elementAt(i);
 				
 				shiftX = shiftX
-				+ (exps.size() * seurat.settings.PixelSize + 1);
+				+ (exps.size() * pixelW + 1);
 				
 				if (shiftX>e.getX()) {
 					ii = i;
@@ -468,7 +474,7 @@ this.repaint();
 		  for (int j = 0; j < Genes.size(); j++) {
 			  
 				shiftY = shiftY
-				+ (Genes.elementAt(j).size() * seurat.settings.PixelSize/ Approx + 2);
+				+ (Genes.elementAt(j).size() * pixelH/ Approx + 2);
 				
 				if (shiftY>e.getY()) {
 					jj = j;
@@ -495,6 +501,17 @@ this.repaint();
 	public void mouseReleased(MouseEvent e) {
 
 		point2 = e.getPoint();
+		
+		if (point1 != null && point2 != null && (point1.getX() - point2.getX())*(point1.getY() - point2.getY())<0) {
+			Point p = point1;
+			point1 = point2;
+			point2 = p;
+			
+			
+		}
+		
+		
+		
 
 		if (e.getButton() == MouseEvent.BUTTON3 || e.isControlDown()) {
 			return;
@@ -526,10 +543,10 @@ this.repaint();
 	}
 
 	public void selectRectangle(int xx1, int yy1, int xx2, int yy2) {
-		int x1 = Math.max(0, xx1 - abstandLinks) / this.pixelSize;
-		int x2 = Math.max(0, xx2 - abstandLinks) / this.pixelSize;
-		int y1 = Math.max(0, yy1 - upShift) * Width / this.pixelSize;
-		int y2 = Math.max(0, yy2 - upShift) * Width / this.pixelSize;
+		int x1 = Math.max(0, xx1 - abstandLinks) / this.pixelW;
+		int x2 = Math.max(0, xx2 - abstandLinks) / this.pixelW;
+		int y1 = Math.max(0, yy1 - upShift) * Width / this.pixelH;
+		int y2 = Math.max(0, yy2 - upShift) * Width / this.pixelH;
 		if (y1 == y2)
 			y2 += Width;
 		if (x1 == x2)
@@ -578,7 +595,7 @@ this.repaint();
 		if (!(e.getButton() == MouseEvent.BUTTON3) && e.getClickCount() == 2) {
 		
 		GlobalView g = new GlobalView(seurat, "GlobalView", this.getBlockInThePoint(e.getPoint()).Experiments, this.getBlockInThePoint(e.getPoint()).Genes,false);
-        g.applyNewPixelSize(g.pixelSize);
+        g.applyNewPixelSize(pixelW,pixelH);
 		}
 		
 	
@@ -600,10 +617,10 @@ this.repaint();
 		point2 = e.getPoint();
 
 		if (e.isShiftDown()) {
-			this.SelectionColor = Color.YELLOW;
+		//	this.SelectionColor = Color.YELLOW;
 
 		} else
-			this.SelectionColor = Color.BLACK;
+			//this.SelectionColor = Color.BLACK;
 
 		this.repaint();
 
@@ -650,16 +667,16 @@ this.repaint();
 			
 			for (int j = var.getColors().size() - 1; j >= 0; j--) {
 
-				colorsHight = var.getColors().size() * (2 * this.pixelSize + 1) + 4;
+				colorsHight = var.getColors().size() * (2 * this.pixelH + 1) + 4;
 
 				g.setColor(var.getColors().elementAt(j));
 
 				g.fillRect(abstandLinks + shiftX, abstandOben
-						+ j * (2 * this.pixelSize + 1), pixelSize,
-						2 * pixelSize + 1);
+						+ j * (2 * this.pixelH + 1), pixelW,
+						2 * pixelH + 1);
 				
 			}
-			shiftX += seurat.settings.PixelSize;
+			shiftX += pixelW;
 			
 			
 			
@@ -680,7 +697,6 @@ this.repaint();
 				blocks[i][j].paint(g);
 			}
 		}
-		
 		
 		
 
@@ -807,21 +823,21 @@ this.repaint();
 			
 			for (int j = var.getColors().size() - 1; j >= 0; j--) {
 
-				colorsHight = var.getColors().size() * (2 * this.pixelSize + 1) + 4;
+				colorsHight = var.getColors().size() * (2 * this.pixelH + 1) + 4;
 
 			//	return (var.getColorNames().elementAt(j));
 
 				if (isPointInRect(e.getX(),e.getY(),
 						abstandLinks + shiftX, 
-						abstandOben+ j * (2 * this.pixelSize + 1), 
-						abstandLinks + shiftX+pixelSize,
-						abstandOben+ j * (2 * this.pixelSize + 1)+2 * pixelSize + 1))
+						abstandOben+ j * (2 * this.pixelH + 1), 
+						abstandLinks + shiftX+pixelW,
+						abstandOben+ j * (2 * this.pixelH + 1)+2 * pixelH + 1))
 				
 				return (var.getColorNames().elementAt(j));
 
 				
 			}
-			shiftX += seurat.settings.PixelSize;
+			shiftX += pixelW;
 			
 			
 			
@@ -837,8 +853,8 @@ this.repaint();
 			
             Block block = this.getBlockInThePoint(e.getPoint());
 
-            int x = (int)Math.floor((e.getPoint().getX()  - block.x)/this.pixelSize);
-            int y = (int)Math.floor((e.getPoint().getY()  - block.y)/this.pixelSize);
+            int x = (int)Math.floor((e.getPoint().getX()  - block.x)/pixelW);
+            int y = (int)Math.floor((e.getPoint().getY()  - block.y)/pixelH);
             
             ISelectable var = block.Experiments.elementAt(x);
            
@@ -924,8 +940,8 @@ this.repaint();
 		
 		public void applySelection(int xx1,int yy1, int xx2, int yy2) {
 			int x1,x2,y1,y2;
-			int width = Experiments.size() * pixelSize;
-			int height = Genes.size() * pixelSize / Approx;
+			int width = Experiments.size() * pixelW;
+			int height = Genes.size() * pixelH / Approx;
 			
 			
 			if (xx1>x+width || xx2<x || y + height < yy1 || y >yy2) return;
@@ -940,7 +956,7 @@ this.repaint();
 			for (int i = 0; i < Experiments.size(); i++) {
 				for (int j =0; j < Genes.size(); j++) {
 					
-					if (   x1<=(x+ i*pixelSize) && x2>=(x+ i*pixelSize) &&  y1<=(y+ j*pixelSize/Approx) && y2>=(y+ j*pixelSize/Approx) ) {
+					if (   x1<=(x+ i*pixelW) && x2>=(x+ i*pixelW) &&  y1<=(y+ j*pixelH/Approx) && y2>=(y+ j*pixelH/Approx) ) {
 						
 			//			Experiments.elementAt(i).isSelected [Genes.elementAt(j).ID] = true;
 				        Experiments.elementAt(i).select(true);
@@ -968,7 +984,7 @@ this.repaint();
 			if (seurat.settings.Model == 1)  g.setColor(Color.black);
 			
 			g.fillRect(x-1, y-1
-					, this.values.length*seurat.settings.PixelSize+2, this.values [0].length*seurat.settings.PixelSize+2);
+					, this.values.length*pixelW+2, this.values [0].length*pixelH+2);
 
 			for (int i = 0; i < this.values.length; i++) {
 				
@@ -1028,8 +1044,8 @@ this.repaint();
 
 					g.setColor(c);
 
-					g.fillRect(x + i * seurat.settings.PixelSize, y + j
-							* seurat.settings.PixelSize, seurat.settings.PixelSize, seurat.settings.PixelSize);
+					g.fillRect(x + i * pixelW, y + j
+							* pixelH, pixelW, pixelH);
 
 				}
 

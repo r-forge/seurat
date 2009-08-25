@@ -1,7 +1,8 @@
 package Settings;
 
 public class Settings {
-	public int PixelSize = 2;
+	public int PixelW = 4;
+	public int PixelH = 2;
 
 	public int Model = 1;
 
@@ -17,12 +18,11 @@ public class Settings {
 	
 	public boolean invertShading = false;
 
-	public int getPixelSize() {
-		return PixelSize;
-	}
+	
 
-	public void setPixelSize(int pixelSize) {
-		PixelSize = pixelSize;
+	public void setPixelSize(int pixelW, int pixelH) {
+		PixelW = pixelW;
+		PixelH = pixelH;
 	}
 
 	public int getModel() {

@@ -496,7 +496,7 @@ class BarchartPanel extends JPanel implements KeyListener, MouseListener,
 					if (colorShift > 1)
 						colorShift -= 1;
 					brush();
-					seurat.applyNewPixelSize(seurat.settings.PixelSize);
+					seurat.applyNewPixelSize();
 					seurat.repaintWindows();
 				
 				}
@@ -510,7 +510,7 @@ class BarchartPanel extends JPanel implements KeyListener, MouseListener,
 			item.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
                 removeColoring();	
-                seurat.applyNewPixelSize(seurat.settings.PixelSize);
+                seurat.applyNewPixelSize();
 				seurat.repaintWindows();
             }
 			});
@@ -561,14 +561,14 @@ class BarchartPanel extends JPanel implements KeyListener, MouseListener,
 				if (colorShift > 1)
 					colorShift -= 1;
 				brush();
-				seurat.applyNewPixelSize(this.seurat.settings.PixelSize);
+				seurat.applyNewPixelSize();
 				seurat.repaintWindows();
 			}
 
 			if (e.getKeyChar() == 'r') {
 
 				this.removeColoring();
-				seurat.applyNewPixelSize(this.seurat.settings.PixelSize);
+				seurat.applyNewPixelSize();
 				seurat.repaintWindows();
 			}
 		}

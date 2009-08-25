@@ -43,7 +43,7 @@ class CorrelationFrame extends JFrame implements MatrixWindow, IPlot {
 
 	public CorrelationFrame(Seurat seurat, Vector Genes,
 			Vector Experiments, int Width, boolean isColumns,
-			String name) {
+			String name, int size) {
 
 		super(name);
 
@@ -55,7 +55,7 @@ class CorrelationFrame extends JFrame implements MatrixWindow, IPlot {
 		this.Genes = Genes;
 		this.Experiments = Experiments;
 
-		this.pixelSize = seurat.settings.PixelSize;
+		this.pixelSize = size;
 
 		this.dataManager = seurat.dataManager;
 
@@ -67,7 +67,7 @@ class CorrelationFrame extends JFrame implements MatrixWindow, IPlot {
 
 		this.getContentPane().setLayout(new BorderLayout());
 		panel = new CorrelationPanel(seurat, Genes, Experiments, Width,
-				isColumns);
+				isColumns,size);
 
 		int length = 0;
 		if (isColumns)
@@ -157,6 +157,16 @@ class CorrelationFrame extends JFrame implements MatrixWindow, IPlot {
 		
 	}
 
+	public void applyNewPixelSize(int pixelW, int PixelH) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void applyNewPixelSize() {
+		// TODO Auto-generated method stub
+		this.applyNewPixelSize(pixelSize);
+	}
+
 }
 
 class CorrelationPanel extends JPanel implements MouseListener,
@@ -192,14 +202,14 @@ class CorrelationPanel extends JPanel implements MouseListener,
 	int pixelSize;
 
 	public CorrelationPanel(Seurat seurat, Vector Genes,
-			Vector Experiments, int Width, boolean isColumns) {
+			Vector Experiments, int Width, boolean isColumns, int size) {
 
 		this.seurat = seurat;
 		this.Width = Width;
 		this.Genes = Genes;
 		this.dataManager = seurat.dataManager;
 		this.isVariables = isColumns;
-		this.pixelSize = seurat.settings.PixelSize;
+		this.pixelSize = size;
 
 		this.Experiments = Experiments;
 		calculateCorrs();

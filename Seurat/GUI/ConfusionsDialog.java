@@ -51,7 +51,7 @@ public class ConfusionsDialog extends JFrame {
 	
 
 	public ConfusionsDialog(Seurat seurat) {
-		super("Dialog");
+		super("Confusion Matrix");
 		this.seurat = seurat;
 		this.dialog = this;
 		

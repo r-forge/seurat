@@ -99,6 +99,11 @@ class ConfusionsPanel extends JPanel implements KeyListener, MouseListener,
 
 	int abstandString = 5;
 
+	
+	double groupParam = 0.2;
+	
+	
+	
 
     JPopupMenu menu;
 	

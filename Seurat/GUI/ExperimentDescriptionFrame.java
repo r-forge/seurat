@@ -210,6 +210,11 @@ public class ExperimentDescriptionFrame extends JFrame {
 				}
 
 			}
+			
+			
+			seurat.openDescriptionItem.setEnabled(false);
+			
+			
 
 		} catch (IOException e) {
 			System.out.println("Wrong file format  " + e);
