@@ -1037,7 +1037,7 @@ public class Seurat extends JFrame implements ColorListener {
 				MainPanel.add(infoPanel, BorderLayout.SOUTH);
 				seurat.update(seurat.getGraphics());
 
-				openCGHItem.setEnabled(true);
+				
 
 				openDescriptionItem.setEnabled(true);
 				openGeneAnnotationsItem.setEnabled(true);
@@ -1415,6 +1415,11 @@ public class Seurat extends JFrame implements ColorListener {
 			}
 		}
 		this.repaintWindows();
+	}
+
+	public void setAggregation(int aggr) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

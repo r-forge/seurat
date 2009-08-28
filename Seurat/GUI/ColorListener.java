@@ -7,5 +7,8 @@ public interface ColorListener {
 
 	public void setModel(int model);
 	
+	
+	public void setAggregation(int aggr);
+	
 	public void applyNewPixelSize();
 }

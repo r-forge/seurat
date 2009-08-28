@@ -1458,6 +1458,22 @@ class GlobalViewAbstractPanel extends JPanel implements MouseListener, IPlot,
 			
 			
 			
+			item = new JMenuItem("set aggregation");
+			item.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					// createCorrelationExperiments();
+
+				    
+				    AggregationDialog dialog =  new AggregationDialog(seurat, globalView.gPanel, Aggregation);
+				    dialog.field.addKeyListener(globalView.gPanel);
+				   
+				    
+				}
+			});
+			menu.add(item);
+			
+			
+			
 
 			menu.show(this, e.getX(), e.getY());
 		}
@@ -2965,6 +2981,13 @@ if (nodesC != null && paintDendrCols) {
 	public void applyNewPixelSize() {
 		// TODO Auto-generated method stub
 		globalView.applyNewPixelSize();
+	}
+
+
+	public void setAggregation(int aggr) {
+		// TODO Auto-generated method stub
+		this.Aggregation = aggr;
+		applyNewPixelSize();
 	}
 
 	
