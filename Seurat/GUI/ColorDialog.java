@@ -16,8 +16,8 @@ public class ColorDialog extends JFrame{
 	JCheckBox box = new JCheckBox("  invert shading  ");
 	
 	
-	JTextField pixelWField = new JTextField("   ");
-	JTextField pixelHField = new JTextField("   ");
+	public JTextField pixelWField = new JTextField("   ");
+	public JTextField pixelHField = new JTextField("   ");
 	
 	
 
@@ -34,7 +34,7 @@ public class ColorDialog extends JFrame{
 	
 	
 	
-	public ColorDialog(Seurat seurat  ,ColorListener listener,int Model, int PixelW, int PixelH) {
+	public ColorDialog(Seurat seurat, ColorListener listener, int PixelW, int PixelH) {
 		super("Color Settings");
 
 		this.listener = listener;
@@ -43,7 +43,7 @@ public class ColorDialog extends JFrame{
 		this.listener = listener;
 		
 		
-		this.setBounds(100, 100, 150, 130);
+		this.setBounds(360, 0, 170, 130);
 
 		
 		
@@ -67,16 +67,16 @@ public class ColorDialog extends JFrame{
 		pixelSizePanel.setLayout(new FlowLayout(FlowLayout.LEFT
 				));
 		
-		pixelWField.setText("   " + settings.PixelW);
+		pixelWField.setText("   " + PixelW);
 		//JButton btn = new JButton("Change");
 		
-		pixelSizePanel.add(new JLabel("Pixel Width:  "));
+		pixelSizePanel.add(new JLabel("Pixel Width:   "));
 		pixelSizePanel.add(pixelWField);
 		
 		
 		
 		
-		pixelHField.setText("   " + settings.PixelH);
+		pixelHField.setText("   " + PixelH);
 		JButton btn = new JButton("Change");
 		btn.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e) {

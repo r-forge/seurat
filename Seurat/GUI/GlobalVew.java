@@ -21,7 +21,7 @@ class GlobalView extends JFrame implements MatrixWindow, IPlot {
 
 	// int[] orderSpalten;
 
-	JMenuItem item = new JMenuItem("Clustering");
+	JMenuItem item;
 
 	GlobalView globalView = this;
 
@@ -66,9 +66,35 @@ class GlobalView extends JFrame implements MatrixWindow, IPlot {
 		
 		
 		int panelW = gPanel.abstandLinks + col* pixelW;
-		int panelH = gPanel.abstandOben+ pixelH*( row/ gPanel.Aggregation )
-		+ this.dataManager.Experiments.elementAt(0).getBarchartToColors()
-		.size() * (2 * pixelH + 2);
+		
+		
+		int colorsHight = 0;
+
+		
+		for (int i = 0; i < gPanel.Columns.size(); i++) {
+			ISelectable var = gPanel.Columns.elementAt(i);
+            if (var.getColors() == null) break;
+			
+			for (int j = var.getColors().size() - 1; j >= 0; j--) {
+
+				colorsHight = var.getColors().size() * (2 * this.gPanel.pixelH + 1) + 4;
+
+				
+			}
+		}
+		
+		
+		
+
+		
+		
+		gPanel.upShift = gPanel.abstandOben + colorsHight;
+		
+		
+		
+		int panelH =  pixelH*( row/ gPanel.Aggregation )
+		+ gPanel.upShift;
+		
 		
 
 		gPanel.setPreferredSize(new Dimension(panelW, panelH));
@@ -85,13 +111,22 @@ class GlobalView extends JFrame implements MatrixWindow, IPlot {
 		
 		if (seurat.SYSTEM == seurat.WINDOWS) {
 
-			newWidth = 	5+ 	panelW + 5+14;
+			   int scrollbarSpace = 0;	
+			   if (panelH>840) scrollbarSpace = 16;
+			   
+			newWidth = 	5+ 	panelW + 5+14 + scrollbarSpace;
 			newHeight = 	5+	panelH+ 26+11	+ infoPanel.getHeight() + abstandUnten;
+			
+			  newHeight = (int)Math.min(newHeight,840);
+			   newWidth = (int)Math.min(newWidth,1600);
 
 		} else {
-		   newWidth = 	5+	panelW + 5;
+			
+		   int scrollbarSpace = 0;	
+		   if (panelH>840) scrollbarSpace = 16;	 
+		   newWidth = 	5+	panelW + 5 + scrollbarSpace;
 		   newHeight = 	5+	panelH+ 26 + infoPanel.getHeight() + abstandUnten;
-		   newHeight = (int)Math.min(newHeight,850);
+		   newHeight = (int)Math.min(newHeight,840);
 		   newWidth = (int)Math.min(newWidth,1600);
 		   
 		//   newHeight = 		panelH+ 16 + infoPanel.getHeight() + abstandUnten;
@@ -104,9 +139,9 @@ class GlobalView extends JFrame implements MatrixWindow, IPlot {
 		
 		
 		
-
-		updateSelection();
 	    gPanel.calculateTree();
+		updateSelection();
+	   
 		
 	}
 	
@@ -120,6 +155,7 @@ class GlobalView extends JFrame implements MatrixWindow, IPlot {
 			Vector Genes, boolean clustering) {
 		super(name);
 
+		item = new JMenuItem(name);
 		this.seurat = seurat;
 		this.dataManager = seurat.dataManager;
 		this.Experiments = Experiments;
@@ -137,6 +173,9 @@ class GlobalView extends JFrame implements MatrixWindow, IPlot {
 
 		
 		this.addKeyListener(panel);
+		this.setFocusTraversalKeysEnabled(false );
+		
+		
 		
 		p.add(panel,BorderLayout.CENTER);
 		
@@ -264,7 +303,7 @@ this.getContentPane().add(new JScrollPane(p), BorderLayout.CENTER);
 		*/
 		
 		
-		this.setLocation(750,0);
+		this.setLocation(550,0);
 		
 		this.setVisible(true);
 
@@ -378,6 +417,15 @@ this.getContentPane().add(new JScrollPane(p), BorderLayout.CENTER);
 	public void applyNewPixelSize() {
 		// TODO Auto-generated method stub
 		this.applyNewPixelSize(gPanel.pixelW,gPanel.pixelH);
+	}
+
+
+
+
+	public void setModel(int model) {
+		// TODO Auto-generated method stub
+		gPanel.Model = model;
+		
 	}
 
 }
@@ -497,6 +545,7 @@ class GlobalViewAbstractPanel extends JPanel implements MouseListener, IPlot,
 		
 		
 		this.addKeyListener(this);
+		this.setFocusTraversalKeysEnabled(false );
 		
 		//if (globalView.clustering) calculateIndexes();
 		
@@ -744,7 +793,7 @@ class GlobalViewAbstractPanel extends JPanel implements MouseListener, IPlot,
 			}
 		}
 
-		if (clustering && nodesR != null) {
+		if (clustering) {
 			if (nodeZeilen != null) updateClustering(nodeZeilen); 
 			if (nodeSpalten != null) updateClustering(nodeSpalten);
 			
@@ -1399,9 +1448,9 @@ class GlobalViewAbstractPanel extends JPanel implements MouseListener, IPlot,
 					// createCorrelationExperiments();
 
 				    
-				    ColorDialog dialog =  new ColorDialog(seurat, (ColorListener)globalView.gPanel, Model, pixelW, pixelH);
-				    
-				    
+				    ColorDialog dialog =  new ColorDialog(seurat, globalView.gPanel, pixelW, pixelH);
+				    dialog.pixelWField.addKeyListener(globalView.gPanel);
+				    dialog.pixelHField.addKeyListener(globalView.gPanel);
 				    
 				}
 			});
@@ -1941,9 +1990,10 @@ class GlobalViewAbstractPanel extends JPanel implements MouseListener, IPlot,
 				g.setColor(var.getColors().elementAt(j));
 
 				g.fillRect(abstandLinks + i * this.pixelW, 2 + abstandOben
-						+ j * (2 * this.pixelW + 1), Math.max(pixelW, 2),
+						+ j * (2 * this.pixelH + 1), Math.max(pixelW, 2),
 						2 * pixelH + 1);
 			}
+			
 		}
 
 		
@@ -2640,8 +2690,8 @@ if (nodesC != null && paintDendrCols) {
 		//	pos += this.getIndexOfGeneInHeatMap(Cases.elementAt(i).getID());
 			pos += this.IndexRows [Cases.elementAt(i).getID()];
 		}
-		int max = 	upShift + (Rows.size() / this.Aggregation) * this.pixelH - this.pixelH/2/this.Aggregation;
-		return Math.min((upShift + pos * this.pixelH / (this.Aggregation * Cases.size()) + this.pixelH/2/this.Aggregation),max);
+		int max = 	 upShift + (Rows.size() / this.Aggregation) * this.pixelH - this.pixelH/2;
+		return Math.min(( upShift + pos * this.pixelH / (this.Aggregation * Cases.size()) + this.pixelH/2),max);
 	}
 
 	public int getXCoordinate(Vector<ISelectable> Cases) {

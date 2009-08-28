@@ -16,7 +16,7 @@ class ChromosomeView extends JFrame implements MatrixWindow, IPlot, MouseListene
 
 	ChromosomePanel panel;
 
-	JMenuItem item = new JMenuItem("Chromosome Viewer");
+	JMenuItem item;
 
 	ChromosomeView globalView = this;
 
@@ -53,6 +53,7 @@ class ChromosomeView extends JFrame implements MatrixWindow, IPlot, MouseListene
 	public ChromosomeView(Seurat seurat, String name, Vector<Chromosome> chr,
 			Vector<CGHVariable> Cases) {
 		super(name + " ");
+		item = new JMenuItem(name);
 
 		this.seurat = seurat;
 		this.dataManager = seurat.dataManager;
@@ -145,7 +146,7 @@ class ChromosomeView extends JFrame implements MatrixWindow, IPlot, MouseListene
         
        
 		
-			this.setBounds(500,0,1000,95+30*Chromosomes.size());
+			this.setBounds(360,0,1000,95+30*Chromosomes.size());
 
 		// this.getContentPane().setLayout(new BorderLayout());
 		
@@ -290,6 +291,17 @@ class ChromosomeView extends JFrame implements MatrixWindow, IPlot, MouseListene
 
 
 	public void applyNewPixelSize(int pixelW, int PixelH) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+
+
+
+
+
+	public void setModel(int model) {
 		// TODO Auto-generated method stub
 		
 	}
@@ -670,7 +682,7 @@ class ChromosomePanel extends JPanel implements MouseListener, IPlot,
 	    	
 	    	Vector v = new Vector();
 	    	v.add(chrs.elementAt(x));
-	    	new ChrView(seurat, "Karyogram: Chromosome " + chrs.elementAt(x).name, v,
+	    	new ChrView(seurat, "Chromosome " + chrs.elementAt(x).name, v,
 	    			Cases);
 	    	//dataManager.clearSelection();
 	        //seurat.repaintWindows();

@@ -218,6 +218,11 @@ class ZoomView extends JFrame implements MatrixWindow,IPlot {
 		
 	}
 
+	public void setModel(int model) {
+		// TODO Auto-generated method stub
+		
+	}
+
 }
 
 class ZoomViewPanel extends JPanel implements MouseListener, IPlot,

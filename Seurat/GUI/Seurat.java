@@ -68,7 +68,7 @@ import java.util.jar.*;
 import RConnection.RConnectionManager;
 import Settings.*;
 
-public class Seurat extends JFrame {
+public class Seurat extends JFrame implements ColorListener {
 
 	JPanel MainPanel = new JPanel();
 
@@ -310,7 +310,10 @@ public class Seurat extends JFrame {
 							Vector<Chromosome> v = new Vector();
 							v.add((Chromosome) object);
 
-							new ChrView(seurat, "Cariogramm", v, Cases);
+							//new ChrView(seurat, "Cariogramm", v, Cases);
+							
+							new ChrView(seurat, "Chromosome " + v.elementAt(0).name, v,
+					    			Cases);
 							return;
 						}
 
@@ -365,7 +368,7 @@ public class Seurat extends JFrame {
 		});
 		fileMenu.add(openGeneExpressionItem);
 
-		openDescriptionItem = new JMenuItem("Open Experiment Descriptor File");
+		openDescriptionItem = new JMenuItem("Open Clinical Data");
 		openDescriptionItem.setEnabled(false);
 
 		// openDescription.setEnabled(false);
@@ -373,7 +376,7 @@ public class Seurat extends JFrame {
 		openDescriptionItem.addActionListener(new ActionListener() {
 
 			public void actionPerformed(ActionEvent e) {
-				fileDialog = new FileDialog(seurat, "Open data", 0);
+				fileDialog = new FileDialog(seurat, "Open Clinical Data", 0);
 				fileDialog.setVisible(true);
 
 				infoLabel.setText("Loading Clinical Data...");
@@ -421,7 +424,7 @@ public class Seurat extends JFrame {
 		});
 		fileMenu.add(openDescriptionItem);
 
-		openGeneAnnotationsItem = new JMenuItem("Open Gene Descriptor File");
+		openGeneAnnotationsItem = new JMenuItem("Open Gene Annotations");
 
 		openGeneAnnotationsItem.setEnabled(false);
 
@@ -430,7 +433,7 @@ public class Seurat extends JFrame {
 		openGeneAnnotationsItem.addActionListener(new ActionListener() {
 
 			public void actionPerformed(ActionEvent e) {
-				fileDialog = new FileDialog(seurat, "Open data", 0);
+				fileDialog = new FileDialog(seurat, "Open Gene Annotations", 0);
 				fileDialog.setVisible(true);
 
 				if (fileDialog.getFile() != null) {
@@ -497,7 +500,7 @@ public class Seurat extends JFrame {
 		openCGHItem.addActionListener(new ActionListener() {
 
 			public void actionPerformed(ActionEvent e) {
-				fileDialog = new FileDialog(seurat, "Open data", 0);
+				fileDialog = new FileDialog(seurat, "Open CGH File", 0);
 				fileDialog.setVisible(true);
 
 				if (fileDialog.getFile() != null) {
@@ -608,10 +611,25 @@ public class Seurat extends JFrame {
 		JMenuItem item = new JMenuItem("Pixel Settings");
 		item.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				new ColorDialog(seurat,seurat,settings.PixelW,settings.PixelH);
+			}
+		});
+		optionsMenu.add(item);
+		
+		
+		
+		
+		item = new JMenuItem("Color Settings");
+		item.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
 				new ColorSettings(seurat);
 			}
 		});
 		optionsMenu.add(item);
+		
+		
+		optionsMenu.addSeparator();
+		
 
 		item = new JMenuItem("Clear all Colors");
 		item.addActionListener(new ActionListener() {
@@ -629,7 +647,7 @@ public class Seurat extends JFrame {
 		plotsMenu = new JMenu("Plots");
 		menuBar.add(plotsMenu);
 
-		item = new JMenuItem("GlobalView");
+		item = new JMenuItem("Heatmap Genexpressions");
 		item.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				// {"ARSA","BBURCG","BBWRCG","TSP","Chen","MDS","HC","GW","OLO"};
@@ -742,6 +760,27 @@ public class Seurat extends JFrame {
 		menuBar.add(windowMenu);
 
 		menuBar.add(helpMenu);
+		
+		item = new JMenuItem("Online Help");
+		item.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				try {
+					BrowserLauncher launcher = new BrowserLauncher();
+					launcher.openURLinBrowser("http://seurat.r-forge.r-project.org/index.html");
+
+				} catch (BrowserLaunchingInitializingException ee) {
+					// TODO Auto-generated catch block
+					ee.printStackTrace();
+				} catch (UnsupportedOperatingSystemException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+
+			}
+		});
+		helpMenu.add(item);
+		
+		
 
 		this.setVisible(true);
 
@@ -923,7 +962,7 @@ public class Seurat extends JFrame {
 
 	public void openFile(String fileName) {
 		if (fileName == null) {
-			fileDialog = new FileDialog(this, "Open data", 0);
+			fileDialog = new FileDialog(this, "Open Gene Expression File", 0);
 			fileDialog.setVisible(true);
 		}
 
@@ -1364,6 +1403,18 @@ public class Seurat extends JFrame {
 		seurat.setVisible(true);
 		seurat.update(seurat.getGraphics());
 
+	}
+
+	public void setModel(int model) {
+		// TODO Auto-generated method stub
+		settings.setModel(model);
+		for (int i = 0; i < this.windows.size(); i++) {
+			try {
+				((MatrixWindow) windows.elementAt(i)).setModel(model);
+			} catch (Exception e) {
+			}
+		}
+		this.repaintWindows();
 	}
 
 }

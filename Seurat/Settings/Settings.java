@@ -2,7 +2,7 @@ package Settings;
 
 public class Settings {
 	public int PixelW = 4;
-	public int PixelH = 2;
+	public int PixelH = 1;
 
 	public int Model = 1;
 

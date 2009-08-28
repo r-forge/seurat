@@ -44,6 +44,7 @@ public class CGHViewer extends JFrame {
 
 	public CGHViewer(Seurat amlTool, FileDialog fileDialog,JProgressBar progressBar) {
 		super("CGH Viewer");
+		System.out.println("CGH Data Viewer");
 		this.seurat = amlTool;
 		this.loadLogos();
 
@@ -79,7 +80,7 @@ public class CGHViewer extends JFrame {
 
 		
 
-		JMenuItem openItem = new JMenuItem("Heatmap States");
+		JMenuItem openItem = new JMenuItem("Heatmap CGH Data");
 		openItem.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				
@@ -91,13 +92,13 @@ public class CGHViewer extends JFrame {
 				}
 				
 				
-				GlobalView v = new GlobalView(seurat,"Heatmap states", vars,
+				GlobalView v = new GlobalView(seurat,"Heatmap CGH Data", vars,
 						CLONES, false);
 				v.applyNewPixelSize(seurat.settings.PixelW,seurat.settings.PixelH);
 			
 			}
 		});
-		seurat.plotsMenu.add(openItem);
+		seurat.plotsMenu.insert(openItem,1);
 		
 		
 
@@ -116,7 +117,7 @@ public class CGHViewer extends JFrame {
 				}
 				
 				
-				new GlobalView(seurat,"Heatmap states", vars,
+				new GlobalView(seurat,"Heatmap CGH Data", vars,
 						CLONES, false);
 			
 			}
@@ -148,7 +149,7 @@ public class CGHViewer extends JFrame {
 		
 		
 		
-		openItem = new JMenuItem("Karyogram");
+		openItem = new JMenuItem("Chromosome Map");
 		openItem.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				
@@ -159,13 +160,13 @@ public class CGHViewer extends JFrame {
 					}
 				}
 				
-				ChromosomeView v = new ChromosomeView(seurat, "Karyogram", seurat.dataManager.Chromosomes,vars);
+				ChromosomeView v = new ChromosomeView(seurat, "Chromosome Map", seurat.dataManager.Chromosomes,vars);
 				v.updateSelection();
 				//new ChromosomeView(seurat,"Chromosome Viewer", seurat.dataManager.Chromosomes,cghVariables);
 			
 			}
 		});
-		seurat.plotsMenu.add(openItem);
+		seurat.plotsMenu.insert(openItem,2);
 		
 		
 
