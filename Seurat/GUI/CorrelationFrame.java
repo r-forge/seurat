@@ -167,6 +167,11 @@ class CorrelationFrame extends JFrame implements MatrixWindow, IPlot {
 		this.applyNewPixelSize(pixelSize);
 	}
 
+	public void setModel(int model) {
+		// TODO Auto-generated method stub
+		
+	}
+
 }
 
 class CorrelationPanel extends JPanel implements MouseListener,

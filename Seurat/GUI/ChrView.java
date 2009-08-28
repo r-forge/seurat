@@ -16,7 +16,7 @@ class ChrView extends JFrame implements MatrixWindow, IPlot {
 
 	ChrPanel panel;
 
-	JMenuItem item = new JMenuItem("Chromosome Viewer");
+	JMenuItem item;
 
 	ChrView globalView = this;
 
@@ -45,7 +45,7 @@ class ChrView extends JFrame implements MatrixWindow, IPlot {
 		
 		System.out.println("ChrView  ");
 		
-		
+		item = new JMenuItem(name);
 
 		this.seurat = seurat;
 		this.dataManager = seurat.dataManager;
@@ -183,6 +183,11 @@ class ChrView extends JFrame implements MatrixWindow, IPlot {
 	public void applyNewPixelSize() {
 		// TODO Auto-generated method stub
 		updateSelection();
+	}
+
+	public void setModel(int model) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

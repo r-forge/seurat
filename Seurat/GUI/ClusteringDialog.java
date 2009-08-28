@@ -246,6 +246,8 @@ public class ClusteringDialog extends JFrame {
 						"Clustering", Exps,Gens);
 				
 				globalView.setLocation(350, 0);
+				globalView.panel.Model = dialog.seurat.settings.Model;
+				globalView.applyNewPixelSize(dialog.seurat.settings.PixelW,dialog.seurat.settings.PixelH);
                 
 				dialog.setVisible(false);
 			}

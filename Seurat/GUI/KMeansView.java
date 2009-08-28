@@ -20,7 +20,7 @@ class KMeansView extends JFrame implements MatrixWindow, IPlot {
 
 	// int[] orderSpalten;
 
-	JMenuItem item = new JMenuItem("KMeansPlot");
+	JMenuItem item ;
 
 	KMeansView plot = this;
 
@@ -42,6 +42,14 @@ int abstandUnten = 2;
 	
 	
 	
+	
+	
+
+	JLabel infoLabel;
+	
+	JPanel infoPanel;
+	
+	
 	public void applyNewPixelSize(int pixelW, int pixelH) {
 		
 	
@@ -57,7 +65,7 @@ int abstandUnten = 2;
 				Vector<ISelectable> exps = this.Experiments.elementAt(i);
 				
 				shiftX = shiftX
-				+ exps.size() * seurat.settings.PixelW + 1;
+				+ exps.size() * pixelW + 1;
 		  }
 		  
 		  
@@ -66,7 +74,7 @@ int abstandUnten = 2;
 		  for (int j = 0; j < Genes.size(); j++) {
 			  
 				shiftY = shiftY
-				+ (Genes.elementAt(j).size() * seurat.settings.PixelH/ panel.Approx + 1);
+				+ (Genes.elementAt(j).size() * pixelH/ panel.Aggregation + 1);
 		  
 		  }
 		  shiftY = shiftY
@@ -76,8 +84,7 @@ int abstandUnten = 2;
 		  
 		 panel.setPreferredSize(new Dimension(shiftX+2, shiftY+2));
 		  
-		  
-		  
+		
 		
 		  
 		  
@@ -86,8 +93,8 @@ int abstandUnten = 2;
 		  
 		 if (seurat.SYSTEM == seurat.WINDOWS) {
 		  
-		  this .setSize( shiftX + 17, shiftY + 38 +abstandUnten);
-		   } else this .setSize(shiftX + 2,shiftY + 23 + abstandUnten );
+		  this .setSize( shiftX + 17, shiftY + 38 +abstandUnten+15);
+		   } else this .setSize(shiftX + 2,shiftY + 23 + abstandUnten +15);
 		 
 		 updateSelection();
 		 
@@ -97,6 +104,8 @@ int abstandUnten = 2;
 	public KMeansView(Seurat seurat, String name,
 			Vector<Vector<ISelectable>> Experiments, Vector<Vector<ISelectable>> Genes) {
 		super(name);
+		System.out.println("KMeansView");
+		item = new JMenuItem(name);
 
 		this.seurat = seurat;
 		this.dataManager = seurat.dataManager;
@@ -120,6 +129,9 @@ int abstandUnten = 2;
 		seurat.windows.add(this);
 
 		seurat.windowMenu.add(item);
+		
+		  
+		 this.addKeyListener(panel);
 
 		item.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -138,7 +150,7 @@ int abstandUnten = 2;
 
 			@Override
 			public void componentResized(ComponentEvent e) {
-				
+				/*
 				
 				long newTimeResized = System.currentTimeMillis();
 				if (newTimeResized - timeResized > 200) {
@@ -173,10 +185,55 @@ int abstandUnten = 2;
 				  
 				  plot.applyNewPixelSize(panel.pixelW,panel.pixelH);
 				  
-				}
+				}*/
 			}
 
 		});
+		
+		
+		
+		infoPanel = new JPanel();
+		//	if (Experiments.size() < 116) infoPanel.setPreferredSize(new Dimension(300,45));
+			infoPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
+			infoPanel.setBorder(BorderFactory.createEtchedBorder());
+			this.getContentPane().add(infoPanel,BorderLayout.SOUTH);
+			
+			infoLabel = new JLabel("Aggregation: 1 : " + panel.Aggregation);
+			Font myFont = new Font("SansSerif", 0, 10);
+
+			
+			
+			String s = "{";
+			for (int i = 0; i < Experiments.size(); i++) {
+				s+=Experiments.elementAt(i).size();
+				if (i != Experiments.size()-1) s+=",";
+			}
+			s+="}";
+			
+			JLabel label = new JLabel("Columns: " + s);
+			label.setFont(myFont);
+			infoPanel.add(label);
+			
+			
+			
+			s = "{";
+			for (int i = 0; i < Genes.size(); i++) {
+				s+=Genes.elementAt(i).size();
+				if (i != Experiments.size()-1) s+=",";
+			}
+			s+="}";
+			
+			
+			
+			label = new JLabel(" Rows: "+s+"  ");
+			label.setFont(myFont);
+			infoPanel.add(label);
+			
+			
+			
+			
+			infoLabel.setFont(myFont);
+			infoPanel.add(infoLabel);
 
 	}
 
@@ -201,13 +258,20 @@ int abstandUnten = 2;
 		this.applyNewPixelSize(panel.pixelW,panel.pixelH);
 	}
 
+	public void setModel(int model) {
+		// TODO Auto-generated method stub
+		panel.Model = model;
+	}
+
 }
 
 class KmeansPanel extends JPanel implements MouseListener, IPlot,
-		MouseMotionListener {
+		MouseMotionListener, ColorListener, KeyListener {
 	DataManager dataManager;
 
 	Seurat seurat;
+	
+	int Model;
 
 	int pixelW;
 	int pixelH;
@@ -236,7 +300,7 @@ class KmeansPanel extends JPanel implements MouseListener, IPlot,
 
 	String info, infoRows, infoColumns;
 
-	int Width = 1;
+	//int Aggregation = 1;
 
 	double[][] data;
 
@@ -257,7 +321,7 @@ class KmeansPanel extends JPanel implements MouseListener, IPlot,
 	
 	
 	
-	int Approx = 1;
+	int Aggregation = 1;
 
 	public KmeansPanel(Seurat seurat, KMeansView plot, Vector<Vector<ISelectable>> Experiments, Vector<Vector<ISelectable>> Genes) {
 
@@ -278,6 +342,7 @@ class KmeansPanel extends JPanel implements MouseListener, IPlot,
 
 		this.addMouseListener(this);
 		this.addMouseMotionListener(this);
+		this.addKeyListener(this);
 
 	}
 
@@ -339,10 +404,10 @@ class KmeansPanel extends JPanel implements MouseListener, IPlot,
 				
 				
 				int a = 0;
-				if ((blocks[i][j].Genes.size()-1) % this.Approx ==0) a =1;
+				if ((blocks[i][j].Genes.size()-1) % this.Aggregation ==0) a =1;
 				
-				blocks[i][j].values = new double [blocks[i][j].Experiments.size()]   [(blocks[i][j].Genes.size()-1) / this.Approx +1];
-				blocks[i][j].isSelected = new boolean [blocks[i][j].Experiments.size()]   [(blocks[i][j].Genes.size()-1) / this.Approx +1];
+				blocks[i][j].values = new double [blocks[i][j].Experiments.size()]   [(blocks[i][j].Genes.size()-1) / this.Aggregation +1];
+				blocks[i][j].isSelected = new boolean [blocks[i][j].Experiments.size()]   [(blocks[i][j].Genes.size()-1) / this.Aggregation +1];
 				
 			
 				
@@ -350,11 +415,11 @@ class KmeansPanel extends JPanel implements MouseListener, IPlot,
 				
 				for (int ii = 0; ii < blocks[i][j].Experiments.size(); ii++) {
 					for (int jj = 0; jj < blocks[i][j].Genes.size(); jj++) {
-						blocks[i][j].values [ii][jj/Approx] = 0;
+						blocks[i][j].values [ii][jj/Aggregation] = 0;
 						//if (blocks[i][j].Experiments.elementAt(ii).isSelected [blocks[i][j].Genes.elementAt(jj).ID]  )  {
 						if (blocks[i][j].Experiments.elementAt(ii).isSelected() &&  blocks[i][j].Genes.elementAt(jj).isSelected()  )  {
 							
-						blocks[i][j].isSelected [ii][jj/Approx] = true;
+						blocks[i][j].isSelected [ii][jj/Aggregation] = true;
 						//	isSelection = true;
 						}
 					}
@@ -362,7 +427,7 @@ class KmeansPanel extends JPanel implements MouseListener, IPlot,
 				
 				
 				
-				int [][] counts = new  int [blocks[i][j].Experiments.size()][blocks[i][j].Genes.size() / this.Approx+2]; 
+				int [][] counts = new  int [blocks[i][j].Experiments.size()][blocks[i][j].Genes.size() / this.Aggregation+2]; 
 				
 				for (int ii = 0; ii < blocks[i][j].Experiments.size(); ii++) {
 					for (int jj = 0; jj < blocks[i][j].Genes.size(); jj++) {
@@ -371,9 +436,9 @@ class KmeansPanel extends JPanel implements MouseListener, IPlot,
 							
 						
 							
-						blocks[i][j].values [ii][jj/this.Approx]+= 
+						blocks[i][j].values [ii][jj/this.Aggregation]+= 
 							exps.elementAt(ii).getRealValue(genes.elementAt(jj).getID()) ;
-				counts [ii][jj/this.Approx]++;
+				counts [ii][jj/this.Aggregation]++;
 						
 						            
 					}
@@ -407,7 +472,7 @@ class KmeansPanel extends JPanel implements MouseListener, IPlot,
 				
 				
 
-				shiftY = shiftY + genes.size() * pixelH/Approx
+				shiftY = shiftY + genes.size() * pixelH/Aggregation
 						+ 1;
 			}
 			
@@ -474,7 +539,7 @@ this.repaint();
 		  for (int j = 0; j < Genes.size(); j++) {
 			  
 				shiftY = shiftY
-				+ (Genes.elementAt(j).size() * pixelH/ Approx + 2);
+				+ (Genes.elementAt(j).size() * pixelH/ Aggregation + 2);
 				
 				if (shiftY>e.getY()) {
 					jj = j;
@@ -542,13 +607,15 @@ this.repaint();
 		this.repaint();
 	}
 
+	
+	/*
 	public void selectRectangle(int xx1, int yy1, int xx2, int yy2) {
 		int x1 = Math.max(0, xx1 - abstandLinks) / this.pixelW;
 		int x2 = Math.max(0, xx2 - abstandLinks) / this.pixelW;
-		int y1 = Math.max(0, yy1 - upShift) * Width / this.pixelH;
-		int y2 = Math.max(0, yy2 - upShift) * Width / this.pixelH;
+		int y1 = Math.max(0, yy1 - upShift) * Aggregation / this.pixelH;
+		int y2 = Math.max(0, yy2 - upShift) * Aggregation / this.pixelH;
 		if (y1 == y2)
-			y2 += Width;
+			y2 += Aggregation;
 		if (x1 == x2)
 			x2 += 1;
 
@@ -578,9 +645,13 @@ this.repaint();
 		 * false; } }
 		 */
 
-		this.repaint();
+		
+	
+	
+	/*
+	this.repaint();
 
-	}
+	}*/
 
 	public void selectNode(CoordinateNode nodeC) {
 		ClusterNode node = nodeC.node;
@@ -602,9 +673,107 @@ this.repaint();
 
 		
 		if (e.getButton() == MouseEvent.BUTTON3 || e.isControlDown()) {
-            Block block = this.getBlockInThePoint(e.getPoint());
+           /* Block block = this.getBlockInThePoint(e.getPoint());
 			
-			new ClusteringDialog(seurat,block.Genes,block.Experiments);
+			new ClusteringDialog(seurat,block.Genes,block.Experiments);*/
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+	JPopupMenu menu = new JPopupMenu();
+			
+			/*
+			JMenuItem item = new JMenuItem("Open Selection");
+			item.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					// createCorrelationExperiments();
+
+					Vector<ISelectable> subGenes = new Vector();
+					Vector<ISelectable> subExps = new Vector();
+					
+					
+					for (int k = 0 ; k < Genes.size(); k++) {
+					Vector<ISelectable> GeneCluster = Genes.elementAt(k);	
+						
+					for (int i = 0; i < GeneCluster.size(); i++) {
+						if (GeneCluster.elementAt(i).isSelected()) subGenes.add(GeneCluster.elementAt(i));
+					}
+					}
+					
+					
+					for (int k = 0 ; k < Experiments.size(); k++) {
+						Vector<ISelectable> ExpCluster = Experiments.elementAt(k);	
+						
+					for (int i = 0; i < ExpCluster.size(); i++) {
+						if (ExpCluster.elementAt(i).isSelected()) subExps.add(ExpCluster.elementAt(i));
+					}
+					
+					}
+					
+					
+					GlobalView globalView = new GlobalView(seurat, "Global View", subExps, subGenes,  false);
+                   globalView.applyNewPixelSize(pixelW,pixelH);
+				}
+			});
+			menu.add(item);
+			
+			
+			menu.addSeparator();
+			*/
+			
+			
+
+			
+			
+			
+			JCheckBoxMenuItem box = new JCheckBoxMenuItem("invert color spectrum");
+			if (Model == 2) box.setSelected(true);
+			else box.setSelected(false);
+			menu.add(box);
+			
+			box.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					JCheckBoxMenuItem box = (JCheckBoxMenuItem)e.getSource();
+					if (box.isSelected()) {
+						Model = 2;
+					}
+					else Model = 1;
+						plot.applyNewPixelSize();
+				
+				}
+				
+			});
+			
+			
+			JMenuItem item = new JMenuItem("set pixel dimension");
+			item.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					// createCorrelationExperiments();
+
+				    
+				    ColorDialog dialog =  new ColorDialog(seurat, (ColorListener)plot.panel, pixelW, pixelH);
+				    dialog.pixelWField.addKeyListener(plot.panel);
+				    dialog.pixelHField.addKeyListener(plot.panel);
+				    
+				    
+				}
+			});
+			menu.add(item);
+			
+			
+			
+
+			menu.show(this, e.getX(), e.getY());
+		
+			
+			
+			
 		}
 
 	}
@@ -798,6 +967,37 @@ this.repaint();
 			return false;
 	}	
 	
+	
+	
+	
+	
+	
+	
+	
+	
+	public void applyNewPixelSize(int pixelW,int pixelH) {
+		this.pixelW = pixelW;
+		this.pixelH = pixelH;
+		plot.applyNewPixelSize(pixelW,pixelH);
+	};
+
+	public void setModel(int model) {
+		Model = model;
+		applyNewPixelSize();
+	};
+	
+	public void applyNewPixelSize() {
+	    applyNewPixelSize(pixelW,pixelH);	
+	};
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	@Override
 	public String getToolTipText(MouseEvent e) {
 		
@@ -941,7 +1141,7 @@ this.repaint();
 		public void applySelection(int xx1,int yy1, int xx2, int yy2) {
 			int x1,x2,y1,y2;
 			int width = Experiments.size() * pixelW;
-			int height = Genes.size() * pixelH / Approx;
+			int height = Genes.size() * pixelH / Aggregation;
 			
 			
 			if (xx1>x+width || xx2<x || y + height < yy1 || y >yy2) return;
@@ -956,7 +1156,7 @@ this.repaint();
 			for (int i = 0; i < Experiments.size(); i++) {
 				for (int j =0; j < Genes.size(); j++) {
 					
-					if (   x1<=(x+ i*pixelW) && x2>=(x+ i*pixelW) &&  y1<=(y+ j*pixelH/Approx) && y2>=(y+ j*pixelH/Approx) ) {
+					if (   x1<=(x+ i*pixelW) && x2>=(x+ i*pixelW) &&  y1<=(y+ j*pixelH/Aggregation) && y2>=(y+ j*pixelH/Aggregation) ) {
 						
 			//			Experiments.elementAt(i).isSelected [Genes.elementAt(j).ID] = true;
 				        Experiments.elementAt(i).select(true);
@@ -980,8 +1180,8 @@ this.repaint();
 		public void paint(Graphics g) {
 			
 			
-			if (seurat.settings.Model == 2)  g.setColor(Color.white);
-			if (seurat.settings.Model == 1)  g.setColor(Color.black);
+			if (Model == 2)  g.setColor(Color.white);
+			if (Model == 1)  g.setColor(Color.black);
 			
 			g.fillRect(x-1, y-1
 					, this.values.length*pixelW+2, this.values [0].length*pixelH+2);
@@ -1000,16 +1200,16 @@ this.repaint();
 
 						koeff = values [i][j] / max;
 
-						if (seurat.settings.Model == 1)  c = Color.getHSBColor(0, (float) fPos(koeff), 1);
-						if (seurat.settings.Model == 2)  c = new Color((float) fPos(koeff), 0, 0);
+						if (Model == 1)  c = Color.getHSBColor(0, (float) fPos(koeff), 1);
+						if (Model == 2)  c = new Color((float) fPos(koeff), 0, 0);
 						
 					} else {
 						koeff = values [i][j] / min;
 
-						if (seurat.settings.Model == 1) c = (Color.getHSBColor((float) 0.33,
+						if (Model == 1) c = (Color.getHSBColor((float) 0.33,
 								(float) fNeg(koeff), 1));
 						
-						if (seurat.settings.Model == 2)  c = new Color(0, (float) fNeg(koeff), 0);
+						if (Model == 2)  c = new Color(0, (float) fNeg(koeff), 0);
 					}
 					
 					
@@ -1022,7 +1222,7 @@ this.repaint();
 					c = c.darker();
 					c = c.darker();
 					
-					if (seurat.settings.Model == 2) {
+					if (Model == 2) {
 						c = c.darker();
 						c = c.darker();
 					}
@@ -1035,7 +1235,7 @@ this.repaint();
 						c = c.brighter();
 						
 						
-						if (seurat.settings.Model == 2) {
+						if (Model == 2) {
 							c = c.brighter();
 							c = c.brighter();
 						}
@@ -1053,6 +1253,93 @@ this.repaint();
 
 		}
 
+	}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	public void keyPressed(KeyEvent arg0) {
+		// TODO Auto-generated method stub
+		
+		
+		
+int panelH = this.dataManager.Experiments.elementAt(0).getBarchartToColors().size() * (2 * this.pixelH + 2);
+		
+		if (arg0.getKeyCode() == 38) {
+			
+			int maxAggr = 0;
+			for (int i = 0; i < Genes.size(); i++) {
+				maxAggr = (int)Math.max(maxAggr,Genes.elementAt(i).size());
+			}
+			
+			
+			
+			if (Aggregation < maxAggr) Aggregation++;
+			
+			
+			
+			
+			
+		    plot.infoLabel.setText("Aggregation: 1 : " + Aggregation);
+		    plot.applyNewPixelSize(pixelW,pixelH);
+			
+			
+			
+		}
+		
+		
+        if (arg0.getKeyCode() == 40) {
+        	
+        	
+        	if (Aggregation > 1) Aggregation--;
+        	
+			
+			plot.infoLabel.setText("Aggregation: 1 : " + Aggregation);
+			plot.applyNewPixelSize();
+		}
+        
+        
+        if (arg0.getKeyCode() == 39) {
+            
+           pixelW++;
+            plot.applyNewPixelSize(pixelW,pixelH);
+        }	
+        
+        
+        if (arg0.getKeyCode() == 37) {
+            
+           if (pixelW>1) pixelW--;
+           plot.applyNewPixelSize(pixelW,pixelH);
+         
+        }
+		
+		
+		
+		
+	}
+
+	public void keyReleased(KeyEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void keyTyped(KeyEvent e) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

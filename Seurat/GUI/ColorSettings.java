@@ -48,7 +48,7 @@ public class ColorSettings extends JFrame{
 		this.seurat = seurat;
 		settings = seurat.settings;
 		
-		this.setBounds(100, 100, 490, 380);
+		this.setBounds(0, 450, 530, 350);
 
 		
 		
@@ -306,13 +306,13 @@ int dimX = 150, dimY = 20;
 		box.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				if (box.isSelected()) {
-					cSettings.settings.Model = 2;
+					cSettings.seurat.setModel(2);
 
 				} else {
-					cSettings.settings.Model = 1;
+					cSettings.seurat.setModel(1);
 
 				}
-				cSettings.seurat.repaintWindows();
+				
 				repaint();
 			}
 		});
@@ -321,7 +321,10 @@ int dimX = 150, dimY = 20;
 		
 		if (settings.Model == 2) box.setSelected(true);
 		else box.setSelected(false);
-				
+			
+		
+		
+		/*
 		
 		JPanel pixelSizePanel = new JPanel();
 		pixelSizePanel.setBorder(BorderFactory.createEtchedBorder());
@@ -356,7 +359,7 @@ int dimX = 150, dimY = 20;
 		
 		invertColorPanel.add(pixelSizePanel,BorderLayout.SOUTH);
 		
-		
+		*/
 		
 		
 		

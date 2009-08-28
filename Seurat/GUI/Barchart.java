@@ -497,6 +497,7 @@ class BarchartPanel extends JPanel implements KeyListener, MouseListener,
 						colorShift -= 1;
 					brush();
 					seurat.applyNewPixelSize();
+					
 					seurat.repaintWindows();
 				
 				}
@@ -510,6 +511,7 @@ class BarchartPanel extends JPanel implements KeyListener, MouseListener,
 			item.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
                 removeColoring();	
+                seurat.applyNewPixelSize();
                 seurat.applyNewPixelSize();
 				seurat.repaintWindows();
             }
