@@ -35,7 +35,7 @@ public class SeriationDialog extends JFrame {
 	JButton okBtn = new JButton("Ok");
 
 	String[] SeriationMethods = { "ARSA", "BBURCG", "BBWRCG", "TSP", "Chen",
-			"MDS", "HC", "GW", "OLO" };
+			"MDS"};
 
 	JComboBox box = new JComboBox(SeriationMethods);
 

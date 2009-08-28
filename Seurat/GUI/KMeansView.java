@@ -93,8 +93,8 @@ int abstandUnten = 2;
 		  
 		 if (seurat.SYSTEM == seurat.WINDOWS) {
 		  
-		  this .setSize( shiftX + 17, shiftY + 38 +abstandUnten+15);
-		   } else this .setSize(shiftX + 2,shiftY + 23 + abstandUnten +15);
+		  this .setSize( shiftX + 17, shiftY + + infoPanel.getHeight()  + 38 +abstandUnten);
+		   } else this .setSize(shiftX + 3,shiftY + abstandUnten + infoPanel.getHeight()  + 23);
 		 
 		 updateSelection();
 		 
@@ -121,7 +121,7 @@ int abstandUnten = 2;
 
 
 		this.setBounds(200, 200, 800, 800);
-		this.applyNewPixelSize(seurat.settings.PixelW, seurat.settings.PixelH);
+		//this.applyNewPixelSize(seurat.settings.PixelW, seurat.settings.PixelH);
 
 		this.getContentPane().add(panel, BorderLayout.CENTER);
 		this.setVisible(true);
@@ -234,7 +234,7 @@ int abstandUnten = 2;
 			
 			infoLabel.setFont(myFont);
 			infoPanel.add(infoLabel);
-
+            this.setVisible(true); 
 	}
 
 	public void updateSelection() {
@@ -276,9 +276,9 @@ class KmeansPanel extends JPanel implements MouseListener, IPlot,
 	int pixelW;
 	int pixelH;
 
-	int abstandLinks = 1;
+	int abstandLinks = 2;
 
-	int abstandOben = 1;
+	int abstandOben = 2;
 
 	Vector<Vector<ISelectable>> Genes;
 
@@ -376,7 +376,7 @@ class KmeansPanel extends JPanel implements MouseListener, IPlot,
 
 		}
 
-		int shiftX = 2;
+		int shiftX = abstandLinks+1;
 
 		boolean isSelection = seurat.dataManager.isSomethingSelected();
 		
@@ -389,7 +389,7 @@ class KmeansPanel extends JPanel implements MouseListener, IPlot,
 			boolean isMinMaxSet = false;
 			double min =0, max = 0;
 
-			int shiftY = 2;
+			int shiftY = abstandOben+1;
 			
 			 shiftY = shiftY
 				+ this.dataManager.Experiments.elementAt(0).getBarchartToColors().size() * (2 * this.pixelH + 2);
@@ -768,6 +768,21 @@ this.repaint();
 			
 			
 			
+			item = new JMenuItem("set aggregation");
+			item.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					// createCorrelationExperiments();
+
+				    
+				    AggregationDialog dialog =  new AggregationDialog(seurat, plot.panel, Aggregation);
+				    dialog.field.addKeyListener(plot.panel);
+				   
+				    
+				}
+			});
+			menu.add(item);
+			
+			
 
 			menu.show(this, e.getX(), e.getY());
 		
@@ -817,7 +832,7 @@ this.repaint();
 		g.fillRect(0, 0, this.getWidth(), this.getHeight());
 
 		
-		int colorsHight = 0;
+		//int colorsHight = 0;
 		int shiftX = 1;
 		
 		
@@ -836,7 +851,7 @@ this.repaint();
 			
 			for (int j = var.getColors().size() - 1; j >= 0; j--) {
 
-				colorsHight = var.getColors().size() * (2 * this.pixelH + 1) + 4;
+			//	colorsHight = var.getColors().size() * (2 * this.pixelH + 1) + 4;
 
 				g.setColor(var.getColors().elementAt(j));
 
@@ -1004,7 +1019,6 @@ this.repaint();
 		
 		
 
-		int colorsHight = 0;
 		int shiftX = 1;
 		
 		
@@ -1023,15 +1037,11 @@ this.repaint();
 			
 			for (int j = var.getColors().size() - 1; j >= 0; j--) {
 
-				colorsHight = var.getColors().size() * (2 * this.pixelH + 1) + 4;
-
-			//	return (var.getColorNames().elementAt(j));
-
 				if (isPointInRect(e.getX(),e.getY(),
 						abstandLinks + shiftX, 
-						abstandOben+ j * (2 * this.pixelH + 1), 
+						abstandOben+ 1+j * (2 * this.pixelH + 1), 
 						abstandLinks + shiftX+pixelW,
-						abstandOben+ j * (2 * this.pixelH + 1)+2 * pixelH + 1))
+						abstandOben+ 1+j * (2 * this.pixelH + 1)+2 * pixelH + 1))
 				
 				return (var.getColorNames().elementAt(j));
 
@@ -1339,6 +1349,13 @@ int panelH = this.dataManager.Experiments.elementAt(0).getBarchartToColors().siz
 
 	public void keyTyped(KeyEvent e) {
 		// TODO Auto-generated method stub
+		
+	}
+
+	public void setAggregation(int aggr) {
+		// TODO Auto-generated method stub
+		this.Aggregation = aggr;
+		applyNewPixelSize();
 		
 	}
 
