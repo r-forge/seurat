@@ -2,8 +2,19 @@ h1{font-size:20px;
 	color: LightBlue;
 	}
 h2{font-size:17px;
+	}
+h3{font-size:25px;
+	color: LightBlue;
 	}	
-
+	
+ul{left-margin:50px
+	}		
+#panel li {
+  margin: 0 0 0 5px;
+  padding: 0;
+  list-style: none;
+  }
+  
 body {
   font: 100.01% Verdana, Arial, Helvetica, sans-serif;
 }
@@ -13,10 +24,6 @@ body {
   padding:0;
 }
 
-#seite {
-  width: 100%;
-  margin: 0 auto;
-}
 
 #kopfbereich {
   padding: 20px;
@@ -30,15 +37,11 @@ body {
   padding: 20px;
 }
 
-#steuerung {
+#left {
   float: left;
-  width:150px;
-  height:1000px;
   padding:20px;
   background-color: white;
   border:0px solid black;
-  margin-right: 20px;
-  line-height: 20px;
 }
 
 </style>

@@ -1,0 +1,95 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+  <title>Seurat: Visual analytics for the integrative analysis of microarray data</title>
+  <meta name="Martin Sill" content="Seurat">
+  <meta name="keywords" content="Microarrays,Integrative,Interactive,Visualization">
+</head>
+<link rel="stylesheet" href="style.css" type="text/css"> 
+<body>
+<div id="inhalt">
+ <h1>Data formats</h1>
+  <br/><br/>
+  <h2>General</h2>
+  <br/>
+  All data files have to be in tab delimited ascii format and missing values should be labeled by "NA".
+  Example files are available in the <a href="down.html" target="PageRechts">Download and Installation</a> section.
+  <br/><br/>
+  <h2>Gene expression data</h2>
+  <br/>
+  Since Seurat provides no preprocessing tools, the gene expression data has to been normalized and preprocessed beforehand. 
+  It is mandatory that the first column contains the gene IDs.
+  The following columns should be named according to the sample IDs and thus contain the gene expression values of the respective samples.
+  <br/><br/>
+  Example:
+  <br/><br/>
+  <pre>
+geneID   sample.1 sample.2  ...   sample.n
+gene.1   y.11     y.12     ...    y.1n
+gene.2   y.21     y.22     ...    y.2n
+...
+gene.p   y.p1     y.p2     ...    y.pn
+  </pre> 
+  <br/>
+  <h2>Clinical data</h2>
+  <br/>
+  The first column should contain the sample IDs and this IDs have to be in the same format as in the gene expression file.
+  The following columns can contain any type of continous or categorical variable with the name of the variable in the first row.
+   <br/><br/>
+   Example:
+   <br/><br/>
+  <pre>
+sampleID   variable.1 variable.2  ...   variable.z
+sample.1   x.11       x.12     ...      x.1z
+sample.2   x.21       x.22     ...      x.2z
+...
+sample.n   x.n1       x.n2     ...      x.nz
+  </pre> 
+  <br/>
+  <h2>Gene annotations</h2>
+  <br/>
+  The first column has to contain the geneIDs and the gene names have to be the same as the gene names in the gene expression file.
+  In case of pathway informations where each gene can belong to different pathways, the entries of such pathway variables have 
+  to be lists of comma delimited strings, like e.g.: "cell_signaling, immunology, metastasis" or for GO-terms: "molecular function|ATP binding|IEA|GO:0005524|GOA/IPI, biological process|defense response to pathogen|IEA|GO:0042829|GOA/IPI, cellular component|nucleus|IEA|GO:0005634"
+  The name of a pathway variable has to begin with a "#" as the first character.<br>
+  In order to associate the gene expression data with the array CGH data the gene annotation file is needed. 
+  In addition the annotation file has to have a column called "ChromosomeNumber" containing the number of the chromosome and a column called "NucleotidePosition" containing the number of the starting position of the ORF of the gene.
+  The following columns can contain any type of continous or categorical variable with the variable names in the first row.  
+  <br/> <br/>
+  Example:
+  <br/><br/>
+    <pre>
+geneID   ChromosomeNumber  NucleotidePosition #pathway    annotation.1 ... annotation.v
+gene.1        1              11223444        path1,path2     a.11     ...     a.1v
+gene.2       22              NA              path1,path3     a.21     ...     a.2v
+...
+gene.p        X              1055            path5           a.p1     ...     a.pv
+  </pre> 
+
+  <br/>
+  <h2>Array CGH data</h2>
+  <br/>
+  The array CGH data has to been normalized and preprocessed. Furthermore some segmentation algorithm has to been applied to estimate cytogenetic gains and losses.
+  We used the R package <a href=http://www.bioconductor.org/packages/2.4/bioc/html/GLAD.html> GLAD </a> to preprocess our example data file.<br> 
+  The first column has to contain the cloneIDs of the CGH clones.
+  In order to associate the states of the clones with the samples, for each sample a column with the name "samplename.States" is needed. 
+  These columns contain the result of the segmentation algorithm and the entries are "-1","0" or "1", which correspond to a cytogenetic loss, no change or gain.<br> 
+  In order to associate the CGH data with the gene expression data and to display the chromosome browser, the following five columns are needed:
+  "ChromosomeNumber", "ChrStart", "ChrEnd", "ChrMidpoint", "ChromosomeCen", "Mapping".
+  The variables "ChrStart", "ChrEnd" and "ChrMidpoint" contain the start, end and midpoint nucleotid position of the CGH clones.
+  "Mapping" contains the names of the cytobands of the CGH clones and "ChromosomeCen" gives the nulceotid position of centromer of the respective chromosome.  
+  See the Example fot details:
+  <br/><br/>
+<pre>
+CloneID ChromosomeNumber ChrStart ChrEnd ChrMidpoint Mapping ChromosomeCen sample.1.States ... sample.n.States
+clone.1        1            145     605      375       1q41     124300000         1                    0
+clone.2       22            11233   12034    11633     22q13    11800000          -1                   1 
+...
+clone.w        X            NA      NA       NA        Xq22     59500000          0                    -1 
+<pre>
+  <br/><br/>
+</div>
+
+ </body>
+</html>
+
