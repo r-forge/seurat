@@ -1,147 +1,175 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
-  <head>
-    <title>
-      Seurat: Visual analytics for the integrative analysis of microarray data
-      </title>
-      <meta name="Martin Sill" content="Seurat">
-  <meta name="keywords" content="Microarrays,Integrative,Interactive,Visualization">
- 	</head>
-  <link rel="stylesheet" href="style.css" type="text/css"> 
-  <body>
-  <div id="inhalt">
-  <h1>User Manual</h1>
-  <br/><br/>
-  <h2>Introduction</h2>
-  <br/>
-  All data sets are assumed to be available in a preprocessed, normalized and tab delimited ascii form. 
-  For more details see the <a href="data.html" target="PageRechts"> Data </a> section or the example
-  files available in the <a href="down.html" target="PageRechts">Download and Installation</a> section.  
-  <br/><br/>
-  <h2>Data manager</h2>
-  <br/>
-  By starting the Seurat.jar file the data manager window will appear:
-  <br/>
-  <div align="left">  
-  <img src="images/datamanager.png" style="margin: 20px 40px;"/>
-  </div>
-  <p>
-  The data manager displays the different datasets loaded. Detailed information about the files and the information stored can be accessed by clicking on the names of the respective data sets.   
-  In addition the manager window shows the objects described by the different data sets. These objects are e.g. genes, samples, CGH clones and chromosomes.
-  Again, detailed information about the objects can be accessed by clicking on the names. 
-  At top of the data manager window is the main panel from which most of the functions can be accessed: 
-  </p>
-  <br/>
-  <div id="panel">
-  <ul> <br/>
-  		<li><b>File</b></li>
-  		<ul "style=list-style-type:none">  		 
-  		<li>&nbsp;&nbsp;&nbsp; open/close different data files</li>
-  		<li>&nbsp;&nbsp;&nbsp; save data files</li>
-  		<li>&nbsp;&nbsp;&nbsp; exit Seurat</li>
-  		</ul>
-  		<li><b>Plots</b></li>
-  		<ul> 
-  		<li>&nbsp;&nbsp;&nbsp; open heatmap plots for gene expression and array CGH data</li> 
-  		<li>&nbsp;&nbsp;&nbsp; open the chromosome map</li>
-  		<li>&nbsp;&nbsp;&nbsp; perform clustering and seriation algorithms</li>
-  		<li>&nbsp;&nbsp;&nbsp; open the confusion matrix to compare clustering results</li>
-  		</ul>
-  		<li><b>Options</b></li>
-  		<ul>
-  		<li>&nbsp;&nbsp;&nbsp; change the pixel settings of the heatmaps</li>
-  		<li>&nbsp;&nbsp;&nbsp; change the color settings of the heatmaps</li>
-  		</ul>
-  		<li><b>Window</b></li>
-  		<ul>
-  		<li>&nbsp;&nbsp;&nbsp; list of all opened windows</li>
-  		<li>&nbsp;&nbsp;&nbsp; close all windows</li>
-  		</ul>
-  		<li><b>Help</b></li>
-  		<ul>
-  		<li>&nbsp;&nbsp;&nbsp; opens this website</li>
-  		</ul>
+<head>
+
+<meta http-equiv="content-type" content="text/html; charset=ISO-8859-1">
+  <title> Seurat: Visual analytics for the integrative analysis of
+microarray data </title>
+  <meta name="Martin Sill" content="Seurat">
+  <meta name="keywords"
+ content="Microarrays,Integrative,Interactive,Visualization">
+  <link rel="stylesheet" href="style.css" type="text/css">
+</head>
+<body>
+<div id="inhalt">
+<h1>User Manual</h1>
+<br>
+<br>
+<h2>Introduction</h2>
+<br>
+All datasets are assumed to be available in a preprocessed, normalized
+and tab delimited ascii form. For more details see the <a
+ href="data.html" target="PageRechts"> Data </a> section or the
+example files available in the <a href="down.html" target="PageRechts">Download
+and Installation</a> section. <br>
+<br>
+<h2>Data manager</h2>
+<br>
+By starting the Seurat.jar file the data manager window will appear: <br>
+<div align="left"> <img src="images/datamanager.png"
+ style="margin: 20px 40px;"> </div>
+<p> The data manager displays the different datasets loaded. Detailed
+information about the files and the information stored can be accessed
+by clicking on the names of the respective datasets. In addition the
+manager window shows the objects described by the different datasets.
+These objects are genes, samples, CGH clones and chromosomes. Again,
+detailed information about the objects can be accessed by clicking on
+the names. At the top of the data manager window is the main panel from
+which most of the functions can be accessed: </p>
+<br>
+<div id="panel">
+<ul>
+  <br>
+  <li><b>File</b></li>
+  <ul style="">
+    <li>&nbsp;&nbsp;&nbsp; open/close different data files</li>
+    <li>&nbsp;&nbsp;&nbsp; save data files</li>
+    <li>&nbsp;&nbsp;&nbsp; exit Seurat</li>
   </ul>
-  </div>
-  <br/>
-  <h2>Interactive genexpression heatmap</h2>
-  <br/>
-  An interactive heatmap showing the gene expression data can be called frome the main panel by:<br/><br/>
-  <em><b>Plots -&gt; Heatmap Genexpressions </b></em> <br/> <br/>
-  <div align="left">  
-  <img src="images/global.png"  style="margin: 20px 40px;"/>
-  </div>
-  The heatmap plot displays the gene expression data with the gene expression levels represented by colors.
-  Pixel and color preferences of all heatmaps can be changed under:<br/> <br/>
-  <em><b>Plots -&gt; Pixel Settings </b></em> <br/><br/>
-  <em><b>Plots -&gt; Color Settings </b></em> <br/><br/>
-  <div align="left">  
-  <img src="images/settings.png" style="margin: 20px 40px;"/>
-  </div>
-  Other options aswell as the pixel settings can be accessed by a right click on the heatmap. 
-  <br/><br/>
-  <h2>Clustering and seriation algorithms</h2>
-  <br/>
-  A clustering of the gene expression data can be performed by:<br/> <br/>
-  <em><b>Plots -&gt; Clustering </b></em>
-  <br/> <br/>
-  Seurat provides agglomerative hierarchical clustering and kmeans clustering. 
-  In order to perform a kmeans clustering, the user has to choose this from the available methods and provide the number of desired sample and gene clusters.
-  Otherwise seurat will perform hierarchical clustering. 
-  For both algorithms different types of distance measures can be chosen, e.g. euclidean, manhattan, pearson etc..
-  To perform hierarchical clustering several linkage functions are available, e.g. single, complete, ward etc..
-  Distance measure and linkage function for clustering genes and samples can be chosen independently.
-  The results of hierarchical clustering are visualized by an reordered heatmap together with the resulting dendrograms.
-  If the user provides the number of desired gene and sample clusters and chooses a hierarchical clustering method, the dendrogram will be cut according to the number of clusters.
-  In this case, the dendrograms will not be visualized.
-  <div align="left">  
-  <img src="images/dendro.png" style="margin: 20px 40px;"/>
-  </div>
-  The results of two clusterings can be compared by a confusion matrix. This graphical tool
-  displays objects falling into the same clusters by squares with sizes proportional to the number of objects.
-  Function to permutate the columns and the rows of the matrix and identify groups can be accessed by a right click on the confusion matrix. 
-  <div align="left">  
-  <img src="images/confusion.png" style="margin: 20px 40px;"/>
-  </div>
-  In addition Seurat provides several seriation algorithms available under:
-  <br/><br/>
-  <em><b>Plots -&gt; Seriation </b></em> 
-  <br/><br/>
-  More information about the implemented seriation algorithms can be found <a href="http://cran.r-project.org/web/packages/seriation/vignettes/seriation.pdf">here</a>.
-  <br/><br/>
-  <h2>Exploring gene annotaions and clinical data</h2>
-  <br/><br/>
-  Clinical data can be accessed via the data manager window. Seurat automatically recognizes the type of the different variables.
-  Continous variables are visualized by a histograms and catgeorical vatiables by bar plots. 
-  Information about functional groups, e.g. Gene Ontology, KEGG, user defined groups are visualized by bar plots.
-  <div align="left">  
-  <img src="images/accessclin.png" style="margin: 20px 40px;"/>
-  </div>
-  Furthermore it is possible to assign colors or to change the bin width of the histogram via the options menu of the plots which can be accessed by a right click on the window.
-  The top line of the heatmap displays the colors of the samples falling into the different classes.  
-  <div align="left">  
-  <img src="images/colors.png" style="margin: 20px 40px;"/>
-  </div>
-  <p></p>
-  <br/>
-  <br/>
-  <h2>Chromosome map</h2>
-  <br/>
-  If array CGH data is available, seurat provides a chromosome map which diplays the relative frequencies of genetical gains and losses as histograms along the chromosomes.
-  This window is available under:<br/><br/>
-  <em><b>Plots -&gt; Chromosome View </b></em>
-   <br/><br/> 
-  <div align="left">  
-  <img src="images/karyotype.png" style="margin: 20px 40px;"/>
-  </div>
-  In addition each single chromosome can be visualized in detail. The single chromosome plots can be opened via the data manager by clicking on the name of the chromosome of interest. 
-  <div align="left">  
-  <img src="images/chromo.png" style="margin: 20px 40px;"/>
-  </div>
-  
-  
-		
+  <li><b>Plots</b></li>
+  <ul>
+    <li>&nbsp;&nbsp;&nbsp; open heatmap plots for gene expression and
+array CGH data</li>
+    <li>&nbsp;&nbsp;&nbsp; open the chromosome map</li>
+    <li>&nbsp;&nbsp;&nbsp; perform clustering and seriation algorithms</li>
+    <li>&nbsp;&nbsp;&nbsp; open the confusion matrix to compare
+clustering results</li>
+  </ul>
+  <li><b>Options</b></li>
+  <ul>
+    <li>&nbsp;&nbsp;&nbsp; change the pixel settings of the heatmaps</li>
+    <li>&nbsp;&nbsp;&nbsp; change the color settings of the heatmaps</li>
+  </ul>
+  <li><b>Window</b></li>
+  <ul>
+    <li>&nbsp;&nbsp;&nbsp; list of all opened windows</li>
+    <li>&nbsp;&nbsp;&nbsp; close all windows</li>
+  </ul>
+  <li><b>Help</b></li>
+  <ul>
+    <li>&nbsp;&nbsp;&nbsp; opens this website</li>
+  </ul>
+</ul>
+</div>
+<br>
+<h2>Interactive genexpression heatmap</h2>
+<br>
+An interactive heatmap showing the gene expression data can be called
+from the main panel by:<br>
+<br>
+<em><b>Plots -&gt; Heatmap Genexpressions </b></em> <br>
+<br>
+<div align="left"> <img src="images/global.png"
+ style="margin: 20px 40px;"> </div>
+The heatmap plot displays the gene expression data with the gene
+expression levels represented by colors. Pixel and color preferences of
+all heatmaps can be changed under:<br>
+<br>
+<em><b>Plots -&gt; Pixel Settings </b></em> <br>
+<br>
+<em><b>Plots -&gt; Color Settings </b></em> <br>
+<br>
+<div align="left"> <img src="images/settings.png"
+ style="margin: 20px 40px;"> </div>
+&nbsp; Additional options can be accessed by a right click on the
+heatmap. <br>
+<br>
+<h2>Clustering and seriation algorithms</h2>
+<br>
+A clustering of the gene expression data can be performed by:<br>
+<br>
+<em><b>Plots -&gt; Clustering </b></em> <br>
+<br>
+Seurat provides agglomerative hierarchical clustering and kmeans
+clustering. In order to perform a kmeans clustering, the user has to
+choose this from the available methods and provide the number of
+desired sample and gene clusters. Otherwise Seurat will perform
+hierarchical clustering. For both algorithms different types of
+distance measures can be chosen, e.g. euclidean, manhattan, pearson. To
+perform hierarchical clustering several linkage functions are
+available, including single, complete, and ward. The distance measures
+and linkage functions for clustering genes and samples can be chosen
+independently. The results of hierarchical clustering are visualized by
+a reordered heatmap together with the resulting dendrograms. If the
+user specifies the number of gene and sample clusters and chooses a
+hierarchical clustering method, the dendrogram will be cut according to
+the number of clusters and will not be drawn.&nbsp; Instead, cluster
+boundaries will be drawn on the reordered heatmap, as for the results
+of a kmeans clustering.
+<div align="left"> <img src="images/dendro.png"
+ style="margin: 20px 40px;"> </div>
+The results of two clusterings can be compared by a confusion matrix.
+This graphical tool displays objects falling into the same clusters by
+squares with size proportional to the number of objects. A function to
+permutate the columns and the rows of the matrix to match the
+clusterings is available with a right click on the confusion matrix.
+<div align="left"> <img src="images/confusion.png"
+ style="margin: 20px 40px;"> </div>
+In addition, Seurat provides several seriation algorithms available
+under: <br>
+<br>
+<em><b>Plots -&gt; Seriation </b></em> <br>
+<br>
+More information about the implemented seriation algorithms can be
+found <a
+ href="http://cran.r-project.org/web/packages/seriation/vignettes/seriation.pdf">here</a>.
 
-  </body>
+<br>
+<br>
+<h2>Exploring gene annotations and clinical data</h2>
+<br>
+<br>
+Clinical data can be accessed via the data manager window. Seurat
+automatically recognizes the types of different variables. Continuous
+variables are visualized by histograms and catgeorical vatiables by
+barcharts. Information about functional groups, e.g. Gene Ontology,
+KEGG, or user defined groups, is visualized by barcharts.
+<div align="left"> <img src="images/accessclin.png"
+ style="margin: 20px 40px;"> </div>
+It is possible to assign colors or to change the binwidth of the
+histogram via the options menu of the plots which is available with a
+right click on the window. The top line of the heatmap displays the
+colors of the samples falling into the different classes.
+<div align="left"> <img src="images/colors.png"
+ style="margin: 20px 40px;"> </div>
+<p></p>
+<br>
+<br>
+<h2>Chromosome map</h2>
+<br>
+If array CGH data is available, Seurat offers a chromosome map which
+diplays the relative frequencies of genetical gains and losses as bars
+along the chromosomes. This window is available under:<br>
+<br>
+<em><b>Plots -&gt; Chromosome View </b></em> <br>
+<br>
+<div align="left"> <img src="images/karyotype.png"
+ style="margin: 20px 40px;"> </div>
+In addition each single chromosome can be visualized in detail. The
+single chromosome plots can be opened via the data manager by clicking
+on the name of the chromosome of interest.
+<div align="left"> <img src="images/chromo.png"
+ style="margin: 20px 40px;"> </div>
+</div>
+</body>
 </html>
-
