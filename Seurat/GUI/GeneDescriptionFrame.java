@@ -9,6 +9,7 @@ import java.awt.*;
 import Data.AnnGene;
 import Data.CGHVariable;
 import Data.Chromosome;
+import Data.Clustering;
 import Data.Gene;
 import Data.GeneVariable;
 import Data.ISelectable;
@@ -228,6 +229,38 @@ public class GeneDescriptionFrame extends JFrame {
 				if (this.geneVariables.elementAt(j).stringBuffer.size() < 10
 						|| !this.geneVariables.elementAt(j).isDouble) {
 					this.geneVariables.elementAt(j).isDiscrete = true;
+					
+					
+					
+					
+					
+					/** Add Clusters to ConfufionsMatrix*/
+					Vector<Vector<ISelectable>> Clusters = new Vector();
+					for (int i = 0; i < this.geneVariables.elementAt(j).stringBuffer.size(); i++) {
+						Clusters.add(new Vector());
+					}
+					
+					for (int i = 0; i < seurat.dataManager.Genes.size(); i++) {
+						ISelectable exp = seurat.dataManager.Genes.elementAt(i);
+					  
+					    
+					    for (int ii = 0; ii < this.geneVariables.elementAt(j).stringBuffer.size(); ii++) {
+							if (this.geneVariables.elementAt(j).stringBuffer.elementAt(ii).equals(this.geneVariables.elementAt(j).stringData [i])) {
+								Clusters.elementAt(ii).add(exp);
+							}
+						}
+					    
+					
+					}
+					
+					
+					seurat.dataManager.GeneClusters.add(new Clustering(this.geneVariables.elementAt(j).getName(),Clusters,this.geneVariables.elementAt(j).stringBuffer));
+				
+					
+					
+					
+					
+					
 
 				}
 				if (this.geneVariables.elementAt(j).isDiscrete && this.geneVariables.elementAt(j).testList()) {

@@ -4,9 +4,13 @@ import java.io.*;
 
 import javax.swing.*;
 
+import com.sun.org.apache.xpath.internal.operations.Variable;
+
 import java.awt.*;
 
+import Data.Clustering;
 import Data.DescriptionVariable;
+import Data.ISelectable;
 import Data.MyStringTokenizer;
 
 import java.util.zip.*;
@@ -206,7 +210,34 @@ public class ExperimentDescriptionFrame extends JFrame {
 				if (this.descriptionVariables.elementAt(j).stringBuffer.size() < 10
 						|| !this.descriptionVariables.elementAt(j).isDouble) {
 					this.descriptionVariables.elementAt(j).isDiscrete = true;
-
+                    
+					
+					
+					
+					/** Add Clusters to ConfufionsMatrix*/
+					Vector<Vector<ISelectable>> Clusters = new Vector();
+					for (int i = 0; i < this.descriptionVariables.elementAt(j).stringBuffer.size(); i++) {
+						Clusters.add(new Vector());
+					}
+					
+					for (int i = 0; i < seurat.dataManager.Experiments.size(); i++) {
+						ISelectable exp = seurat.dataManager.Experiments.elementAt(i);
+					  
+					    
+					    for (int ii = 0; ii < this.descriptionVariables.elementAt(j).stringBuffer.size(); ii++) {
+							if (this.descriptionVariables.elementAt(j).stringBuffer.elementAt(ii).equals(this.descriptionVariables.elementAt(j).stringData [i])) {
+								Clusters.elementAt(ii).add(exp);
+							}
+						}
+					    
+					
+					}
+					
+					
+					seurat.dataManager.ExpClusters.add(new Clustering(this.descriptionVariables.elementAt(j).getName(),Clusters,this.descriptionVariables.elementAt(j).stringBuffer));
+					
+					
+					
 				}
 
 			}
@@ -216,11 +247,22 @@ public class ExperimentDescriptionFrame extends JFrame {
 			
 			
 
+		
+			
+			
 		} catch (IOException e) {
 			System.out.println("Wrong file format  " + e);
 		}
 
 	}
+	
+	
+	
+	
+	
+	
+	
+	
 
 	public boolean doesntContain(Vector<String> buffer, String word) {
 		for (int i = 0; i < buffer.size(); i++) {

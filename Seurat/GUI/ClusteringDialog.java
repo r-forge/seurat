@@ -237,8 +237,20 @@ public class ClusteringDialog extends JFrame {
 				System.out.println((System.currentTimeMillis() - time)/1000);
 				
 					
-				dialog.seurat.dataManager.GeneClusters.add(new Clustering(methodRows + " , " + DistanceRows + " , "+nR, Gens));
-				dialog.seurat.dataManager.ExpClusters.add(new Clustering(methodColumns + " , " + DistanceColumns + " , "+nC, Exps));
+				Vector<String> GeneNames = new Vector();
+				for (int i = 0; i < Gens.size(); i++) {
+					GeneNames.add(""+i);
+				}
+				
+				
+				
+				Vector<String> ExpsNames = new Vector();
+				for (int i = 0; i < Gens.size(); i++) {
+					ExpsNames.add(""+i);
+				}
+				
+				dialog.seurat.dataManager.GeneClusters.add(new Clustering(methodRows + " , " + DistanceRows + " , "+nR, Gens,GeneNames));
+				dialog.seurat.dataManager.ExpClusters.add(new Clustering(methodColumns + " , " + DistanceColumns + " , "+nC, Exps,ExpsNames));
 				
 				
 
