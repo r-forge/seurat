@@ -647,7 +647,7 @@ public class Seurat extends JFrame implements ColorListener {
 		plotsMenu = new JMenu("Plots");
 		menuBar.add(plotsMenu);
 
-		item = new JMenuItem("Heatmap Genexpressions");
+		item = new JMenuItem("Heatmap Gene Expressions");
 		item.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				// {"ARSA","BBURCG","BBWRCG","TSP","Chen","MDS","HC","GW","OLO"};
@@ -684,7 +684,7 @@ public class Seurat extends JFrame implements ColorListener {
 							.add(dataManager.Experiments.elementAt(order[i]));
 				}
 
-				GlobalView frame = new GlobalView(seurat, "GlobalView",
+				GlobalView frame = new GlobalView(seurat, "Heatmap Gene Expressions",
 						Experiments, Genes, false);
 				frame.applyNewPixelSize(seurat.settings.PixelW,seurat.settings.PixelH);
 				// GlobalView frame = new GlobalView(seurat, "GlobalView",

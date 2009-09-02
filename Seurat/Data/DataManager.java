@@ -74,7 +74,7 @@ public class DataManager {
 	public String ChrStart = "ChrStart";
 	public String ChrEnd = "ChrEnd";
 	public String ChrCen = "ChromosomeCen";
-	public String CloneMidPoint = "CloneMidpoint";
+	//public String CloneMidPoint = "CloneMidpoint";
 	public String CloneCytoBand = "Mapping";
 	public String States = ".States";
 	

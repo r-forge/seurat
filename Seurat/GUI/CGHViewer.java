@@ -424,12 +424,12 @@ public class CGHViewer extends JFrame {
 		}
 		
 		
-		
+		/*
 		CGHVariable varCloneMidpoint = null;
 		for (int i = 0; i < cghVariables.size(); i++) {
 			if (cghVariables.elementAt(i).name.contains(seurat.dataManager.CloneMidPoint)) varCloneMidpoint = cghVariables.elementAt(i);
 		}
-		
+		*/
 		
 		
 		CGHVariable varCloneCytoBand = null;
@@ -569,7 +569,7 @@ public class CGHViewer extends JFrame {
 				
 				
 				if (gene.chrName != null) {
-					System.out.println("-->"+gene.chrName);
+					//System.out.println("-->"+gene.chrName);
 					
 					Chromosome chromosome = seurat.dataManager.getChromosome(gene.chrName);
 					if (chromosome != null) {
@@ -587,6 +587,7 @@ public class CGHViewer extends JFrame {
 							clone.chromosome.chrStart = start;
 							clone.chromosome.chrEnd = end;
 							clone.chromosome.chrCen = cen;
+							clone.NucleoPosition = Math.round((end + start)/2);
 							
 						//	System.out.println(start + " " + end + " " + " " + pos + " " + gene.getName());
 							
@@ -614,7 +615,7 @@ public class CGHViewer extends JFrame {
 		for (int i = 0; i < CLONES.size(); i++) {
 			Clone clone = CLONES.elementAt(i);
 			//System.out.println(varCloneMidpoint.doubleData);
-			clone.NucleoPosition = varCloneMidpoint.doubleData [clone.ID];
+		//	clone.NucleoPosition = varCloneMidpoint.doubleData [clone.ID];
 			clone.CytoBand = varCloneCytoBand.stringData [clone.ID];
 			clone.chromosome.Center = varChrCen.doubleData [clone.ID];
 		}

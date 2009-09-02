@@ -78,6 +78,15 @@ class ChrView extends JFrame implements MatrixWindow, IPlot {
 			      panel.setPreferredSize(new Dimension((int)Math.round(width*1.33),panel.getHeight()));
 			      panel.setSize(new Dimension((int)Math.round(width*1.33),panel.getHeight()));
 			      
+			      
+			      if ((int)Math.round(width*1.66) < 1200) {
+			    	  setSize(new Dimension((int)Math.round(width*1.33)+40,getHeight()));
+				     
+			      }
+			      
+			      else   setSize(new Dimension(1200,getHeight()));
+			      
+			      
 			      updateSelection();
 			      setVisible(true);
 			}

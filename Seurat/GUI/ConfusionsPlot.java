@@ -32,7 +32,13 @@ public class ConfusionsPlot extends JFrame implements IPlot {
 
 		this.getContentPane().setLayout(new BorderLayout());
 		this.getContentPane().add(new JScrollPane(panel), BorderLayout.CENTER);
-		this.setBounds(400, 400, 300, 300);
+		
+		
+		
+		this.setBounds(400, 0, 
+				(int)Math.min(800,Experiments1.Names.size()*80 + panel.abstandLinks + panel.abstandRechts), 
+				(int)Math.min(800,Experiments2.Names.size()*80 + 30)
+		);
 
 		this.setVisible(true);
 		
@@ -92,6 +98,8 @@ class ConfusionsPanel extends JPanel implements KeyListener, MouseListener,
 	Image image;
 
 	int abstandLinks = 80;
+	int abstandRechts = 5;
+	
 
 	int abstandOben = 20;
 
@@ -295,7 +303,7 @@ class ConfusionsPanel extends JPanel implements KeyListener, MouseListener,
 		
 		
 	    
-        int width = this.getWidth() - 25;
+        int width = this.getWidth() - abstandLinks - abstandRechts;
         int height = this.getHeight() - 25;
         
        
@@ -354,8 +362,8 @@ class ConfusionsPanel extends JPanel implements KeyListener, MouseListener,
        	     int c = height/counts [0].length;
        	
        	     
-       	     if (isPointInRect(x + (b-w)/2 +22,y + (c-h)/2,point1,point2) &&
-       	    		isPointInRect(x + (b-w)/2 +22 + w,y + (c-h)/2 + h,point1,point2)) {
+       	     if (isPointInRect(x + (b-w)/2 +abstandLinks,y + (c-h)/2,point1,point2) &&
+       	    		isPointInRect(x + (b-w)/2 +abstandLinks + w,y + (c-h)/2 + h,point1,point2)) {
        	    	 selectRect(i,j);
        	     }
        	     
@@ -496,7 +504,7 @@ class ConfusionsPanel extends JPanel implements KeyListener, MouseListener,
 		
 		
 		
-		int width = this.getWidth() - 25;
+		int width = this.getWidth() - abstandLinks - abstandRechts;
         int height = this.getHeight() - 25;
         
         int [][] counts = new int [matrix.length][matrix [0].length];
@@ -516,7 +524,7 @@ class ConfusionsPanel extends JPanel implements KeyListener, MouseListener,
 
 		
 		     
-		int i = counts.length * (e.getX()-22)/ width;
+		int i = counts.length * (e.getX()-abstandLinks)/ width;
 		int j = (e.getY() - 20) * counts [0].length / height;
 		
 		isSelected [Columns.elementAt(i)][Rows.elementAt(j)] = counts [i][j];
@@ -1220,13 +1228,13 @@ class ConfusionsPanel extends JPanel implements KeyListener, MouseListener,
         g.setColor(Color.black);
         
         
-        int width = this.getWidth() - 25;
+        int width = this.getWidth() - abstandLinks - abstandRechts;
         int height = this.getHeight() - 25;
         
         
-        g.drawLine(20, 22, this.getWidth()-3 , 22);
+        g.drawLine(abstandLinks, 22, this.getWidth()- abstandRechts, 22);
 	    
-	    g.drawLine(20, 22 , 20,   this.getHeight()-5);
+	    g.drawLine(abstandLinks, 22 , abstandLinks,   this.getHeight()-5);
 		
 	    
 	
@@ -1256,20 +1264,35 @@ class ConfusionsPanel extends JPanel implements KeyListener, MouseListener,
             
             
             
+            for (int j = 0; j < counts [0].length; j++) {
+       		 
+       		 
+       		 
+    		 	g.setColor(Color.black);
+    		 	String s = cutLabels(Experiments2.Names.elementAt(Rows.elementAt(j)), abstandLinks-10,g);
+    		 	
+            	g.drawString(s, abstandLinks - getLength(s,g)-5, height * j/counts [0].length + 20 + height/counts [0].length/2);
+        
+            
+            
+            }
+            
+            
            
             
            
             for (int i = 0; i < counts.length; i++) {
             	g.setColor(Color.black);
             	
-            	g.drawString(""+(Columns.elementAt(i)+1) + "", width* i/counts.length+width/counts.length/2 + 22, 20);
+            	String s = ""+cutLabels(Experiments1.Names.elementAt(Columns.elementAt(i)),(width-10)/counts.length,g);
+            	
+            	g.drawString(s, width* i/counts.length + abstandLinks  + (width/counts.length - getLength(s,g))/2   , 20);
             	
             	 for (int j = 0; j < counts [0].length; j++) {
             		 
             		 
             		 
             		 	g.setColor(Color.black);
-                    	g.drawString((Rows.elementAt(j)+1) + "", 5, height * j/counts [0].length + 20 + height/counts [0].length/2);
                     	
                     
             		 int x = width* i/counts.length;
@@ -1281,9 +1304,9 @@ class ConfusionsPanel extends JPanel implements KeyListener, MouseListener,
             	     int c = height/counts [0].length;
             		 
             	     
-            	     g.drawLine(width* (i+1)/counts.length+22, 22, width* (i+1)/counts.length+22, this.getHeight()-5);
+            	     g.drawLine(width* (i+1)/counts.length+abstandLinks, 22, width* (i+1)/counts.length+abstandLinks, this.getHeight()-5);
             	     
-            	     g.drawLine(20, height * (j+1)/counts [0].length + 20, this.getWidth()-3, height * (j+1)/counts [0].length + 20);
+            	     g.drawLine(abstandLinks, height * (j+1)/counts [0].length + 20, this.getWidth()-abstandRechts, height * (j+1)/counts [0].length + 20);
                   	
             		 
             	     
@@ -1293,21 +1316,21 @@ class ConfusionsPanel extends JPanel implements KeyListener, MouseListener,
             	//	 else g.setColor(new Color(144,155,222));
             		 
             		 
-                 	g.fillRect(x + (b-w)/2 +22,y + (c-h)/2,w,h);
+                 	g.fillRect(x + (b-w)/2 +abstandLinks,y + (c-h)/2,w,h);
                  	
                  	
                  	g.setColor(Color.RED);
                  	if (isSelected [Columns.elementAt(i)][Rows.elementAt(j)] > 0) {
                  		double koeff = (double)isSelected [Columns.elementAt(i)][Rows.elementAt(j)] / counts [i][j];
                  		
-                 		g.fillRect(x + (b-w)/2 +22,(int)Math.round(y + (c+h)/2 - h*koeff),w,(int)Math.round(h*koeff));
+                 		g.fillRect(x + (b-w)/2 +abstandLinks,(int)Math.round(y + (c+h)/2 - h*koeff),w,(int)Math.round(h*koeff));
                         
                  	}
                  	
                  	
                  	 g.setColor(Color.black);
              		
-                  	if (w != 0) g.drawRect(x + (b-w)/2 +22,y + (c-h)/2,w,h);
+                  	if (w != 0) g.drawRect(x + (b-w)/2 +abstandLinks,y + (c-h)/2,w,h);
             	     
             	 
             	 /*
@@ -1348,7 +1371,7 @@ class ConfusionsPanel extends JPanel implements KeyListener, MouseListener,
             	g.setColor(Color.RED);
             	
             	g.drawRect(
-            			width* colShift/counts.length+22,
+            			width* colShift/counts.length+abstandLinks,
             			
             			height * rowShift/counts [0].length + 20,
             			
@@ -1358,7 +1381,7 @@ class ConfusionsPanel extends JPanel implements KeyListener, MouseListener,
             			);
             			
             	g.drawRect(
-            			width* colShift/counts.length+22+1,
+            			width* colShift/counts.length+abstandLinks+1,
             			
             			height * rowShift/counts [0].length + 20+1,
             			
@@ -1368,7 +1391,7 @@ class ConfusionsPanel extends JPanel implements KeyListener, MouseListener,
             			);
             	
             	g.drawRect(
-            			width* colShift/counts.length+22-1,
+            			width* colShift/counts.length+abstandLinks-1,
             			
             			height * rowShift/counts [0].length + 20-1,
             			
@@ -1404,6 +1427,82 @@ class ConfusionsPanel extends JPanel implements KeyListener, MouseListener,
 
 	}
 
+	
+	
+	
+	
+	
+	
+	public String cutLabels(String s, int availablePlace, Graphics g) {
+		s = s.replaceAll("\"", "");
+		String ss = this.cutLabelsHelp(s, availablePlace, g);
+		if (ss.length() < 5)
+			return ss;
+
+		int Width = 0;
+		for (int i = 0; i < ss.length(); i++)
+			Width += g.getFontMetrics().charWidth(ss.charAt(i));
+		if (Width < availablePlace)
+			return ss;
+
+		while (Width > availablePlace) {
+			Width = 0;
+			ss = ss.substring(0, ss.length() - 1);
+			for (int i = 0; i < ss.length(); i++)
+				Width += g.getFontMetrics().charWidth(ss.charAt(i));
+
+		}
+
+		return ss;
+
+	};
+	
+	
+	
+	
+	public int getLength(String s , Graphics g) {
+		int Width = 0;
+		for (int i = 0; i < s.length(); i++)
+			Width += g.getFontMetrics().charWidth(s.charAt(i));
+	    
+	    return Width;
+	}
+
+
+	
+
+	public String cutLabelsHelp(String s, int availablePlace, Graphics g) {
+		int Width = 0;
+		for (int i = 0; i < s.length(); i++)
+			Width += g.getFontMetrics().charWidth(s.charAt(i));
+		if (Width < availablePlace)
+			return s;
+
+		Width = 0;
+		/*
+		 * String[] split = s.split(" "); String cutS = ""; if (split.length >
+		 * 1) {
+		 * 
+		 * for (int i = 0; i < split.length; i++) if (split[i].length() > 1)
+		 * cutS += split[i].substring(0, 1); else cutS += split[i]; for (int i =
+		 * 0; i < cutS.length(); i++) Width +=
+		 * g.getFontMetrics().charWidth(cutS.charAt(i)); if (Width <
+		 * availablePlace) return cutS; }
+		 */
+
+		s = s.replaceAll("ck", "c");
+		String cutS = "";
+		for (int i = 0; i < s.length(); i++) {
+			char c = s.charAt(i);
+			// if (c != 'e' && c != 'u' && c != 'i' && c != 'o' && c != 'ü'
+			// && c != 'a' && c != 'ö' && c != 'ä' && c != 'y')
+			cutS += c;
+		}
+
+		return cutS;
+
+	}
+	
 	
 	
 	
@@ -1473,7 +1572,7 @@ class ConfusionsPanel extends JPanel implements KeyListener, MouseListener,
 		
 		if (!e.isControlDown()) return null;
 		
-		int width = this.getWidth() - 25;
+		int width = this.getWidth() - abstandLinks - abstandRechts;
         int height = this.getHeight() - 25;
         
         int [][] counts = new int [matrix.length][matrix [0].length];
@@ -1487,7 +1586,7 @@ class ConfusionsPanel extends JPanel implements KeyListener, MouseListener,
 		
 		
 		
-		int i = counts.length * e.getX()/ width;
+		int i = counts.length * (e.getX()-abstandLinks)/ width;
 		int j = (e.getY() - 20) * counts [0].length / height;
      	
 		if (i<0 || j<0 || i >= counts.length || j >= counts [0].length) return null;

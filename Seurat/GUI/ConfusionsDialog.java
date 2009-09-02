@@ -68,7 +68,7 @@ public class ConfusionsDialog extends JFrame {
 		panel.setBorder(BorderFactory.createEtchedBorder());
 		
 		 ButtonGroup gr = new ButtonGroup();
-	     experimentsBtn = new JRadioButton("Experiments");
+	     experimentsBtn = new JRadioButton("Samples");
 	     gr.add(experimentsBtn);
 		    genesBtn = new JRadioButton("Genes");
 		 
@@ -83,7 +83,7 @@ public class ConfusionsDialog extends JFrame {
 		genesBtn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				Vector names = new Vector();
-				for (int i = 0; i < dataManager.ExpClusters.size(); i++) {
+				for (int i = 0; i < dataManager.GeneClusters.size(); i++) {
 		          names.add(dataManager.GeneClusters.elementAt(i).name);			
 				}
 				

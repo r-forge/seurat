@@ -35,7 +35,7 @@ public class SeriationDialog extends JFrame {
 	JButton okBtn = new JButton("Ok");
 
 	String[] SeriationMethods = { "ARSA", "BBURCG", "BBWRCG", "TSP", "Chen",
-			"MDS"};
+			"MDS","BEA", "PCA"};
 
 	JComboBox box = new JComboBox(SeriationMethods);
 
@@ -144,8 +144,8 @@ Vector<ISelectable> Experiments;
 					+ Distance + "\")");
 			// rConnection.voidEval("order<-seriate(d,method=NULL,control =
 			// NULL)");
-			dataManager.rConnection.voidEval("order<-seriate(d,method=\"" + method
-					+ "\")");
+			if (!method.equals("BEA") && !method.equals("PCA")) dataManager.rConnection.voidEval("order<-seriate(d,method=\"" + method  + "\")");
+			else dataManager.rConnection.voidEval("order<-seriate(tempData,method=\"" + method + "\")");
 
 			int[] orderZeilen = dataManager.rConnection.eval("get_order(order,1)")
 					.asIntegers();
@@ -163,8 +163,8 @@ Vector<ISelectable> Experiments;
 			dataManager.rConnection.voidEval("d<-dist(tempData,method=\""
 					+ Distance + "\")");
 			
-			dataManager.rConnection.voidEval("order<-seriate(d,method=\"" + method
-					+ "\")");
+			if (!method.equals("BEA") && !method.equals("PCA")) dataManager.rConnection.voidEval("order<-seriate(d,method=\"" + method+ "\")");
+			else dataManager.rConnection.voidEval("order<-seriate(tempData,method=\"" + method+ "\")");
 
 			int[] orderSpalten = dataManager.rConnection.eval("get_order(order,1)")
 					.asIntegers();
@@ -202,11 +202,11 @@ Vector<ISelectable> Experiments;
 		} catch (RserveException e) {
 			e.printStackTrace();
 			
-			JOptionPane.showMessageDialog(this, "Calculation failed.");
+			JOptionPane.showMessageDialog(this, "Calculation failed." + e.getRequestErrorDescription() );
 		}
 	} catch (Exception e) {
 		e.printStackTrace();
-		JOptionPane.showMessageDialog(this, "Calculation failed.");
+		JOptionPane.showMessageDialog(this, "Calculation failed: " + e.getMessage() );
 	}
 
 	}
