@@ -82,14 +82,14 @@ the result of the segmentation algorithm and the entries are "-1","0"
 or "1", which correspond to a cytogenetic loss, no change or gain.<br>
 To link the CGH data with the gene expression data, the following six
 columns are needed: "ChromosomeNumber", "ChrStart", "ChrEnd",
-"ChrMidpoint", "ChromosomeCen", "Mapping". The variables "ChrStart",
-"ChrEnd" and "ChrMidpoint" contain the start, end and midpoint
+"CloneMidpoint", "ChromosomeCen", "Mapping". The variables "ChrStart",
+"ChrEnd" and "CloneMidpoint" contain the start, end and midpoint
 nucleotide positions of each CGH clone. "Mapping" gives the cytoband
 location of the CGH clone and "ChromosomeCen" gives the nucleotide
 position of the centromere of the chromosome (so it is the same for all
 clones on the same chromosome). See the example for details: <br>
 <br>
-<pre>CloneID ChromosomeNumber ChrStart ChrEnd ChrMidpoint Mapping ChromosomeCen sample.1.States ... sample.n.States<br>clone.1        1            145     605      375       1q41     124300000         1                    0<br>clone.2       22            11233   12034    11633     22q13    11800000          -1                   1 <br>...<br>clone.w        X            NA      NA       NA        Xq22     59500000          0                    -1 <br><pre>  <br><br>
+<pre>CloneID ChromosomeNumber ChrStart ChrEnd CloneMidpoint Mapping ChromosomeCen sample.1.States ... sample.n.States<br>clone.1        1            145     605      375       1q41     124300000         1                    0<br>clone.2       22            11233   12034    11633     22q13    11800000          -1                   1 <br>...<br>clone.w        X            NA      NA       NA        Xq22     59500000          0                    -1 <br><pre>  <br><br>
 </pre></pre>
 </div>
 </body>
