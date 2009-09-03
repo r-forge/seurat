@@ -10,7 +10,7 @@
 <div id="inhalt">
   <h1>Download and Installation</h1>
   <br/><br/>
-  <h2>Requirements</h2>
+  <h2>R and Java Runtime Environment</h2>
   <br/>
   In order to run Seurat the latest <a href="http://java.sun.com/javase/downloads/index.jsp" target="_blank">JRE</a> (or JDK) and the latest <a href="http://cran.r-project.org/">R</a> version need to be installed.
   In addition, to perform any clustering and seriation analysis, the R packages <a href="http://www.rforge.net/Rserve/index.html" target="_blank">Rserve</a>, <a href="http://cran.r-project.org/web/packages/amap/index.html">amap</a> and <a href="http://cran.r-project.org/web/packages/seriation/index.html" target="_blank">seriation</a> need to be installed.
@@ -38,8 +38,23 @@ You should have received a copy of the GNU General Public License
 along with this program; if not, see <a href="http://www.gnu.org/licenses/" target="_blank">http://www.gnu.org/licenses/</a>.
 </pre>
   <br/><br/>
-  <a href="download/Seurat.jar">Seurat.jar</a>&nbsp;&nbsp;&nbsp; <b>Version 0.1 10/01/2009</b>
+  <a href="download/Seurat.zip">Seurat.zip</a>&nbsp;&nbsp;&nbsp; <b>Version 0.1 10/01/2009</b>
   <br/><br/>
+  <h2>Installation and Run</h2> 
+  <br/><br/>
+  <p class="textos">To install just download the .zip file, unzip it and:</p>
+  <ul>
+      <br/><br/> 
+      <li><strong>Windows</strong>: Windows users have to launch Rserve manually by typing the following into the R console:
+      <br/><br/> <pre>library(Rserve);Rserve()</pre></li> <br/>
+      double click on Seurat.bat, or type Seurat.bat in the command line.
+      <br/> <br/>
+      <li><strong>Linux</strong>: Launch the Seurat.jar file within via the terminal by:
+      <br/><br/><pre>java -jar Seurat.jar</pre></li>
+       <br/><br/> 
+      <li><strong>MacOS X</strong>: same as for Linux (an .app will follow)</li>
+       <br/><br/> 
+  </ul>    
   <h2>Sample Data</h2> 
   <br/> 
 Here are some sample data sets, which are ready to load and test with Seurat:
