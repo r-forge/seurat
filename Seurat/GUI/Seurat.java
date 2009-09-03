@@ -278,6 +278,18 @@ public class Seurat extends JFrame implements ColorListener {
 							createGeneInfo((Gene) object);
 							return;
 						}
+						
+						
+						
+						
+						if (object.isClone()) {
+							// System.out.println(object.getName() + "  "
+							// +object.getType());
+
+							createCloneInfo((Clone) object);
+							return;
+						}
+
 
 					}
 
@@ -1371,6 +1383,99 @@ public class Seurat extends JFrame implements ColorListener {
 
 		}
 	}
+	
+	
+	
+	
+	
+	public void createCloneInfo(Clone clone) {
+		// this.middlePanel.removeAll();
+
+		JEditorPane editorPane = new JEditorPane("text/html", "");
+		StyleSheet css = ((HTMLEditorKit) editorPane.getEditorKit())
+				.getStyleSheet();
+		Style style = css.getStyle("body");
+		JTextField tempField = new JTextField();
+		editorPane.setBorder(tempField.getBorder());
+		StyleConstants.setRightIndent(style, (float) (2.0));
+		StyleConstants.setLeftIndent(style, (float) (2.0));
+		StyleConstants.setSpaceBelow(style, (float) (-2.0));
+		StyleConstants.setSpaceAbove(style, (float) (-2.0));
+		StyleConstants.setFontFamily(style, tempField.getFont().getFamily());
+		StyleConstants.setFontSize(style, tempField.getFont().getSize());
+
+	
+
+			String text = "<html><body><font face='Arial'><font color='#20000'><table border='0' ALIGN=LEFT>";
+
+			int m = 0;
+
+			for (int i = 0; i < dataManager.cghVariables.size(); i++) {
+
+				CGHVariable var = dataManager.cghVariables.elementAt(i);
+				if (m < var.getName().length())
+					m = var.getName().length();
+
+			}
+
+			for (int i = 0; i < dataManager.cghVariables.size(); i++) {
+
+				CGHVariable var = dataManager.cghVariables.elementAt(i);
+
+				text += "<tr ALIGN=LEFT><th ALIGN=LEFT><h4>" + var.getName()
+						+ ":</th>";
+				// int k = m - var.getName().length();
+				// for (int j = 0; j < k; j++)
+				// text+=" ";
+
+		
+					text += "<th ALIGN=LEFT><h4>"+ var.stringData[var.getID()] + "</th></tr>";
+			
+			}
+
+			text += "</body></html>";
+
+			editorPane.setEditable(false);
+			editorPane.addHyperlinkListener(new HyperlinkListener() {
+				public void hyperlinkUpdate(HyperlinkEvent e) {
+					if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
+						System.out.println("Open browser: " + e.getURL());
+						try {
+							BrowserLauncher launcher = new BrowserLauncher();
+							launcher.openURLinBrowser("" + e.getURL());
+
+						} catch (BrowserLaunchingInitializingException e1) {
+							// TODO Auto-generated catch block
+							e1.printStackTrace();
+						} catch (UnsupportedOperatingSystemException e1) {
+							// TODO Auto-generated catch block
+							e1.printStackTrace();
+						}
+					}
+				}
+			});
+
+			editorPane.setText(text);
+
+			/*
+			 * JTextArea pp = new JTextArea(text);
+			 * pp.setBackground(Color.WHITE); // pp.setLayout(new
+			 * GridLayout(dataManager.descriptionVariables.size(),1));
+			 * middlePanel.setLayout(new BorderLayout()); middlePanel.add(new
+			 * JScrollPane(pp));
+			 */
+
+			Info info = new Info(seurat, clone.getName());
+			info.getContentPane().add(new JScrollPane(editorPane),
+					BorderLayout.CENTER);
+			info.setSize(new Dimension(500, 700));
+			info.setVisible(true);
+
+		
+	}
+	
+	
+	
 	
 	
 	

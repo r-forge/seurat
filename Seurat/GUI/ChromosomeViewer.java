@@ -84,9 +84,13 @@ class ChromosomeView extends JFrame implements MatrixWindow, IPlot, MouseListene
 		ChromosomePanel panel = new ChromosomePanel(seurat,this, chr,Cases);
 	      p.add(panel);
 	      
+	     
+	     this.addKeyListener(panel); 
+	      
 	      this.panel = panel;
 		
 		infoPanel = new JPanel();
+		infoPanel.addKeyListener(panel); 
 	
 		infoPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
 		
@@ -99,6 +103,16 @@ class ChromosomeView extends JFrame implements MatrixWindow, IPlot, MouseListene
 			     
 			      globalView.panel.setPreferredSize(new Dimension((int)Math.round(width*1.33),globalView.panel.getHeight()));
 			      globalView.panel.setSize(new Dimension((int)Math.round(width*1.33),globalView.panel.getHeight()));
+			      
+			      
+			      
+			      if ((int)Math.round(width*1.33) < 1200) {
+			    	  setSize(new Dimension((int)Math.round(width*1.33)+40,getHeight()));
+			      }
+			      else setSize(new Dimension(1200,getHeight()));
+			      
+			      
+			      
 			      
 			      
 			      updateSelection();
@@ -137,7 +151,7 @@ class ChromosomeView extends JFrame implements MatrixWindow, IPlot, MouseListene
 		
 		
 		infoPanel.setBorder(BorderFactory.createEtchedBorder());
-		this.getContentPane().add(infoPanel,BorderLayout.SOUTH);
+		//this.getContentPane().add(infoPanel,BorderLayout.SOUTH);
 		
 		
 		this.addMouseListener(panel);
@@ -313,8 +327,7 @@ class ChromosomeView extends JFrame implements MatrixWindow, IPlot, MouseListene
 
 
 
-class ChromosomePanel extends JPanel implements MouseListener, IPlot,
-		MouseMotionListener {
+class ChromosomePanel extends JPanel implements MouseListener, IPlot, MouseMotionListener, KeyListener {
 	DataManager dataManager;
 
 	Seurat seurat;
@@ -376,7 +389,7 @@ class ChromosomePanel extends JPanel implements MouseListener, IPlot,
 		this.addMouseListener(this);
 		this.addMouseMotionListener(this);
 		
-		
+		this.addKeyListener(this);
 		
 		 calcLength();
 		
@@ -1102,6 +1115,81 @@ for (int ii = 0; ii < chrs.size(); ii++) {
 			}
 		}
 		return res;
+	}
+
+
+
+
+	public void keyPressed(KeyEvent arg0) {
+		// TODO Auto-generated method stub
+		
+		
+		
+		
+		
+		
+if (arg0.getKeyCode() == 38) {
+			
+	int width = getWidth();
+    
+   setPreferredSize(new Dimension((int)Math.round(width*1.33),getHeight()));
+    setSize(new Dimension((int)Math.round(width*1.33),getHeight()));
+    
+    
+    
+    if ((int)Math.round(width*1.33) < 1200) {
+  	  cView.setSize(new Dimension((int)Math.round(width*1.33)+40,cView.getHeight()));
+    }
+    else cView.setSize(new Dimension(1200,getHeight()));
+    
+    
+    
+    
+    
+    cView.updateSelection();
+    cView.setVisible(true);
+			
+			
+			
+		}
+		
+		
+        if (arg0.getKeyCode() == 40) {
+        	int width = getWidth();
+			
+			 setPreferredSize(new Dimension((int)Math.round(width*0.66),getHeight()));
+			 setSize(new Dimension((int)Math.round(width*0.66),getHeight()));
+			      
+			    
+		      if ((int)Math.round(width*0.66) < getWidth()) {
+		    	  cView.setSize(new Dimension((int)Math.round(width*0.66)+40,cView.getHeight()));
+			     
+		      }
+		      cView.updateSelection();
+		      cView.setVisible(true);
+		}
+        
+        
+        
+        
+        
+		
+	}
+
+
+
+
+	public void keyReleased(KeyEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+
+
+	public void keyTyped(KeyEvent e) {
+		// TODO Auto-generated method stub
+		
 	}
 	
 	
