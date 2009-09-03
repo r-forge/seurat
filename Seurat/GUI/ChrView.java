@@ -66,6 +66,10 @@ class ChrView extends JFrame implements MatrixWindow, IPlot {
 		}
 		
 		infoPanel = new JPanel();
+		
+		
+		addKeyListener(panel); 
+		infoPanel.addKeyListener(panel); 
 	
 		infoPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
 		
@@ -121,7 +125,7 @@ class ChrView extends JFrame implements MatrixWindow, IPlot {
 		
 		
 		infoPanel.setBorder(BorderFactory.createEtchedBorder());
-		this.getContentPane().add(infoPanel,BorderLayout.SOUTH);
+		//this.getContentPane().add(infoPanel,BorderLayout.SOUTH);
 		
 		
 		
@@ -202,7 +206,7 @@ class ChrView extends JFrame implements MatrixWindow, IPlot {
 }
 
 class ChrPanel extends JPanel implements MouseListener, IPlot,
-		MouseMotionListener {
+		MouseMotionListener,KeyListener {
 	DataManager dataManager;
 
 	Seurat seurat;
@@ -261,6 +265,8 @@ class ChrPanel extends JPanel implements MouseListener, IPlot,
 
 		this.addMouseListener(this);
 		this.addMouseMotionListener(this);
+		
+		addKeyListener(this);
 		
 	}
 
@@ -1118,6 +1124,62 @@ public void selectPoint(int xx1, int yy1) {
 	public void removeColoring() {
 		// TODO Auto-generated method stub
 
+	}
+
+
+	public void keyPressed(KeyEvent arg0) {
+		// TODO Auto-generated method stub
+		
+if (arg0.getKeyCode() == 38) {
+	 int width = getWidth();
+     setPreferredSize(new Dimension((int)Math.round(width*1.33),getHeight()));
+     setSize(new Dimension((int)Math.round(width*1.33),getHeight()));
+     
+     
+     if ((int)Math.round(width*1.66) < 1200) {
+   	  cView.setSize(new Dimension((int)Math.round(width*1.33)+40,cView.getHeight()));
+	     
+     }
+     
+     else   cView.setSize(new Dimension(1200,getHeight()));
+     
+     
+     cView.updateSelection();
+    cView. setVisible(true);
+			
+		}
+		
+		
+        if (arg0.getKeyCode() == 40) {
+        	
+        	 int width = getWidth();
+		      setPreferredSize(new Dimension((int)Math.round(width*0.66),getHeight()));
+		      setSize(new Dimension((int)Math.round(width*0.66),getHeight()));
+		      
+		      if ((int)Math.round(width*0.66) < getWidth()) {
+		    	  cView.setSize(new Dimension((int)Math.round(width*0.66)+40,cView.getHeight()));
+			     
+		      }
+		      cView.updateSelection();
+		      cView.setVisible(true);
+		      
+		}
+        
+		
+		
+		
+	}
+
+
+	public void keyReleased(KeyEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	public void keyTyped(KeyEvent e) {
+		// TODO Auto-generated method stub
+		
 	}
 
 	
