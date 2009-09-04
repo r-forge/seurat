@@ -100,14 +100,14 @@ A clustering of the gene expression data can be performed by:<br>
 <br>
 <em><b>Plots -&gt; Clustering </b></em> <br>
 <br>
-Seurat provides agglomerative hierarchical clustering and kmeans
-clustering. In order to perform a kmeans clustering, the user has to
+Seurat provides agglomerative hierarchical clustering and k-means
+clustering. In order to perform a k-means clustering, the user has to
 choose this from the available methods and provide the number of
 desired sample and gene clusters. Otherwise Seurat will perform
 hierarchical clustering. For both algorithms different types of
 distance measures can be chosen, e.g. euclidean, manhattan, pearson. To
 perform hierarchical clustering several linkage functions are
-available, including single, complete, and ward. The distance measures
+available, including single, complete, and Ward. The distance measures
 and linkage functions for clustering genes and samples can be chosen
 independently. The results of hierarchical clustering are visualized by
 a reordered heatmap together with the resulting dendrograms. If the
@@ -115,7 +115,7 @@ user specifies the number of gene and sample clusters and chooses a
 hierarchical clustering method, the dendrogram will be cut according to
 the number of clusters and will not be drawn.&nbsp; Instead, cluster
 boundaries will be drawn on the reordered heatmap, as for the results
-of a kmeans clustering.
+of a k-means clustering.
 <div align="left"> <img src="images/dendro.png"
  style="margin: 20px 40px;"> </div>
 The results of two clusterings can be compared by a confusion matrix.
@@ -141,7 +141,7 @@ found <a
 <br>
 Clinical data can be accessed via the data manager window. Seurat
 automatically recognizes the types of different variables. Continuous
-variables are visualized by histograms and catgeorical vatiables by
+variables are visualized by histograms and categorical variables by
 barcharts. Information about functional groups, e.g. Gene Ontology,
 KEGG, or user defined groups, is visualized by barcharts.
 <div align="left"> <img src="images/accessclin.png"
