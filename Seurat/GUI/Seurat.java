@@ -104,8 +104,8 @@ public class Seurat extends JFrame implements ColorListener {
 
 	PicCanvas contIcon, numIcon;
 
-	ImageIcon contImageIcon, numImageIcon, geneImageIcon, cloneImageIcon,
-			chrImageIcon, expImageIcon;
+	ImageIcon contImageIcon, numImageIcon, geneImageIcon,geneImageIconS, cloneImageIcon,cloneImageIconS,
+			chrImageIcon, chrImageIconS,expImageIcon;
 
 	public DataManager dataManager = new DataManager();
 
@@ -229,8 +229,8 @@ public class Seurat extends JFrame implements ColorListener {
 		tree = new JTree(treeNode);
 		DataCellRenderer renderer =
 
-		new DataCellRenderer(numImageIcon, contImageIcon, geneImageIcon,
-				chrImageIcon, cloneImageIcon, expImageIcon);
+		new DataCellRenderer(numImageIcon, contImageIcon, geneImageIcon, geneImageIconS,
+				chrImageIcon,chrImageIconS, cloneImageIcon, cloneImageIconS, expImageIcon);
 
 		tree.setCellRenderer(renderer);
 
@@ -807,13 +807,30 @@ public class Seurat extends JFrame implements ColorListener {
 
 		geneImageIcon = new ImageIcon(this.readGif("Gene.gif"));
 		System.out.println("Gene Logo loaded...");
+		
+		
+		geneImageIconS = new ImageIcon(this.readGif("GeneS.gif"));
+		System.out.println("GeneS Logo loaded...");
+		
+		
+		
 		expImageIcon = new ImageIcon(this.readGif("Exp.gif"));
 		System.out.println("Exp Logo loaded...");
 		cloneImageIcon = new ImageIcon(this.readGif("Clone.gif"));
 		System.out.println("Clone Logo loaded...");
+		
+		cloneImageIconS = new ImageIcon(this.readGif("CloneS.gif"));
+		System.out.println("Clone Logo S loaded...");
+		
+		
 		chrImageIcon = new ImageIcon(this.readGif("Chromosom.gif"));
 		System.out.println("Chromosome Logo loaded...");
 
+		chrImageIconS = new ImageIcon(this.readGif("ChromosomS.gif"));
+		System.out.println("ChromosomeS Logo loaded...");
+
+		
+		
 		logoIcon = new PicCanvas(new ImageIcon(this.readGif("logo.gif"))
 				.getImage(), this);
 
@@ -1036,7 +1053,7 @@ public class Seurat extends JFrame implements ColorListener {
 				DataCellRenderer renderer =
 
 				new DataCellRenderer(numImageIcon, contImageIcon,
-						geneImageIcon, chrImageIcon, cloneImageIcon,
+						geneImageIcon,geneImageIconS, chrImageIcon, chrImageIconS,cloneImageIcon,cloneImageIconS,
 						expImageIcon);
 
 				tree.setCellRenderer(renderer);

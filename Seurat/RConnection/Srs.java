@@ -1,8 +1,7 @@
 package RConnection;
 
 import org.rosuda.REngine.*;
-import org.rosuda.REngine.Rserve.RConnection;
-
+import org.rosuda.REngine.Rserve.*;
 import java.io.*;
 import java.util.*;
 
@@ -23,8 +22,7 @@ class StreamHog extends Thread
 }
 
 public class Srs {
-    public static boolean launchRserve(String cmd) { return launchRserve(cmd, "--vanilla","--save"); }
-    //return launchRserve(cmd, "--vanilla --slave","--no-save --slave"); }
+    public static boolean launchRserve(String cmd) { return launchRserve(cmd, "--vanilla --slave","--no-save --slave"); }
 
     public static boolean launchRserve(String cmd, String rargs, String rsrvargs) {
     try {
@@ -54,14 +52,14 @@ public class Srs {
   }
 
   public static boolean checkLocalRserve() {
-  /*  try {
+    try {
       RConnection c = new RConnection();
       System.out.println("Rserve is running.");
       c.close();
-   //   return true;
+      return true;
     } catch (Exception e) {
       System.out.println("First connect try failed with: "+e.getMessage());
-    }*/
+    }
     return (launchRserve("R") ||
             ((new File("/usr/local/lib/R/bin/R")).exists() && launchRserve("/usr/local/lib/R/bin/R")) ||
             ((new File("/usr/lib/R/bin/R")).exists() && launchRserve("/usr/lib/R/bin/R")) ||

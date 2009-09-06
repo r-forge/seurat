@@ -257,6 +257,18 @@ public class ClusteringDialog extends JFrame {
 				KMeansView globalView = new KMeansView(dialog.seurat,
 						"Clustering", Exps,Gens);
 				
+				
+				int count = 0;
+				for (int i = 0; i < Gens.size(); i++) {
+					count+=Gens.elementAt(i).size();
+				}
+				
+				int aggr = 1;
+				System.out.println(count);
+				while (count/dialog.seurat.settings.PixelH/aggr > 700) aggr++;
+				 	
+				globalView.panel.Aggregation = aggr;
+				System.out.println("Aggregation: " + aggr);
 				globalView.setLocation(350, 0);
 				globalView.panel.Model = dialog.seurat.settings.Model;
 				globalView.applyNewPixelSize(dialog.seurat.settings.PixelW,dialog.seurat.settings.PixelH);
@@ -500,7 +512,8 @@ public class ClusteringDialog extends JFrame {
 			RConnection rConnection = dataManager.getRConnection();
 			
 			
-			
+	//		rConnection.voidEval("require(amap)");
+
 			rConnection.voidEval("require(stats)");
 			rConnection.voidEval("require(amap)");
 			

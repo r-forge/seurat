@@ -93,8 +93,8 @@ int abstandUnten = 2;
 		  
 		 if (seurat.SYSTEM == seurat.WINDOWS) {
 		  
-		  this .setSize( shiftX + 17, shiftY + + infoPanel.getHeight()  + 38 +abstandUnten);
-		   } else this .setSize(shiftX + 3,shiftY + abstandUnten + infoPanel.getHeight()  + 23);
+		  this .setSize( shiftX + 14, (int)Math.min(800,shiftY + + infoPanel.getHeight()  + 41 +abstandUnten));
+		   } else this .setSize(shiftX + 7,(int)Math.min(800,shiftY + abstandUnten + infoPanel.getHeight()  + 28));
 		 
 		 updateSelection();
 		 
@@ -120,10 +120,10 @@ int abstandUnten = 2;
 		
 
 
-		this.setBounds(200, 200, 800, 800);
+		this.setBounds(200, 200, 700, 700);
 		//this.applyNewPixelSize(seurat.settings.PixelW, seurat.settings.PixelH);
 
-		this.getContentPane().add(panel, BorderLayout.CENTER);
+		this.getContentPane().add(new JScrollPane(panel), BorderLayout.CENTER);
 		this.setVisible(true);
 
 		seurat.windows.add(this);
@@ -192,11 +192,28 @@ int abstandUnten = 2;
 		
 		
 		
+	
+		  
+		  
+		  
+		  
+		  
+		
+		
+		
 		infoPanel = new JPanel();
 		//	if (Experiments.size() < 116) infoPanel.setPreferredSize(new Dimension(300,45));
 			infoPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
 			infoPanel.setBorder(BorderFactory.createEtchedBorder());
 			this.getContentPane().add(infoPanel,BorderLayout.SOUTH);
+			
+			
+			
+			
+			
+			
+			
+			
 			
 			infoLabel = new JLabel("Aggregation: 1 : " + panel.Aggregation);
 			Font myFont = new Font("SansSerif", 0, 10);

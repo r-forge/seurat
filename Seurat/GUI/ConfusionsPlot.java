@@ -46,7 +46,7 @@ public class ConfusionsPlot extends JFrame implements IPlot {
 
 		seurat.windows.add(this);
 
-		item = new JMenuItem("ComparePlot");
+		item = new JMenuItem("Confusions Matrix");
 		seurat.windowMenu.add(item);
 
 		item.addActionListener(new ActionListener() {
@@ -55,6 +55,13 @@ public class ConfusionsPlot extends JFrame implements IPlot {
 			}
 		});
 
+		
+		this.addWindowListener(new WindowAdapter() {
+			@Override
+			public void windowClosing(WindowEvent e) {
+				panel.seurat.windowMenu.remove(item);
+			}
+		});
 		
 		this.setVisible(true);
 

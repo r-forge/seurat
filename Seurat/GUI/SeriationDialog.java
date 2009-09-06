@@ -124,7 +124,10 @@ Vector<ISelectable> Experiments;
 			RConnection rConnection = dataManager.getRConnection();	
 			
 			
-			dataManager.rConnection.voidEval("library(stats)");
+			dataManager.rConnection.voidEval("require(stats)");
+			
+			
+			
 		
 			dataManager.rConnection.voidEval("require(seriation)");
 			
@@ -193,10 +196,10 @@ Vector<ISelectable> Experiments;
 			
 			
 
-			GlobalView globalView = new GlobalView(seurat, method, E,G,false);
+			GlobalView globalView = new GlobalView(seurat, "Heatmap "+method, E,G,false);
             globalView.applyNewPixelSize(seurat.settings.PixelW,seurat.settings.PixelH);
 		
-			globalView.setLocation(350, 0);
+			globalView.setLocation(333, 0);
 			globalView.setVisible(true);
 
 		} catch (RserveException e) {

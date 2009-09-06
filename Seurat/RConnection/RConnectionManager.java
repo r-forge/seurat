@@ -13,17 +13,34 @@ import org.rosuda.REngine.Rserve.RserveException;
 public class RConnectionManager {
 	
 	public void connectToR() throws InterruptedException, RserveException{
-	/*
-		try {
-		this.startRServeUnterWindows();
-		}
-		catch (Exception e) {}
-		//this.checkLocalRserve();// JOptionPane.showMessageDialog(this,"Connection
-		// to R failed...");
-		 * 
-		 */
+	
 		
-		//System.out.println("result="+Srs.checkLocalRserve());
+		
+		
+		
+		
+		if (!(System.getProperties().getProperty("os.name")).contains("Mac"))
+		{
+			boolean hasR = StartRserve.checkLocalRserve();
+		    
+		    System.out.println("Starting RServe ... "+hasR);	
+		}	
+		else {
+		
+			try {
+			    RConnection c=new RConnection();
+			    int x;
+			    c.shutdown();
+			} catch (Exception x) {};
+			this.startRServeUnterWindows();
+			Srs.checkLocalRserve();
+		
+		
+	    
+		}
+	    
+		/*
+	
 		try {
 		    RConnection c=new RConnection();
 		    int x;
@@ -31,12 +48,12 @@ public class RConnectionManager {
 		} catch (Exception x) {};
 		this.startRServeUnterWindows();
 		Srs.checkLocalRserve();
-	
+	*/
 	
 		
 		//RConnection c = new RConnection();
 		//c.close();
-		Thread.sleep(1000);
+		//Thread.sleep(1000);
 		
 		
 	}
