@@ -28,7 +28,7 @@ public class Barchart extends JFrame implements IPlot {
 
 		this.getContentPane().setLayout(new BorderLayout());
 		this.getContentPane().add(new JScrollPane(panel), BorderLayout.CENTER);
-		this.setBounds(400, 400, 250, Math.min(panel.balken.size()
+		this.setBounds(350, 0, 250, Math.min(panel.balken.size()
 				* panel.BinHeigth * 2 + panel.abstandOben + 40, 600));
 
 		this.setVisible(true);
@@ -45,6 +45,14 @@ public class Barchart extends JFrame implements IPlot {
 			}
 		});
 
+		this.addWindowListener(new WindowAdapter() {
+			@Override
+			public void windowClosing(WindowEvent e) {
+				panel.seurat.windowMenu.remove(item);
+			}
+		});
+		
+		
 		panel.calculateAbstandLinks();
 		this.setVisible(true);
 
@@ -59,7 +67,7 @@ public class Barchart extends JFrame implements IPlot {
 
 		this.getContentPane().setLayout(new BorderLayout());
 		this.getContentPane().add(new JScrollPane(panel), BorderLayout.CENTER);
-		this.setBounds(400, 400, 250, Math.min(panel.balken.size()
+		this.setBounds(350, 0, 250, Math.min(panel.balken.size()
 				* panel.BinHeigth * 2 + panel.abstandOben + 40, 600));
 
 		this.setVisible(true);
@@ -75,6 +83,14 @@ public class Barchart extends JFrame implements IPlot {
 				setVisible(true);
 			}
 		});
+		
+		this.addWindowListener(new WindowAdapter() {
+			@Override
+			public void windowClosing(WindowEvent e) {
+				panel.seurat.windowMenu.remove(item);
+			}
+		});
+		
 
 		panel.calculateAbstandLinks();
 		this.setVisible(true);

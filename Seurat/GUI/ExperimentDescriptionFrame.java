@@ -211,7 +211,8 @@ public class ExperimentDescriptionFrame extends JFrame {
 						|| !this.descriptionVariables.elementAt(j).isDouble) {
 					this.descriptionVariables.elementAt(j).isDiscrete = true;
                     
-					
+					if (this.descriptionVariables.elementAt(j).stringBuffer.size() < 25) {
+								
 					
 					
 					/** Add Clusters to ConfufionsMatrix*/
@@ -236,7 +237,7 @@ public class ExperimentDescriptionFrame extends JFrame {
 					
 					seurat.dataManager.ExpClusters.add(new Clustering(this.descriptionVariables.elementAt(j).getName(),Clusters,this.descriptionVariables.elementAt(j).stringBuffer));
 					
-					
+				}
 					
 				}
 

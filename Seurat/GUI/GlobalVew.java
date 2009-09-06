@@ -114,11 +114,11 @@ class GlobalView extends JFrame implements MatrixWindow, IPlot {
 			   int scrollbarSpace = 0;	
 			   if (panelH>840) scrollbarSpace = 16;
 			   
-			newWidth = 	5+ 	panelW + 5+14 + scrollbarSpace;
-			newHeight = 	5+	panelH+ 26+11	+ infoPanel.getHeight() + abstandUnten;
+			newWidth = 	panelW + 5+14 + scrollbarSpace;
+			newHeight = 	panelH+ 26+8	+ infoPanel.getHeight() + abstandUnten;
 			
-			  newHeight = (int)Math.min(newHeight,840);
-			   newWidth = (int)Math.min(newWidth,1600);
+			  newHeight = (int)Math.min(newHeight,830);
+			   newWidth = (int)Math.min(newWidth,1100);
 
 		} else {
 			
@@ -126,8 +126,8 @@ class GlobalView extends JFrame implements MatrixWindow, IPlot {
 		   if (panelH>840) scrollbarSpace = 16;	 
 		   newWidth = 	5+	panelW + 5 + scrollbarSpace;
 		   newHeight = 	5+	panelH+ 26 + infoPanel.getHeight() + abstandUnten;
-		   newHeight = (int)Math.min(newHeight,840);
-		   newWidth = (int)Math.min(newWidth,1600);
+		   newHeight = (int)Math.min(newHeight,830);
+		   newWidth = (int)Math.min(newWidth,1100);
 		   
 		//   newHeight = 		panelH+ 16 + infoPanel.getHeight() + abstandUnten;
 		}
@@ -242,7 +242,10 @@ class GlobalView extends JFrame implements MatrixWindow, IPlot {
 		}
 		
 		
-this.getContentPane().add(new JScrollPane(p), BorderLayout.CENTER);
+		JScrollPane sPane = new JScrollPane(p);
+		sPane.addKeyListener(panel);
+		
+this.getContentPane().add(sPane, BorderLayout.CENTER);
 		
 		
 		
@@ -1553,6 +1556,9 @@ class GlobalViewAbstractPanel extends JPanel implements MouseListener, IPlot,
 				s += "<FONT FACE = 'Arial'><TR><TD>" + exp.getName()
 						+ "  </TD><TD> ";
 
+				
+				if (Aggregation == 1) s+= gene.getName()
+				+ "  </TD><TD> "; 
 				int x = Math.max(0, e.getPoint().x - abstandLinks)
 						/ this.pixelW;
 				int y = Math.max(0, e.getPoint().y - upShift)

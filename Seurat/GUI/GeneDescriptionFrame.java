@@ -235,28 +235,52 @@ public class GeneDescriptionFrame extends JFrame {
 					
 					
 					/** Add Clusters to ConfufionsMatrix*/
+					
+					
+					
+					if (this.geneVariables.elementAt(j).stringBuffer.size() < 25) {
+					
 					Vector<Vector<ISelectable>> Clusters = new Vector();
 					for (int i = 0; i < this.geneVariables.elementAt(j).stringBuffer.size(); i++) {
 						Clusters.add(new Vector());
 					}
 					
+					if (geneVariables.elementAt(j).stringData.length < seurat.dataManager.Genes.size()) Clusters.add(new Vector());  
+					
+					
 					for (int i = 0; i < seurat.dataManager.Genes.size(); i++) {
 						ISelectable exp = seurat.dataManager.Genes.elementAt(i);
 					  
-					    
+						if (i >= this.geneVariables.elementAt(j).stringData.length) {
+							Clusters.lastElement().add(exp);
+						}
+						else {
 					    for (int ii = 0; ii < this.geneVariables.elementAt(j).stringBuffer.size(); ii++) {
+					    	
+					    	
+					    	
 							if (this.geneVariables.elementAt(j).stringBuffer.elementAt(ii).equals(this.geneVariables.elementAt(j).stringData [i])) {
 								Clusters.elementAt(ii).add(exp);
 							}
 						}
-					    
+						}
 					
 					}
 					
 					
-					seurat.dataManager.GeneClusters.add(new Clustering(this.geneVariables.elementAt(j).getName(),Clusters,this.geneVariables.elementAt(j).stringBuffer));
-				
 					
+					Vector<String> buffer = new Vector();
+					for (int i = 0; i < this.geneVariables.elementAt(j).stringBuffer.size(); i++) {
+						buffer.add(this.geneVariables.elementAt(j).stringBuffer.elementAt(i));
+					}
+					
+					if (seurat.dataManager.Genes.size() > this.geneVariables.elementAt(j).stringData.length) {
+						buffer.add("not assigned");
+					}
+					
+					seurat.dataManager.GeneClusters.add(new Clustering(this.geneVariables.elementAt(j).getName(),Clusters,buffer));
+				
+					}
 					
 					
 					

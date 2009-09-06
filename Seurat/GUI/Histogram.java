@@ -18,6 +18,9 @@ public class Histogram extends JFrame implements IPlot {
 	HistogramPanel panel;
 
 	String name;
+	
+	
+	JMenuItem item;
 
 	public Histogram(Seurat amlTool, Vector variables, String name,
 			double[] data) {
@@ -36,12 +39,20 @@ public class Histogram extends JFrame implements IPlot {
 
 		amlTool.windows.add(this);
 
-		JMenuItem item = new JMenuItem(name);
+		item = new JMenuItem(name);
 		amlTool.windowMenu.add(item);
 
 		item.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				histogram.setVisible(true);
+			}
+		});
+		
+		
+		this.addWindowListener(new WindowAdapter() {
+			@Override
+			public void windowClosing(WindowEvent e) {
+				panel.seurat.windowMenu.remove(item);
 			}
 		});
 

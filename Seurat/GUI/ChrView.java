@@ -130,9 +130,11 @@ class ChrView extends JFrame implements MatrixWindow, IPlot {
 		
 		
 		this.addMouseListener(panel);
-        this.getContentPane().add(new JScrollPane(p), BorderLayout.CENTER);
+		JScrollPane pane = new JScrollPane(p);
+		pane.addKeyListener(panel);
+        this.getContentPane().add(pane, BorderLayout.CENTER);
 		
-			this.setBounds(200,200,1020,270);
+			this.setBounds(200,200,1020,230);
 
 		// this.getContentPane().setLayout(new BorderLayout());
 		
@@ -1130,9 +1132,9 @@ public void selectPoint(int xx1, int yy1) {
 	public void keyPressed(KeyEvent arg0) {
 		// TODO Auto-generated method stub
 		
-if (arg0.getKeyCode() == 38) {
+if (arg0.getKeyCode() == 39) {
 	 int width = getWidth();
-     setPreferredSize(new Dimension((int)Math.round(width*1.33),getHeight()));
+     setPreferredSize(new Dimension((int)Math.round(width*1.33),140));
      setSize(new Dimension((int)Math.round(width*1.33),getHeight()));
      
      
@@ -1141,7 +1143,7 @@ if (arg0.getKeyCode() == 38) {
 	     
      }
      
-     else   cView.setSize(new Dimension(1200,getHeight()));
+     else   cView.setSize(new Dimension(1200,cView.getHeight()));
      
      
      cView.updateSelection();
@@ -1150,13 +1152,13 @@ if (arg0.getKeyCode() == 38) {
 		}
 		
 		
-        if (arg0.getKeyCode() == 40) {
+        if (arg0.getKeyCode() == 37) {
         	
         	 int width = getWidth();
-		      setPreferredSize(new Dimension((int)Math.round(width*0.66),getHeight()));
+		      setPreferredSize(new Dimension((int)Math.round(width*0.66),140));
 		      setSize(new Dimension((int)Math.round(width*0.66),getHeight()));
 		      
-		      if ((int)Math.round(width*0.66) < getWidth()) {
+		      if ((int)Math.round(width*0.66) < cView.getWidth()) {
 		    	  cView.setSize(new Dimension((int)Math.round(width*0.66)+40,cView.getHeight()));
 			     
 		      }

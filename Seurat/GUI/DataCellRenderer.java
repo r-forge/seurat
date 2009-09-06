@@ -15,17 +15,20 @@ import Data.Gene;
 
 
 public class DataCellRenderer extends DefaultTreeCellRenderer{
-	 Icon numIcon,discreteIcon,geneIcon,chrIcon,cloneIcon,expIcon;
+	 Icon numIcon,discreteIcon,geneIcon,geneIconS,chrIcon,cloneIcon,cloneIconS,expIcon, chrIconS;
 
 
 
-	    public DataCellRenderer(Icon numIcon,Icon discreteIcon,Icon geneIcon,Icon chrIcon,Icon cloneIcon,Icon expIcon) {
+	    public DataCellRenderer(Icon numIcon,Icon discreteIcon,Icon geneIcon,Icon geneIconS,Icon chrIcon,Icon chrIconS,Icon cloneIcon,Icon cloneIconS,Icon expIcon) {
 
 	        this.numIcon = numIcon;
 	        this.discreteIcon = discreteIcon;
             this.geneIcon = geneIcon;
+            this.geneIconS = geneIconS;
             this.chrIcon = chrIcon;
+            this.chrIconS = chrIconS;
             this.cloneIcon = cloneIcon;
+            this.cloneIconS = cloneIconS;
             this.expIcon = expIcon;
 	        
 	    }
@@ -68,6 +71,26 @@ public class DataCellRenderer extends DefaultTreeCellRenderer{
 	        		setIcon(discreteIcon);
 	        		return this;
 	        	}
+	        	
+	        	if (value instanceof DataTreeNode && ((DataTreeNode)value).object instanceof Clone) {
+	        		setIcon(cloneIconS);
+	        	    return this;
+	        	}
+	        	
+	        	
+	        	if (value instanceof DataTreeNode && ((DataTreeNode)value).object instanceof Gene) {
+	        		setIcon(geneIconS);
+	        	    return this;
+	        	}
+	        	
+	        	
+	        	if (value instanceof DataTreeNode && ((DataTreeNode)value).object instanceof Chromosome) {
+	        		setIcon(chrIconS);
+	        	    return this;
+	        	}
+	        	
+	        	
+	        	
 	        setIcon(null);
 
 	      //      setToolTipText("This book is in the Tutorial series.");
@@ -76,7 +99,7 @@ public class DataCellRenderer extends DefaultTreeCellRenderer{
 	        	
 	        	if (value instanceof DataTreeNode) {
 	        		
-	        		System.out.println("Object  "+((DataTreeNode)value).name);
+	        	//	System.out.println("Object  "+((DataTreeNode)value).name);
 	        		
 	        		Object o = ((DataTreeNode)value).object;
 	        		

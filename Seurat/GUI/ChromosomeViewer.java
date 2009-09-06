@@ -156,11 +156,14 @@ class ChromosomeView extends JFrame implements MatrixWindow, IPlot, MouseListene
 		
 		this.addMouseListener(panel);
 		
-        this.getContentPane().add(new JScrollPane(p), BorderLayout.CENTER);
+		JScrollPane pane = new JScrollPane(p,JScrollPane.VERTICAL_SCROLLBAR_NEVER,JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+		pane.addKeyListener(panel);
+		
+        this.getContentPane().add(pane, BorderLayout.CENTER);
         
        
 		
-			this.setBounds(360,0,1000,95+30*Chromosomes.size());
+			this.setBounds(340,0,1100,95+30*Chromosomes.size());
 
 		// this.getContentPane().setLayout(new BorderLayout());
 		
@@ -1128,19 +1131,19 @@ for (int ii = 0; ii < chrs.size(); ii++) {
 		
 		
 		
-if (arg0.getKeyCode() == 38) {
+if (arg0.getKeyCode() == 39) {
 			
 	int width = getWidth();
     
-   setPreferredSize(new Dimension((int)Math.round(width*1.33),getHeight()));
+    setPreferredSize(new Dimension((int)Math.round(width*1.33),30*cView.Chromosomes.size()));
     setSize(new Dimension((int)Math.round(width*1.33),getHeight()));
     
     
     
-    if ((int)Math.round(width*1.33) < 1200) {
+    if ((int)Math.round(width*1.33) < 1100) {
   	  cView.setSize(new Dimension((int)Math.round(width*1.33)+40,cView.getHeight()));
     }
-    else cView.setSize(new Dimension(1200,getHeight()));
+    else cView.setSize(new Dimension(1100,cView.getHeight()));
     
     
     
@@ -1154,14 +1157,14 @@ if (arg0.getKeyCode() == 38) {
 		}
 		
 		
-        if (arg0.getKeyCode() == 40) {
+        if (arg0.getKeyCode() == 37) {
         	int width = getWidth();
 			
-			 setPreferredSize(new Dimension((int)Math.round(width*0.66),getHeight()));
+			 setPreferredSize(new Dimension((int)Math.round(width*0.66),30*cView.Chromosomes.size()));
 			 setSize(new Dimension((int)Math.round(width*0.66),getHeight()));
 			      
 			    
-		      if ((int)Math.round(width*0.66) < getWidth()) {
+		      if ((int)Math.round(width*0.66) < cView.getWidth()) {
 		    	  cView.setSize(new Dimension((int)Math.round(width*0.66)+40,cView.getHeight()));
 			     
 		      }
