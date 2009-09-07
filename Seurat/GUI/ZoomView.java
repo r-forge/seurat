@@ -223,6 +223,11 @@ class ZoomView extends JFrame implements MatrixWindow,IPlot {
 		
 	}
 
+	public void print() {
+		// TODO Auto-generated method stub
+		
+	}
+
 }
 
 class ZoomViewPanel extends JPanel implements MouseListener, IPlot,
@@ -821,6 +826,13 @@ public void updateSelection() {
 
 
 	public void removeColoring() {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+
+	public void print() {
 		// TODO Auto-generated method stub
 		
 	}

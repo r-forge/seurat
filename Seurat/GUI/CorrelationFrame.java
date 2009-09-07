@@ -66,7 +66,7 @@ class CorrelationFrame extends JFrame implements MatrixWindow, IPlot {
 		});
 
 		this.getContentPane().setLayout(new BorderLayout());
-		panel = new CorrelationPanel(seurat, Genes, Experiments, Width,
+		panel = new CorrelationPanel(seurat, this,Genes, Experiments, Width,
 				isColumns,size);
 
 		int length = 0;
@@ -172,6 +172,20 @@ class CorrelationFrame extends JFrame implements MatrixWindow, IPlot {
 		
 	}
 
+	public void print() {
+		// TODO Auto-generated method stub
+		try {
+			   PrintJob prjob = getToolkit().getPrintJob( this,null, null );
+			   Graphics pg = prjob.getGraphics();
+			   panel.paint(pg);
+			   pg.dispose();
+			   prjob.end();
+			   }
+			   catch (Exception e) {
+				   e.printStackTrace();
+			   } 
+	}
+
 }
 
 class CorrelationPanel extends JPanel implements MouseListener,
@@ -205,11 +219,14 @@ class CorrelationPanel extends JPanel implements MouseListener,
 	Vector<ISelectable> Experiments;
 
 	int pixelSize;
+	
+	CorrelationFrame frame;
 
-	public CorrelationPanel(Seurat seurat, Vector Genes,
+	public CorrelationPanel(Seurat seurat, CorrelationFrame frame, Vector Genes,
 			Vector Experiments, int Width, boolean isColumns, int size) {
 
 		this.seurat = seurat;
+		this.frame = frame;
 		this.Width = Width;
 		this.Genes = Genes;
 		this.dataManager = seurat.dataManager;
@@ -464,6 +481,31 @@ class CorrelationPanel extends JPanel implements MouseListener,
 		    	dataManager.deleteSelection();
 		        seurat.repaintWindows();
 		    }
+		 
+		 
+		 if (e.getButton() == MouseEvent.BUTTON3 || e.isControlDown()) {
+
+				JPopupMenu menu = new JPopupMenu();
+				JMenuItem item;
+
+			    item = new JMenuItem("Print");
+			    item.addActionListener(new ActionListener() {
+				
+			    	 public void actionPerformed(ActionEvent e) {
+					// createCorrelationGenes();
+					
+					
+					
+					frame.print();
+					
+				    }
+		    	});
+			    menu.add(item);
+			    menu.show(this, e.getX(), e.getY());
+			   
+		
+		  }
+		 
 			
 		point1 = e.getPoint();
 	}

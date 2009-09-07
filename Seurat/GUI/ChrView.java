@@ -205,6 +205,11 @@ class ChrView extends JFrame implements MatrixWindow, IPlot {
 		
 	}
 
+	public void print() {
+		// TODO Auto-generated method stub
+		panel.print();
+	}
+
 }
 
 class ChrPanel extends JPanel implements MouseListener, IPlot,
@@ -678,6 +683,59 @@ public void selectPoint(int xx1, int yy1) {
 		
 		   if (e.getButton() == MouseEvent.BUTTON3 || e.isControlDown()) {
 
+				JPopupMenu menu = new JPopupMenu();
+				JMenuItem item;
+				
+				
+				
+				
+				 item = new JMenuItem("Zoom In");
+				    item.addActionListener(new ActionListener() {
+					
+				    	 public void actionPerformed(ActionEvent ee) {
+						// createCorrelationGenes();
+				    		zoomIn();
+						
+					    }
+			    	});
+				    menu.add(item);
+				    
+				    
+
+					 item = new JMenuItem("Zoom Out");
+					    item.addActionListener(new ActionListener() {
+						
+					    	 public void actionPerformed(ActionEvent ee) {
+							// createCorrelationGenes();
+					    		zoomOut();
+							
+						    }
+				    	});
+					    menu.add(item);
+				    
+				    
+				
+				menu.addSeparator();
+				
+				
+				
+				
+
+			    item = new JMenuItem("Print");
+			    item.addActionListener(new ActionListener() {
+				
+			    	 public void actionPerformed(ActionEvent e) {
+					// createCorrelationGenes();
+					
+					
+					
+					print();
+					
+				    }
+		    	});
+			    menu.add(item);
+			    menu.show(this, e.getX(), e.getY());
+			   
 		
 		  }else {
 			  System.out.println("Select Point");
@@ -1127,45 +1185,64 @@ public void selectPoint(int xx1, int yy1) {
 		// TODO Auto-generated method stub
 
 	}
+	
+	
+	
+	
+	
+	public void zoomIn() {
+		 int width = getWidth();
+	     setPreferredSize(new Dimension((int)Math.round(width*1.33),140));
+	     setSize(new Dimension((int)Math.round(width*1.33),getHeight()));
+	     
+	     
+	     if ((int)Math.round(width*1.66) < 1200) {
+	   	  cView.setSize(new Dimension((int)Math.round(width*1.33)+40,cView.getHeight()));
+		     
+	     }
+	     
+	     else   cView.setSize(new Dimension(1200,cView.getHeight()));
+	     
+	     
+	     cView.updateSelection();
+	    cView. setVisible(true);
+				
+				
+	}
+	
+	
+	public void zoomOut(){
+		
+   	 int width = getWidth();
+	      setPreferredSize(new Dimension((int)Math.round(width*0.66),140));
+	      setSize(new Dimension((int)Math.round(width*0.66),getHeight()));
+	      
+	      if ((int)Math.round(width*0.66) < cView.getWidth()) {
+	    	  cView.setSize(new Dimension((int)Math.round(width*0.66)+40,cView.getHeight()));
+		     
+	      }
+	      cView.updateSelection();
+	      cView.setVisible(true);	
+	      
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
 
 
 	public void keyPressed(KeyEvent arg0) {
 		// TODO Auto-generated method stub
 		
-if (arg0.getKeyCode() == 39) {
-	 int width = getWidth();
-     setPreferredSize(new Dimension((int)Math.round(width*1.33),140));
-     setSize(new Dimension((int)Math.round(width*1.33),getHeight()));
-     
-     
-     if ((int)Math.round(width*1.66) < 1200) {
-   	  cView.setSize(new Dimension((int)Math.round(width*1.33)+40,cView.getHeight()));
-	     
-     }
-     
-     else   cView.setSize(new Dimension(1200,cView.getHeight()));
-     
-     
-     cView.updateSelection();
-    cView. setVisible(true);
-			
-		}
+if (arg0.getKeyCode() == 39) zoomIn();
 		
 		
-        if (arg0.getKeyCode() == 37) {
-        	
-        	 int width = getWidth();
-		      setPreferredSize(new Dimension((int)Math.round(width*0.66),140));
-		      setSize(new Dimension((int)Math.round(width*0.66),getHeight()));
-		      
-		      if ((int)Math.round(width*0.66) < cView.getWidth()) {
-		    	  cView.setSize(new Dimension((int)Math.round(width*0.66)+40,cView.getHeight()));
-			     
-		      }
-		      cView.updateSelection();
-		      cView.setVisible(true);
-		      
-		}
+        if (arg0.getKeyCode() == 37) zoomOut();
         
 		
 		
@@ -1182,6 +1259,21 @@ if (arg0.getKeyCode() == 39) {
 	public void keyTyped(KeyEvent e) {
 		// TODO Auto-generated method stub
 		
+	}
+
+
+	public void print() {
+		// TODO Auto-generated method stub
+		try {
+			   PrintJob prjob = getToolkit().getPrintJob( cView,null, null );
+			   Graphics pg = prjob.getGraphics();
+			   paint(pg);
+			   pg.dispose();
+			   prjob.end();
+			   }
+			   catch (Exception e) {
+				   e.printStackTrace();
+			   } 
 	}
 
 	

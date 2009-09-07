@@ -431,6 +431,14 @@ this.getContentPane().add(sPane, BorderLayout.CENTER);
 		
 	}
 
+
+
+
+	public void print() {
+		// TODO Auto-generated method stub
+		gPanel.print();
+	}
+
 }
 
 class GlobalViewAbstractPanel extends JPanel implements MouseListener, IPlot,
@@ -1474,6 +1482,24 @@ class GlobalViewAbstractPanel extends JPanel implements MouseListener, IPlot,
 				}
 			});
 			menu.add(item);
+			
+			
+			menu.addSeparator();
+
+				    item = new JMenuItem("Print");
+				    item.addActionListener(new ActionListener() {
+					
+				    	 public void actionPerformed(ActionEvent e) {
+						// createCorrelationGenes();
+						
+						
+						
+						print();
+						
+					    }
+			    	});
+				    menu.add(item);
+				
 			
 			
 			
@@ -2868,6 +2894,23 @@ if (nodesC != null && paintDendrCols) {
 		return corr;
 	}
 
+	
+	   public void print() {
+			  
+		   try {
+		   PrintJob prjob = getToolkit().getPrintJob( globalView,null, null );
+		   Graphics pg = prjob.getGraphics();
+		   paint(pg);
+		   pg.dispose();
+		   prjob.end();
+		   }
+		   catch (Exception e) {
+			   e.printStackTrace();
+		   } 
+	   }
+	
+	
+	
 	public void brush() {
 		// TODO Auto-generated method stub
 

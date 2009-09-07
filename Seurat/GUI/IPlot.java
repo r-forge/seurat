@@ -8,4 +8,6 @@ public interface IPlot {
 	
 	public void removeColoring();
 
+	public void print();
+	
 }

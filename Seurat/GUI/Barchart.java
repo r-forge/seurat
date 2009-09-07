@@ -130,6 +130,12 @@ public class Barchart extends JFrame implements IPlot {
 		panel.removeColoring();
 	}
 
+
+	public void print() {
+		// TODO Auto-generated method stub
+		panel.print();
+	}
+
 }
 
 class BarchartPanel extends JPanel implements KeyListener, MouseListener,
@@ -185,6 +191,8 @@ class BarchartPanel extends JPanel implements KeyListener, MouseListener,
 	JPopupMenu menu;
 
 	Vector<Balken> balken;
+	
+	
 
 	public BarchartPanel(Barchart barchart, Seurat seurat, String name,
 			Vector<ISelectable> variables, String[] data) {
@@ -503,6 +511,7 @@ class BarchartPanel extends JPanel implements KeyListener, MouseListener,
 
 			menu.add(sortMenu);
 			
+			menu.addSeparator();
 			
 			item = new JMenuItem("Add Colors");
 
@@ -534,18 +543,23 @@ class BarchartPanel extends JPanel implements KeyListener, MouseListener,
 			});
 			if (variables.elementAt(0) instanceof Variable) menu.add(item);
 			
+			menu.addSeparator();
 			
 			
-			
+			 item = new JMenuItem("Print");
+				item.addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent e) {
+						// createCorrelationGenes();
+						
+						
+						
+						print();
+						
+					}
+				});
+				menu.add(item);
 
-			item = new JMenuItem("Dismiss");
-
-			item.addActionListener(new ActionListener() {
-				public void actionPerformed(ActionEvent e) {
-					menu.setVisible(false);
-				}
-			});
-			menu.add(item);
+			
 
 			menu.show(this, e.getX(), e.getY());
 
@@ -993,6 +1007,20 @@ class BarchartPanel extends JPanel implements KeyListener, MouseListener,
 			this.name = name;
 		}
 
+	}
+
+	public void print() {
+		// TODO Auto-generated method stub
+		try {
+			   PrintJob prjob = getToolkit().getPrintJob( barchart,null, null );
+			   Graphics pg = prjob.getGraphics();
+			   paint(pg);
+			   pg.dispose();
+			   prjob.end();
+			   }
+			   catch (Exception e) {
+				   e.printStackTrace();
+			   } 
 	}
 
 }

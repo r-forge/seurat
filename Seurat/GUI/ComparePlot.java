@@ -67,6 +67,11 @@ public class ComparePlot extends JFrame implements IPlot {
 		
 	}
 
+	public void print() {
+		// TODO Auto-generated method stub
+		
+	}
+
 }
 
 class ComparePanel extends JPanel implements KeyListener, MouseListener,
@@ -648,6 +653,13 @@ class ComparePanel extends JPanel implements KeyListener, MouseListener,
 		
 		
 		
+		
+	}
+
+
+
+	public void print() {
+		// TODO Auto-generated method stub
 		
 	}
 	
