@@ -56,6 +56,8 @@ GO-terms: "molecular function|ATP binding|IEA|GO:0005524|GOA/IPI,
 biological process|defense response to pathogen|IEA|GO:0042829|GOA/IPI,
 cellular component|nucleus|IEA|GO:0005634" The name of a pathway
 variable has to begin with a "#" as the first character.<br>
+If the data set contains URLs (e.g. linking to cross-references like PubMed),
+the name of the respective column has to begin with a "@" symbol.<br>  
 In order to associate the gene expression data with the array CGH data
 the gene annotation file is needed. In addition the annotation file has
 to have a column called "ChromosomeNumber" containing the number of the
@@ -82,14 +84,13 @@ the result of the segmentation algorithm and the entries are "-1","0"
 or "1", which correspond to a cytogenetic loss, no change or gain.<br>
 To link the CGH data with the gene expression data, the following six
 columns are needed: "ChromosomeNumber", "ChrStart", "ChrEnd",
-"CloneMidpoint", "ChromosomeCen", "Mapping". The variables "ChrStart",
-"ChrEnd" and "CloneMidpoint" contain the start, end and midpoint
-nucleotide positions of each CGH clone. "Mapping" gives the cytoband
+"ChromosomeCen", "Mapping". The variables "ChrStart" and
+"ChrEnd" contain the start and end nucleotide positions of each CGH clone. "Mapping" gives the cytoband
 location of the CGH clone and "ChromosomeCen" gives the nucleotide
 position of the centromere of the chromosome (so it is the same for all
 clones on the same chromosome). See the example for details: <br>
 <br>
-<pre>CloneID ChromosomeNumber ChrStart ChrEnd CloneMidpoint Mapping ChromosomeCen sample.1.States ... sample.n.States<br>clone.1        1            145     605      375       1q41     124300000         1                    0<br>clone.2       22            11233   12034    11633     22q13    11800000          -1                   1 <br>...<br>clone.w        X            NA      NA       NA        Xq22     59500000          0                    -1 <br><pre>  <br><br>
+<pre>CloneID ChromosomeNumber ChrStart ChrEnd Mapping ChromosomeCen sample.1.States ... sample.n.States<br>clone.1        1            145     605       1q41     124300000         1                    0<br>clone.2       22            11233   12034     22q13    11800000          -1                   1 <br>...<br>clone.w        X            NA      NA        Xq22     59500000          0                    -1 <br><pre>  <br><br>
 </pre></pre>
 </div>
 </body>
