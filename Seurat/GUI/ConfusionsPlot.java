@@ -28,7 +28,7 @@ public class ConfusionsPlot extends JFrame implements IPlot {
 		super("ComparePlot: ( " + method1 + " , " + method2 + " )");
 		this.seurat = seurat;
 
-		panel = new ConfusionsPanel(seurat, method1, method2, Experiments1, Experiments2);
+		panel = new ConfusionsPanel(seurat,this, method1, method2, Experiments1, Experiments2);
 
 		this.getContentPane().setLayout(new BorderLayout());
 		this.getContentPane().add(new JScrollPane(panel), BorderLayout.CENTER);
@@ -80,6 +80,11 @@ public class ConfusionsPlot extends JFrame implements IPlot {
 	public void removeColoring() {
 		// TODO Auto-generated method stub
 		
+	}
+
+	public void print() {
+		// TODO Auto-generated method stub
+		panel.print();
 	}
 
 }
@@ -163,13 +168,16 @@ class ConfusionsPanel extends JPanel implements KeyListener, MouseListener,
     Vector<Vector<Integer>> ClusterRows;
     Vector<Vector<Integer>> ClusterColumns;
     
+    ConfusionsPlot plot;
     
     int count=-1;
 
-	public ConfusionsPanel(Seurat seurat, String method1, String method2, Clustering Experiments1, Clustering Experiments2) {
+	public ConfusionsPanel(Seurat seurat, ConfusionsPlot plot, String method1, String method2, Clustering Experiments1, Clustering Experiments2) {
 
 	
 		this.seurat = seurat;
+		
+		this.plot = plot;
 	
         this.Experiments1 = Experiments1;
         this.Experiments2 = Experiments2;
@@ -465,6 +473,8 @@ class ConfusionsPanel extends JPanel implements KeyListener, MouseListener,
 			});
 			menu.add(item);
 			
+			menu.addSeparator();
+			
 			
 			item = new JMenuItem("find Group");
 			item.addActionListener(new ActionListener() {
@@ -495,8 +505,22 @@ class ConfusionsPanel extends JPanel implements KeyListener, MouseListener,
 			menu.add(item);
 			
 			
+			menu.addSeparator();
 			
 			
+			 item = new JMenuItem("Print");
+			    item.addActionListener(new ActionListener() {
+				
+			    	 public void actionPerformed(ActionEvent e) {
+					// createCorrelationGenes();
+					
+					
+					
+					print();
+					
+				    }
+		    	});
+			    menu.add(item);
 			
 			
 			
@@ -5740,6 +5764,44 @@ double crit = 0;
 
 
 
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+public void print() {
+	// TODO Auto-generated method stub
+	try {
+		   PrintJob prjob = getToolkit().getPrintJob( plot,null, null );
+		   Graphics pg = prjob.getGraphics();
+		   paint(pg);
+		   pg.dispose();
+		   prjob.end();
+		   }
+		   catch (Exception e) {
+			   e.printStackTrace();
+		   } 	
 }
 
 

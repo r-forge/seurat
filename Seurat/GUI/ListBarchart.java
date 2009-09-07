@@ -23,7 +23,7 @@ public class ListBarchart extends JFrame implements IPlot {
 		super(var.name);
 		this.seurat = seurat;
 
-		panel = new ListBarchartPanel(seurat, var,variables);
+		panel = new ListBarchartPanel(seurat,this, var,variables);
 
 		this.getContentPane().setLayout(new BorderLayout());
 		this.getContentPane().add(new JScrollPane(panel), BorderLayout.CENTER);
@@ -63,6 +63,11 @@ public class ListBarchart extends JFrame implements IPlot {
 		
 	}
 
+	public void print() {
+		// TODO Auto-generated method stub
+		panel.print();
+	}
+
 }
 
 class ListBarchartPanel extends JPanel implements KeyListener, MouseListener,
@@ -77,6 +82,8 @@ class ListBarchartPanel extends JPanel implements KeyListener, MouseListener,
 	Seurat seurat;
 
 
+	ListBarchart barChart;
+	
 	JMenuItem item = new JMenuItem("");
 
 	ListBarchartPanel barchartPanel = this;
@@ -122,12 +129,13 @@ class ListBarchartPanel extends JPanel implements KeyListener, MouseListener,
 	boolean[] selectedBalken;
 	
 
-	public ListBarchartPanel(Seurat seurat, GeneVariable var,Vector<ISelectable> variables) {
+	public ListBarchartPanel(Seurat seurat, ListBarchart bar,GeneVariable var,Vector<ISelectable> variables) {
 
 	
 		this.seurat = seurat;
 		this.variables = variables;
         this.geneVar = var;
+        this.barChart = bar;
       
 
 		// this.descriptionVariable = descriptionVariable;
@@ -417,6 +425,8 @@ class ListBarchartPanel extends JPanel implements KeyListener, MouseListener,
 			menu.add(sortMenu);
 			
 			
+			
+			/*
 	item = new  JMenuItem("Dismiss");
 			
 			item.addActionListener(new ActionListener() {
@@ -425,7 +435,23 @@ class ListBarchartPanel extends JPanel implements KeyListener, MouseListener,
 				}
 			});
 			menu.add(item);
+			*/
 			
+			menu.addSeparator();
+			
+			 item = new JMenuItem("Print");
+			    item.addActionListener(new ActionListener() {
+				
+			    	 public void actionPerformed(ActionEvent e) {
+					// createCorrelationGenes();
+					
+					
+					
+					print();
+					
+				    }
+		    	});
+			    menu.add(item);
 		
 			
 			menu.show(this,e.getX(), e.getY());
@@ -919,6 +945,24 @@ class ListBarchartPanel extends JPanel implements KeyListener, MouseListener,
 			this.ID = ID;
 		}
 		
+	}
+
+
+
+
+
+	public void print() {
+		// TODO Auto-generated method stub
+		try {
+			   PrintJob prjob = getToolkit().getPrintJob( barChart,null, null );
+			   Graphics pg = prjob.getGraphics();
+			   paint(pg);
+			   pg.dispose();
+			   prjob.end();
+			   }
+			   catch (Exception e) {
+				   e.printStackTrace();
+			   } 
 	}
 	
 	

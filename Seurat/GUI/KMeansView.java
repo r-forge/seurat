@@ -280,6 +280,11 @@ int abstandUnten = 2;
 		panel.Model = model;
 	}
 
+	public void print() {
+		// TODO Auto-generated method stub
+		panel.print();
+	}
+
 }
 
 class KmeansPanel extends JPanel implements MouseListener, IPlot,
@@ -798,6 +803,23 @@ this.repaint();
 				}
 			});
 			menu.add(item);
+			
+			menu.addSeparator();
+			
+			 item = new JMenuItem("Print");
+			    item.addActionListener(new ActionListener() {
+				
+			    	 public void actionPerformed(ActionEvent e) {
+					// createCorrelationGenes();
+					
+					
+					
+					print();
+					
+				    }
+		    	});
+			    menu.add(item);
+			
 			
 			
 
@@ -1374,6 +1396,20 @@ int panelH = this.dataManager.Experiments.elementAt(0).getBarchartToColors().siz
 		this.Aggregation = aggr;
 		applyNewPixelSize();
 		
+	}
+
+	public void print() {
+		// TODO Auto-generated method stub
+		try {
+			   PrintJob prjob = getToolkit().getPrintJob( plot,null, null );
+			   Graphics pg = prjob.getGraphics();
+			   paint(pg);
+			   pg.dispose();
+			   prjob.end();
+			   }
+			   catch (Exception e) {
+				   e.printStackTrace();
+			   } 
 	}
 
 }
