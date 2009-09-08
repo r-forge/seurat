@@ -113,6 +113,7 @@ public class DataLoader {
 
 				for (int i = 0; i < col; i++) {
 					token = st.nextToken();
+					dataManager. variables.elementAt(i).stringData[len] = token;
 
 					if ((dataManager.variables.elementAt(i)).type == Variable.Double) {
 						try {
@@ -145,7 +146,7 @@ public class DataLoader {
 								(dataManager.variables.elementAt(i)).isNotNA[len] = false;
 								(dataManager.variables.elementAt(i)).setValue(len,dataManager.NA);
 							} else {
-								(dataManager. variables.elementAt(i)).stringData[len] = token;
+								
 								(dataManager.variables.elementAt(i)).type = Variable.String;
 								(dataManager.variables.elementAt(i)).isExperiment = false;
 							}

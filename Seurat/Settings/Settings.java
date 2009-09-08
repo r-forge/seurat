@@ -17,6 +17,8 @@ public class Settings {
 	public double MAXP,MINP;
 	
 	public boolean invertShading = false;
+	
+	public static int DiscretLimit = 25;
 
 	
 
