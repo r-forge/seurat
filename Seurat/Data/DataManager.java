@@ -21,7 +21,7 @@ public class DataManager {
 	
 	public RConnection rConnection;
 
-	public double NA = 6.02E23;
+	public static double NA = 6.02E23;
 
 	public double minValue, maxValue;
 	

@@ -46,10 +46,20 @@ public class Variable implements ISelectable,NodeCase{
 	private Vector<String> colorNames = new Vector();
 	private Vector<IPlot> barchartsToColors = new Vector();
 	
+	public boolean isDiscret = true;
+	
+	public Vector<String> Buffer;
+	
 
 	public boolean isGene() {
 		return false;
 	}
+	
+	
+	public void setDiscret(boolean discret)
+	{
+	this.isDiscret = discret;	
+	} 
 
 	public Variable(DataManager dataManager,String name, int type, int ID) {
 		this.name = name;

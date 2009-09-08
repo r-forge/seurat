@@ -20,8 +20,10 @@ import javax.imageio.*;
 
 import Data.CGHVariable;
 import Data.Chromosome;
+import Data.Clustering;
 import Data.DescriptionVariable;
 import Data.Gene;
+import Data.ISelectable;
 import Data.MyStringTokenizer;
 import Data.Variable;
 
@@ -67,6 +69,7 @@ import java.util.jar.*;
 
 import RConnection.RConnectionManager;
 import Settings.*;
+import Tools.Tools;
 
 public class Seurat extends JFrame implements ColorListener {
 
@@ -1072,6 +1075,71 @@ public class Seurat extends JFrame implements ColorListener {
 				openGeneAnnotationsItem.setEnabled(true);
 				saveGeneExpressions.setEnabled(true);
 				closeDataset.setEnabled(true);
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				for (int j = 0; j < dataManager.variables.size(); j++) {
+					
+					
+					Variable var = dataManager.variables.elementAt(j);
+					var.Buffer = new Vector();
+					
+					for (int i = 0; i < var.stringData.length; i++) {
+						if (Tools.doesntContain(var.Buffer, var.stringData [i])) var.Buffer.add(var.stringData [i]);
+					    if (var.Buffer.size()>Settings.DiscretLimit) {
+					    	var.setDiscret(false);
+					    	break;  
+					    }
+					   
+					}
+					
+					
+					var.Buffer = Tools.sortBuffer(var.Buffer);
+					
+					
+					if (var.isDiscret) {
+						
+						
+			
+	  				/** Add Clusters to ConfufionsMatrix*/
+						Vector<Vector<ISelectable>> Clusters = new Vector();
+						for (int i = 0; i < var.Buffer.size(); i++) {
+							Clusters.add(new Vector());
+						}
+						
+						for (int i = 0; i < seurat.dataManager.Genes.size(); i++) {
+							ISelectable exp = seurat.dataManager.Genes.elementAt(i);
+						  
+						    
+						    for (int ii = 0; ii < var.Buffer.size(); ii++) {
+								if (var.Buffer.elementAt(ii).equals(var.stringData [i])) {
+									Clusters.elementAt(ii).add(exp);
+								}
+							}
+						    
+						
+						}
+						
+						
+						seurat.dataManager.GeneClusters.add(new Clustering(var.getName(),Clusters,var.Buffer));
+						
+					
+						
+					}
+
+				}
+				
+				
+				
+				
+				
 				
 
 			} catch (Exception e) {

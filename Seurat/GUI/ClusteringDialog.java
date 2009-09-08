@@ -249,8 +249,8 @@ public class ClusteringDialog extends JFrame {
 					ExpsNames.add(""+i);
 				}
 				
-				dialog.seurat.dataManager.GeneClusters.add(new Clustering(methodRows + " , " + DistanceRows + " , "+nR, Gens,GeneNames));
-				dialog.seurat.dataManager.ExpClusters.add(new Clustering(methodColumns + " , " + DistanceColumns + " , "+nC, Exps,ExpsNames));
+				dialog.seurat.dataManager.GeneClusters.add(new Clustering("\""+methodRows + " , " + DistanceRows + " , "+nR + "\"", Gens,GeneNames));
+				dialog.seurat.dataManager.ExpClusters.add(new Clustering("\""+methodColumns + " , " + DistanceColumns + " , "+nC+ "\"", Exps,ExpsNames));
 				
 				
 

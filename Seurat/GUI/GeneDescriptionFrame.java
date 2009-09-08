@@ -4,6 +4,8 @@ import java.io.*;
 
 import javax.swing.*;
 
+import Tools.Tools;
+
 import java.awt.*;
 
 import Data.AnnGene;
@@ -17,6 +19,7 @@ import Data.MyStringTokenizer;
 
 import java.util.zip.*;
 import java.util.jar.*;
+import Settings.*;
 
 public class GeneDescriptionFrame extends JFrame {
 	Seurat seurat;
@@ -157,7 +160,7 @@ public class GeneDescriptionFrame extends JFrame {
 					if (token.equals("")) token = "NA";
 					
 						
-					if (doesntContain(
+					if (Tools.doesntContain(
 							(geneVariables
 									.elementAt(i)).stringBuffer, token))
 						(geneVariables
@@ -226,7 +229,7 @@ public class GeneDescriptionFrame extends JFrame {
 			 */
 
 			for (int j = 0; j < this.geneVariables.size(); j++) {
-				if (this.geneVariables.elementAt(j).stringBuffer.size() < 10
+				if (this.geneVariables.elementAt(j).stringBuffer.size() < Settings.DiscretLimit
 						|| !this.geneVariables.elementAt(j).isDouble) {
 					this.geneVariables.elementAt(j).isDiscrete = true;
 					
@@ -238,8 +241,10 @@ public class GeneDescriptionFrame extends JFrame {
 					
 					
 					
-					if (this.geneVariables.elementAt(j).stringBuffer.size() < 25) {
+					if (this.geneVariables.elementAt(j).stringBuffer.size() < Settings.DiscretLimit) {
 					
+						this.geneVariables.elementAt(j).stringBuffer = Tools.sortBuffer(this.geneVariables.elementAt(j).stringBuffer);	
+						
 					Vector<Vector<ISelectable>> Clusters = new Vector();
 					for (int i = 0; i < this.geneVariables.elementAt(j).stringBuffer.size(); i++) {
 						Clusters.add(new Vector());
@@ -451,29 +456,6 @@ public class GeneDescriptionFrame extends JFrame {
 	
 	
 	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	public boolean doesntContain(Vector<String> buffer, String word) {
-		for (int i = 0; i < buffer.size(); i++) {
-			if (buffer.elementAt(i).equals(word))
-				return false;
-		}
-		return true;
-	}
 	
 
 	

@@ -4,6 +4,8 @@ import java.io.*;
 
 import javax.swing.*;
 
+import Tools.Tools;
+
 import com.sun.org.apache.xpath.internal.operations.Variable;
 
 import java.awt.*;
@@ -15,6 +17,8 @@ import Data.MyStringTokenizer;
 
 import java.util.zip.*;
 import java.util.jar.*;
+import Settings.*;
+
 
 public class ExperimentDescriptionFrame extends JFrame {
 	Seurat seurat;
@@ -149,7 +153,7 @@ public class ExperimentDescriptionFrame extends JFrame {
 				for (int i = 0; i < col; i++) {
 					token = myStk.tokens.elementAt(i);
 
-					if (doesntContain(
+					if (Tools.doesntContain(
 							(descriptionVariables
 									.elementAt(i)).stringBuffer, token))
 						(descriptionVariables
@@ -207,13 +211,13 @@ public class ExperimentDescriptionFrame extends JFrame {
 			 */
 
 			for (int j = 0; j < this.descriptionVariables.size(); j++) {
-				if (this.descriptionVariables.elementAt(j).stringBuffer.size() < 10
+				if (this.descriptionVariables.elementAt(j).stringBuffer.size() < Settings.DiscretLimit
 						|| !this.descriptionVariables.elementAt(j).isDouble) {
 					this.descriptionVariables.elementAt(j).isDiscrete = true;
                     
-					if (this.descriptionVariables.elementAt(j).stringBuffer.size() < 25) {
+					if (this.descriptionVariables.elementAt(j).stringBuffer.size() < Settings.DiscretLimit) {
 								
-					
+						this.descriptionVariables.elementAt(j).stringBuffer = Tools.sortBuffer(this.descriptionVariables.elementAt(j).stringBuffer);
 					
 					/** Add Clusters to ConfufionsMatrix*/
 					Vector<Vector<ISelectable>> Clusters = new Vector();
@@ -265,12 +269,6 @@ public class ExperimentDescriptionFrame extends JFrame {
 	
 	
 
-	public boolean doesntContain(Vector<String> buffer, String word) {
-		for (int i = 0; i < buffer.size(); i++) {
-			if (buffer.elementAt(i).equals(word))
-				return false;
-		}
-		return true;
-	}
+	
 
 }
