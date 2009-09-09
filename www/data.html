@@ -16,6 +16,7 @@ microarray data</title>
 <br>
 <br>
 <h2>General</h2>
+<hr>
 <br>
 All data files have to be in tab delimited ascii format and missing
 values should be labeled "NA". Example files are available in the <a
@@ -23,6 +24,7 @@ values should be labeled "NA". Example files are available in the <a
 section. <br>
 <br>
 <h2>Gene expression data</h2>
+<hr>
 <br>
 Seurat provides no preprocessing tools, gene expression data should be
 normalized and preprocessed beforehand. It is mandatory that the first
@@ -35,6 +37,7 @@ Example: <br>
 <pre>geneID   sample.1 sample.2  ...   sample.n<br>gene.1   y.11     y.12     ...    y.1n<br>gene.2   y.21     y.22     ...    y.2n<br>...<br>gene.p   y.p1     y.p2     ...    y.pn<br>  </pre>
 <br>
 <h2>Clinical data</h2>
+<hr>
 <br>
 The first column should contain the sample IDs and these IDs should
 have the same format as in the gene expression file.&nbsp; Additional
@@ -71,6 +74,7 @@ Example: <br>
 <pre>geneID   ChromosomeNumber  NucleotidePosition #pathway    annotation.1 ... annotation.v<br>gene.1        1              11223444        path1,path2     a.11     ...     a.1v<br>gene.2       22              NA              path1,path3     a.21     ...     a.2v<br>...<br>gene.p        X              1055            path5           a.p1     ...     a.pv<br>  </pre>
 <br>
 <h2>Array CGH data</h2>
+<hr>
 <br>
 The array CGH data should have been normalized and preprocessed. A
 segmentation algorithm should be applied to estimate cytogenetic gains
