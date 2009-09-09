@@ -13,24 +13,27 @@ microarray data</title>
 <body>
 <div id="inhalt">
 <h1>Data formats</h1>
+<hr>
 <br>
 <br>
 <h2>General</h2>
 <hr>
 <br>
+<p align="justify">
 All data files have to be in tab delimited ascii format and missing
 values should be labeled "NA". Example files are available in the <a
  href="down.html" target="PageRechts">Download and Installation</a>
-section. <br>
+section.</p> <br>
 <br>
 <h2>Gene expression data</h2>
 <hr>
 <br>
-Seurat provides no preprocessing tools, gene expression data should be
+<p align="justify">Seurat provides no preprocessing tools, gene expression data should be
 normalized and preprocessed beforehand. It is mandatory that the first
 column contains the gene IDs. The following columns should be named
 according to the sample IDs and thus contain the gene expression values
-of the respective samples. <br>
+of the respective samples.
+</p> <br>
 <br>
 Example: <br>
 <br>
@@ -39,17 +42,20 @@ Example: <br>
 <h2>Clinical data</h2>
 <hr>
 <br>
+<p align="justify">
 The first column should contain the sample IDs and these IDs should
 have the same format as in the gene expression file.&nbsp; Additional
 columns can contain any type of continous or categorical variable with
-the name of the variable in the first row. <br>
+the name of the variable in the first row.</p> <br>
 <br>
 Example: <br>
 <br>
 <pre>sampleID   variable.1 variable.2  ...   variable.z<br>sample.1   x.11       x.12     ...      x.1z<br>sample.2   x.21       x.22     ...      x.2z<br>...<br>sample.n   x.n1       x.n2     ...      x.nz<br>  </pre>
 <br>
 <h2>Gene annotations</h2>
+<hr>
 <br>
+<p align="justify">
 The first column has to contain the geneIDs and the gene names must be
 the same as the gene names in the gene expression file. In case of
 pathway informations where each gene can belong to different pathways,
@@ -67,7 +73,7 @@ to have a column called "ChromosomeNumber" containing the number of the
 chromosome and a column called "NucleotidePosition" containing the
 number of the starting position of the ORF of the gene. Additional
 columns can contain any type of continous or categorical variable with
-the variable names in the first row. <br>
+the variable names in the first row. </p><br>
 <br>
 Example: <br>
 <br>
@@ -76,6 +82,7 @@ Example: <br>
 <h2>Array CGH data</h2>
 <hr>
 <br>
+<p align="justify">
 The array CGH data should have been normalized and preprocessed. A
 segmentation algorithm should be applied to estimate cytogenetic gains
 and losses. We used the R package <a
@@ -92,7 +99,7 @@ columns are needed: "ChromosomeNumber", "ChrStart", "ChrEnd",
 "ChrEnd" contain the start and end nucleotide positions of each CGH clone. "Mapping" gives the cytoband
 location of the CGH clone and "ChromosomeCen" gives the nucleotide
 position of the centromere of the chromosome (so it is the same for all
-clones on the same chromosome). See the example for details: <br>
+clones on the same chromosome). See the example for details:</p> <br>
 <br>
 <pre>CloneID ChromosomeNumber ChrStart ChrEnd Mapping ChromosomeCen sample.1.States ... sample.n.States<br>clone.1        1            145     605       1q41     124300000         1                    0<br>clone.2       22            11233   12034     22q13    11800000          -1                   1 <br>...<br>clone.w        X            NA      NA        Xq22     59500000          0                    -1 <br><pre>  <br><br>
 </pre></pre>

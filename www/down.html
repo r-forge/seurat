@@ -9,18 +9,22 @@
 <body>
 <div id="inhalt">
   <h1>Download and Installation</h1>
+  <hr>
   <br/><br/>
   <h2>R and Java Runtime Environment</h2>
   <hr>
   <br/>
+  <p align="justify">
   In order to run Seurat the latest <a href="http://java.sun.com/javase/downloads/index.jsp" target="_blank">JRE</a> (or JDK) and the latest <a href="http://cran.r-project.org/">R</a> version need to be installed.
-  In addition, to perform any clustering and seriation analysis, the R packages <a href="http://www.rforge.net/Rserve/index.html" target="_blank">Rserve</a>, <a href="http://cran.r-project.org/web/packages/amap/index.html">amap</a> and <a href="http://cran.r-project.org/web/packages/seriation/index.html" target="_blank">seriation</a> need to be installed.
+  In addition, to perform any clustering and seriation analysis, the R packages <a href="http://www.rforge.net/Rserve/index.html" target="_blank">Rserve</a>, <a href="http://cran.r-project.org/web/packages/amap/index.html">amap</a>
+  and <a href="http://cran.r-project.org/web/packages/seriation/index.html" target="_blank">seriation</a> need to be installed.</p>
   This can be done by typing the following into the R console:<br/><br/>
   <pre>
   install.packages(c("Rserve","amap","seriation"))
   </pre>
   <br/>
   <h2>Download Seurat</h2>
+  <hr>
   <br/> 
    By downloading any version of Seurat, you accept the following license:
    <br/><br/>
@@ -41,6 +45,7 @@ along with this program; if not, see <a href="http://www.gnu.org/licenses/" targ
   <br/><br/>
   <a href="download/Seurat.zip">Seurat.zip</a>&nbsp;&nbsp;&nbsp; <b>Version 0.90 September 01, 2009</b>
   <br/><br/>
+  <br/>
   <h2>Installation and Run</h2> 
   <hr>
   <br/><br/>
@@ -54,15 +59,17 @@ along with this program; if not, see <a href="http://www.gnu.org/licenses/" targ
        <br/><br/> 
       <li><strong>MacOS X</strong>: double click the Seurat.app in the MAC folder </li>
        <br/><br/> 
-  </ul>    
-  If Seurat returns an "calculation failed" error message after runnig any clustering or seriation algorithm, the software could not connect to Rserve.
-  In this case you have to lauch Rserve manually by typing the following into the R console:<br/><br/>
+  </ul>
+  <p align="justify">    
+  If Seurat returns an "calculation failed" error message after runnig any clustering or seriation algorithm,
+  the software could not connect to Rserve. In this case you have to lauch Rserve manually by typing the following
+  into the R console: </p><br/><br/>
   <pre>
   	library(Rserve)
 	library(amap)
 	library(seriation)
 	Rserve()
-	</pre>
+	</pre><br/>
   <h2>Sample Data</h2> 
   <hr>
   <br/> 
