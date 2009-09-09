@@ -13,16 +13,18 @@ microarray data </title>
 <body>
 <div id="inhalt">
 <h1>User Manual</h1>
+<hr>
 <br>
 <br>
 <h2>Introduction</h2>
 <hr>
 <br>
+<p align="justify">
 All datasets are assumed to be available in a preprocessed, normalized
 and tab delimited ascii form. For more details see the <a
  href="data.html" target="PageRechts"> Data </a> section or the
 example files available in the <a href="down.html" target="PageRechts">Download
-and Installation</a> section. <br>
+and Installation</a> section. </p><br>
 <br>
 <h2>Data manager</h2>
 <hr>
@@ -30,7 +32,7 @@ and Installation</a> section. <br>
 By launching Seurat the data manager window will appear: <br>
 <div align="left"> <img src="images/datamanager.png"
  style="margin: 20px 40px;"> </div>
-<p> The data manager displays the different datasets and the according variables loaded into Seurat.
+<p align="justify"> The data manager displays the different datasets and the according variables loaded into Seurat.
 Detailed information about each file and the variables stored can be accessed
 with a click on the name of the respective dataset.
 In addition the manager window shows the objects described by the datasets.
@@ -118,13 +120,14 @@ from the main panel by:<br>
 <br>
 <div align="left"> <img src="images/global.png"
  style="margin: 20px 40px;"> </div>
+<p align="justify"> 
 The heatmap plot displays the gene expression data with the gene
 expression levels represented by colors. The rows and the columns of the heatmap correspond to the genes and the samples, respectivly.
 Due to the limited number of available pixels (even for high resolutions), it is usually impossible to visualize a high dimensional data set 
 with each expression value represented by one pixel. 
 In this case nearby expression values are automatically aggregated and visualized by one pixel.
 The lower margin of the heatmap plot shows the number rows and columns and the aggregation ratio.
-The aggregation ratio can be changed with the arrow keys. 
+The aggregation ratio can be changed with the arrow keys. </p>
 Pixel and color preferences of all heatmap plots can be changed under:<br>
 <br>
 <em><i>Plots &rarr; Pixel Settings </i></em> <br>
@@ -147,6 +150,7 @@ A clustering of the gene expression data can be performed by:<br>
 <br>
 <em><i>Plots &rarr; Clustering</i> </em> <br>
 <br>
+<p align="justify">
 Seurat provides agglomerative hierarchical clustering and k-means
 clustering. In order to perform a k-means clustering, the user has to
 choose this from the available methods and provide the number of
@@ -163,15 +167,16 @@ hierarchical clustering method, the dendrogram will be cut according to
 the number of clusters and will not be drawn.&nbsp; Instead, cluster
 boundaries will be drawn on the reordered heatmap, as for the results
 of a k-means clustering. Furthermore is possible to apply all of the described 
-algortihms to selected subsets (resulting cluster) of the data.
+algortihms to selected subsets (resulting cluster) of the data.</p>
 <div align="left"> <img src="images/dendro.png"
  style="margin: 20px 40px;"> </div>
+<p align="justify"> 
 The results of two clusterings can be compared by a confusion matrix.
 This graphical tool displays objects falling into the same clusters by
 squares with size proportional to the number of objects. A function to
 permutate the columns and the rows of the matrix to match the
 clusterings is available with a right click on the confusion matrix.
-In addition the confusion matrix can be used to compare the clustering result with any clinical variable or gene annotation. 
+In addition the confusion matrix can be used to compare the clustering result with any clinical variable or gene annotation. </p>
 <div align="left"> <img src="images/confusion.png"
  style="margin: 20px 40px;"> </div>
 Seurat provides several seriation algorithms available under: <br>
@@ -188,17 +193,19 @@ found <a
 <hr>
 <br>
 <br>
+<p align="justify">
 Clinical data and gene annotations can be accessed via the data manager window with a double click on the name of the variable.
 Seurat automatically recognizes the types of different variables. Continuous
 variables are visualized by histograms and categorical variables by
 barcharts. Information about functional groups, e.g. Gene Ontology,
-KEGG, or user defined groups, is visualized by barcharts.
+KEGG, or user defined groups, is visualized by barcharts.</p>
 <div align="left"> <img src="images/accessclin.png"
  style="margin: 20px 40px;"> </div>
+<p align="justify"> 
 It is possible to assign colors or to change the binwidth of the
 histogram via the options menu of the plots which is available with a
 right click on the window. The top line of the heatmap displays the
-colors of the samples falling into the different classes.
+colors of the samples falling into the different classes.</p>
 <div align="left"> <img src="images/colors.png"
  style="margin: 20px 40px;"> </div>
 <p></p>
@@ -207,20 +214,22 @@ colors of the samples falling into the different classes.
 <h2>Chromosome map</h2>
 <hr>
 <br>
+<p align="justify">
 If array CGH data is available, Seurat offers a chromosome map.
 This plot displays all chromosomes together with the relative number of samples showing a genetical change.
 For each array CGH clone along the chromosome a green bar corresponds to the relative number of samples
-showing a genetical gain and the red bar displays the relative number of losses.
+showing a genetical gain and the red bar displays the relative number of losses.</p>
 The chromosome map is available under:<br>
 <br>
 <em><i>Plots &rarr; Chromosome View </i></em> <br>
 <br>
 <div align="left"> <img src="images/karyotype.png"
  style="margin: 20px 40px;"> </div>
+<p align="justify"> 
 The single chromosome plot can be opened via the data manager with a double click
 on the name of the chromosome of interest. In addtition to the red an green bars showing the relative number of different genetical states, 
 this plot also displays the single cytobands where the array CGH clones are located.
-The resolution of both types of plots can be changed with the arrow keys. 
+The resolution of both types of plots can be changed with the arrow keys.</p> 
 <div align="left"> <img src="images/chromo.png"
  style="margin: 20px 40px;"> </div>
 </div>
