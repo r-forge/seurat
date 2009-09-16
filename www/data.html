@@ -1,8 +1,8 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
-
-<meta http-equiv="content-type" content="text/html; charset=ISO-8859-1">
+  <meta http-equiv="content-type"
+ content="text/html; charset=ISO-8859-1">
   <title>Seurat: Visual analytics for the integrative analysis of
 microarray data</title>
   <meta name="Martin Sill" content="Seurat">
@@ -23,17 +23,20 @@ microarray data</title>
 All data files have to be in tab delimited ascii format and missing
 values should be labeled "NA". Example files are available in the <a
  href="down.html" target="PageRechts">Download and Installation</a>
-section.</p> <br>
+section.</p>
+<br>
 <br>
 <h2>Gene expression data</h2>
 <hr>
 <br>
-<p align="justify">Seurat provides no preprocessing tools, gene expression data should be
+<p align="justify">Seurat provides no preprocessing tools, gene
+expression data should be
 normalized and preprocessed beforehand. It is mandatory that the first
 column contains the gene IDs. The following columns should be named
-according to the sample IDs and thus contain the gene expression values
+according to the sample IDs and contains the gene expression values
 of the respective samples.
-</p> <br>
+</p>
+<br>
 <br>
 Example: <br>
 <br>
@@ -46,7 +49,8 @@ Example: <br>
 The first column should contain the sample IDs and these IDs should
 have the same format as in the gene expression file.&nbsp; Additional
 columns can contain any type of continous or categorical variable with
-the name of the variable in the first row.</p> <br>
+the name of the variable in the first row.</p>
+<br>
 <br>
 Example: <br>
 <br>
@@ -64,16 +68,18 @@ strings, e.g.: "cell_signaling, immunology, metastasis" or for
 GO-terms: "molecular function|ATP binding|IEA|GO:0005524|GOA/IPI,
 biological process|defense response to pathogen|IEA|GO:0042829|GOA/IPI,
 cellular component|nucleus|IEA|GO:0005634" The name of a pathway
-variable has to begin with a "#" as the first character.<br>
-If the data set contains URLs (e.g. linking to cross-references like PubMed),
-the name of the respective column has to begin with a "@" symbol.<br>  
+variable has to begin with "#" as the first character.<br>
+If the data set contains URLs (e.g. linking to cross-references like
+PubMed),
+the name of the respective column has to begin with a "@" symbol.<br>
 In order to associate the gene expression data with the array CGH data
 the gene annotation file is needed. In addition the annotation file has
 to have a column called "ChromosomeNumber" containing the number of the
 chromosome and a column called "NucleotidePosition" containing the
-number of the starting position of the ORF of the gene. Additional
-columns can contain any type of continous or categorical variable with
-the variable names in the first row. </p><br>
+starting position of the ORF of the gene. Additional
+columns can contain any type of continuous or categorical variable with
+the variable names in the first row. </p>
+<br>
 <br>
 Example: <br>
 <br>
@@ -86,7 +92,8 @@ Example: <br>
 The array CGH data should have been normalized and preprocessed. A
 segmentation algorithm should be applied to estimate cytogenetic gains
 and losses. We used the R package <a
- href="http://www.bioconductor.org/packages/2.4/bioc/html/GLAD.html" target="_blank">
+ href="http://www.bioconductor.org/packages/2.4/bioc/html/GLAD.html"
+ target="_blank">
 GLAD </a> to preprocess our example data file.<br>
 The first column contains the cloneIDs of the CGH clones. To link the
 states of the clones with the samples, a column with the name
@@ -96,10 +103,12 @@ or "1", which correspond to a cytogenetic loss, no change or gain.<br>
 To link the CGH data with the gene expression data, the following six
 columns are needed: "ChromosomeNumber", "ChrStart", "ChrEnd",
 "ChromosomeCen", "Mapping". The variables "ChrStart" and
-"ChrEnd" contain the start and end nucleotide positions of each CGH clone. "Mapping" gives the cytoband
+"ChrEnd" contain the start and end nucleotide positions of each CGH
+clone. "Mapping" gives the cytoband
 location of the CGH clone and "ChromosomeCen" gives the nucleotide
 position of the centromere of the chromosome (so it is the same for all
-clones on the same chromosome). See the example for details:</p> <br>
+clones on the same chromosome). See the example for details:</p>
+<br>
 <br>
 <pre>CloneID ChromosomeNumber ChrStart ChrEnd Mapping ChromosomeCen sample.1.States ... sample.n.States<br>clone.1        1            145     605       1q41     124300000         1                    0<br>clone.2       22            11233   12034     22q13    11800000          -1                   1 <br>...<br>clone.w        X            NA      NA        Xq22     59500000          0                    -1 <br><pre>  <br><br>
 </pre></pre>
