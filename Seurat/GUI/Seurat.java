@@ -309,11 +309,13 @@ public class Seurat extends JFrame implements ColorListener {
 
 						if ((!object.isVariable() && !object.isGene())
 								&& object.getType() == 2) {
+							System.out.println("Barchart");
 							new Barchart(seurat, object);
 						}
 						// Liste
 						if (object.getType() == 3) {
-
+							System.out.println("Histogram");
+                             new ListBarchart(seurat,(GeneVariable)object,((GeneVariable)object).AnnGenes);
 						}
 
 						if (object instanceof Chromosome) {

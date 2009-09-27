@@ -888,7 +888,7 @@ class HistogramPanel extends JPanel implements KeyListener, MouseListener,
 			menu.add(item);
 
 			
-			menu.addSeparator();
+			
 			
 			item = new JMenuItem("Add Colors");
 
@@ -903,7 +903,10 @@ class HistogramPanel extends JPanel implements KeyListener, MouseListener,
 				
 				}
 			});
-			if (variables.elementAt(0) instanceof Variable) menu.add(item);
+			if (variables.elementAt(0) instanceof Variable) {
+				menu.addSeparator();
+				menu.add(item);
+			}
 			
 			
 			

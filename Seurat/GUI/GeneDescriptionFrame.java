@@ -292,7 +292,10 @@ public class GeneDescriptionFrame extends JFrame {
 					
 
 				}
-				if (this.geneVariables.elementAt(j).isDiscrete && this.geneVariables.elementAt(j).testList()) {
+				
+				
+				if (this.geneVariables.elementAt(j).testList()) {
+					//System.out.println(this.geneVariables.elementAt(j).name + "!!!");
 					this.geneVariables.elementAt(j).isList = true;
 					this.geneVariables.elementAt(j).calculateList();
 		

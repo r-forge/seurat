@@ -208,9 +208,10 @@ public class GeneVariable implements ISelectable{
 
 	public int getType() {
 		// TODO Auto-generated method stub
+		if (isList) return 3;
 		if (isDouble) return 1;
 		if (isDiscrete) return 2;
-		if (isList) return 3;
+		
 		
 		return -1;
 	}
