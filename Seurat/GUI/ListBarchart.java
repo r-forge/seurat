@@ -9,6 +9,7 @@ import java.awt.*;
 
 import Data.GeneVariable;
 import Data.ISelectable;
+import Data.Variable;
 import GUI.BarchartPanel.Balken;
 
 public class ListBarchart extends JFrame implements IPlot {
@@ -27,7 +28,7 @@ public class ListBarchart extends JFrame implements IPlot {
 
 		this.getContentPane().setLayout(new BorderLayout());
 		this.getContentPane().add(new JScrollPane(panel), BorderLayout.CENTER);
-		this.setBounds(400, 400, 250, Math.min(panel.balken.size()
+		this.setBounds(400, 0, 250, Math.min(panel.balken.size()
 				* panel.BinHeigth * 2 + panel.abstandOben + 40, 600));
 
 		this.setVisible(true);
@@ -258,6 +259,7 @@ class ListBarchartPanel extends JPanel implements KeyListener, MouseListener,
 
 		seurat.dataManager.deleteSelection();
 		
+		boolean selected = false;
 		
 		for (int i = 0; i < selectedBalken.length; i++) {
 
@@ -266,6 +268,7 @@ class ListBarchartPanel extends JPanel implements KeyListener, MouseListener,
 			
 			
 			if (selectedBalken[i]) {
+				selected = true;
 				for (int j = 0; j < geneVar.bufferCount [ID]; j++) {
 					  int geneVarIndex = geneVar.geneMitListValue.elementAt(ID).elementAt(j);
 					
@@ -275,6 +278,13 @@ class ListBarchartPanel extends JPanel implements KeyListener, MouseListener,
 				}
 				
 				
+			}
+		}
+		
+		if (selected) {
+			Vector<Variable> vars = seurat.dataManager.Experiments;
+			for (int i = 0; i < vars.size();i++) {
+				vars.elementAt(i).select(true);
 			}
 		}
 
@@ -352,14 +362,7 @@ class ListBarchartPanel extends JPanel implements KeyListener, MouseListener,
 		if (e.getButton() == MouseEvent.BUTTON3 || e.isControlDown()) {
 
 			
-			menu = new JPopupMenu();
-			JMenuItem item = new JMenuItem("Spineplot");
-			item.addActionListener(new ActionListener() {
-				public void actionPerformed(ActionEvent e) {
-					
-				}
-			});
-			menu.add(item);
+			
 			
 			
 			JMenu sortMenu = new JMenu("Sort by ...");

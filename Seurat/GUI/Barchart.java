@@ -511,7 +511,7 @@ class BarchartPanel extends JPanel implements KeyListener, MouseListener,
 
 			menu.add(sortMenu);
 			
-			menu.addSeparator();
+			
 			
 			item = new JMenuItem("Add Colors");
 
@@ -527,7 +527,10 @@ class BarchartPanel extends JPanel implements KeyListener, MouseListener,
 				
 				}
 			});
-			if (variables.elementAt(0) instanceof Variable) menu.add(item);
+			if (variables.elementAt(0) instanceof Variable) {
+				menu.addSeparator();
+				menu.add(item);
+			}
 			
 			
 			
