@@ -129,6 +129,8 @@ class ListBarchartPanel extends JPanel implements KeyListener, MouseListener,
 	
 	boolean[] selectedBalken;
 	
+	boolean firstPaint = true;
+	
 
 	public ListBarchartPanel(Seurat seurat, ListBarchart bar,GeneVariable var,Vector<ISelectable> variables) {
 
@@ -362,7 +364,7 @@ class ListBarchartPanel extends JPanel implements KeyListener, MouseListener,
 		if (e.getButton() == MouseEvent.BUTTON3 || e.isControlDown()) {
 
 			
-			
+            menu = new JPopupMenu();			
 			
 			
 			JMenu sortMenu = new JMenu("Sort by ...");
@@ -637,7 +639,7 @@ class ListBarchartPanel extends JPanel implements KeyListener, MouseListener,
 
 		for (int i = 0; i < geneVar.bufferCount.length; i++) {
 			
-			Balken balk = new Balken(this,i);
+			Balken balk = new Balken(this,i,geneVar.stringBuffer.elementAt(i));
 			balken.add(balk);
 			
 			balk.balkenRel =  geneVar.bufferCount [i];
@@ -681,16 +683,16 @@ class ListBarchartPanel extends JPanel implements KeyListener, MouseListener,
 
 		
 			
-			if (balken.elementAt(i).name == null) {
+		//	if (balken.elementAt(i).name == null) {
 				
-				String s = geneVar.stringBuffer.elementAt(i);
-				balken.elementAt(i).name = s;
-			
+		//		String s = geneVar.stringBuffer.elementAt(i);
+		//		balken.elementAt(i).name = s;
+		//	}
 				
-				balken.elementAt(i).nameKurz = this.cutLabels(s, abstandLinks
+				balken.elementAt(i).nameKurz = this.cutLabels(balken.elementAt(i).name, abstandLinks
 					- abstandString - 3, this.getGraphics());
-			}
 			
+			   //  System.out.println(balken.elementAt(i).nameKurz + "_"+balken.elementAt(i).name);
 			
 			
 			
@@ -739,7 +741,10 @@ class ListBarchartPanel extends JPanel implements KeyListener, MouseListener,
 	@Override
 	public void paint(Graphics g) {
 	
-		if (this.balken == null) this.updateSelection(); 
+		if (this.balken == null || firstPaint) {
+			firstPaint = false;
+			this.updateSelection(); 
+		}
 
 		g.setColor(Color.WHITE);
 		g.fillRect(0, 0, this.getWidth(), this.getHeight());
@@ -821,6 +826,7 @@ class ListBarchartPanel extends JPanel implements KeyListener, MouseListener,
 
 	public String cutLabels(String s, int availablePlace, Graphics g) {
 		s = s.replaceAll("\"", "");
+		if (s.equals("")) return "";
 		String ss = this.cutLabelsHelp(s, availablePlace, g);
 		if (ss.length() < 5)
 			return ss;
@@ -942,7 +948,7 @@ class ListBarchartPanel extends JPanel implements KeyListener, MouseListener,
 		int ID;
 		
 		
-		public Balken(ListBarchartPanel panel,int ID) {
+		public Balken(ListBarchartPanel panel,int ID, String name) {
 			this.panel = panel;
 			this.name = name;
 			this.ID = ID;

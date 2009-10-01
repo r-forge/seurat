@@ -170,6 +170,8 @@ class BarchartPanel extends JPanel implements KeyListener, MouseListener,
 
 	int abstandString = 5;
 
+	boolean firstPaint = true;
+	
 	// int[] balkenAbs;
 
 	// double[] koeff;
@@ -822,8 +824,10 @@ class BarchartPanel extends JPanel implements KeyListener, MouseListener,
 	@Override
 	public void paint(Graphics g) {
 
-		if (this.balken == null)
+		if (this.balken == null || firstPaint) {
 			this.updateSelection();
+			firstPaint = false;
+		}
 
 		g.setColor(Color.WHITE);
 		g.fillRect(0, 0, this.getWidth(), this.getHeight());

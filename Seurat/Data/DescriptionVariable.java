@@ -24,11 +24,14 @@ public class DescriptionVariable implements ISelectable{
 	public String[] stringData;
 	
 	public Vector<ISelectable> variables;
+	
+	public DescriptionVariable indexVar;
 
 	public DescriptionVariable(String name, int type,Vector variables) {
 		this.name = name;
 		this.type = type;
 		this.variables = variables;
+	
 	}
 
 	public boolean containsNa() {
@@ -112,7 +115,16 @@ public class DescriptionVariable implements ISelectable{
 	
 	public String [] getStringData() {
 		// TODO Auto-generated method stub
-		return stringData;
+		 String [] data = new String [variables.size()];
+		   for (int i = 0; i < variables.size(); i++) {
+			   ISelectable var = variables.elementAt(i);
+			   if (findInBuffer(variables.elementAt(i).getName(),indexVar.stringBuffer)!=-1) {data [i] = stringData [findInBuffer(variables.elementAt(i).getName(),indexVar.stringBuffer)];}
+			   else data [i] = "NA";
+		   }
+			
+			return data;
+			
+			
 	}
 
 	public Vector<ISelectable> getVariables() {
@@ -122,8 +134,25 @@ public class DescriptionVariable implements ISelectable{
 
 	public double[] getDoubleData() {
 		// TODO Auto-generated method stub
-		return doubleData;
+	   double [] data = new double [variables.size()];
+	   for (int i = 0; i < variables.size(); i++) {
+		   ISelectable var = variables.elementAt(i);
+		   if (findInBuffer(variables.elementAt(i).getName(),indexVar.stringBuffer)!=-1) {data [i] = doubleData [findInBuffer(variables.elementAt(i).getName(),indexVar.stringBuffer)];}
+		   else data [i] = DataManager.NA;
+	   }
+		
+		return data;
 	}
+	
+	public int findInBuffer(String s, Vector<String> Buffer) {
+		for (int i = 0; i < Buffer.size(); i++) {
+			String ss = s.replaceAll("\"","");
+			if (Buffer.elementAt(i).contains(ss)) return i;
+		}
+		return -1;
+	}
+	
+	
 
 	public boolean isGene() {
 		// TODO Auto-generated method stub
