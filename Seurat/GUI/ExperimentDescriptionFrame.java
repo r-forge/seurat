@@ -112,8 +112,10 @@ public class ExperimentDescriptionFrame extends JFrame {
 			StringTokenizer stk = new StringTokenizer(line, "	");
 			int col = 0;
 			while (stk.hasMoreTokens()) {
-				descriptionVariables.add(new DescriptionVariable(stk
-						.nextToken(), DescriptionVariable.Double,seurat.dataManager.Experiments));
+				DescriptionVariable var = new DescriptionVariable(stk
+						.nextToken(), DescriptionVariable.Double,seurat.dataManager.Experiments);
+				descriptionVariables.add(var);
+				var.indexVar = descriptionVariables.elementAt(0);
 				col++;
 			}
 
