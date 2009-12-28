@@ -10,16 +10,18 @@ import com.sun.org.apache.xpath.internal.operations.Variable;
 
 import Data.Chromosome;
 import Data.Clone;
+import Data.ClusterNode;
+import Data.Clustering;
 import Data.DataTreeNode;
 import Data.Gene;
 
 
 public class DataCellRenderer extends DefaultTreeCellRenderer{
-	 Icon numIcon,discreteIcon,geneIcon,geneIconS,chrIcon,cloneIcon,cloneIconS,expIcon, chrIconS;
+	 Icon numIcon,discreteIcon,geneIcon,geneIconS,chrIcon,cloneIcon,cloneIconS,expIcon, chrIconS,hclustIcon;
 
 
 
-	    public DataCellRenderer(Icon numIcon,Icon discreteIcon,Icon geneIcon,Icon geneIconS,Icon chrIcon,Icon chrIconS,Icon cloneIcon,Icon cloneIconS,Icon expIcon) {
+	    public DataCellRenderer(Icon numIcon,Icon discreteIcon,Icon geneIcon,Icon geneIconS,Icon chrIcon,Icon chrIconS,Icon cloneIcon,Icon cloneIconS,Icon expIcon,Icon hclustIcon) {
 
 	        this.numIcon = numIcon;
 	        this.discreteIcon = discreteIcon;
@@ -30,6 +32,7 @@ public class DataCellRenderer extends DefaultTreeCellRenderer{
             this.cloneIcon = cloneIcon;
             this.cloneIconS = cloneIconS;
             this.expIcon = expIcon;
+            this.hclustIcon = hclustIcon;
 	        
 	    }
 
@@ -77,6 +80,17 @@ public class DataCellRenderer extends DefaultTreeCellRenderer{
 	        	    return this;
 	        	}
 	        	
+	        	
+	        	if (value instanceof DataTreeNode && (((DataTreeNode)value).cObject!=null)&&((DataTreeNode)value).cObject instanceof Clustering) {
+	        		setIcon(discreteIcon);
+	        	    return this;
+	        	}
+	        	
+	        	
+	        	if (value instanceof DataTreeNode && (((DataTreeNode)value).cObject!=null)&& ((DataTreeNode)value).cObject instanceof ClusterNode) {
+	        		setIcon(hclustIcon);
+	        	    return this;
+	        	}
 	        	
 	        	if (value instanceof DataTreeNode && ((DataTreeNode)value).object instanceof Gene) {
 	        		setIcon(geneIconS);

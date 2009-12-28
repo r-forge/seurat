@@ -3,10 +3,14 @@ package GUI;
 import java.util.*;
 import javax.swing.*;
 
+import Tools.Tools;
+
 import java.awt.event.*;
 import java.awt.*;
 
+import Data.CGHVariable;
 import Data.DescriptionVariable;
+import Data.GeneVariable;
 import Data.ISelectable;
 import Data.Variable;
 
@@ -18,6 +22,8 @@ public class Barchart extends JFrame implements IPlot {
 
 	JMenuItem item = new JMenuItem("");
 	String name;
+	
+	boolean isChr = false;
 
 	public Barchart(Seurat seurat, String name, Vector variables,
 			String[] data) {
@@ -92,7 +98,17 @@ public class Barchart extends JFrame implements IPlot {
 		});
 		
 
+	
+		
 		panel.calculateAbstandLinks();
+		
+		/**Test für die Sortinerung des Chromosomes*/
+		if (object instanceof GeneVariable) isChr = ((GeneVariable)object).isChromosome;
+		if (object instanceof CGHVariable) isChr = ((CGHVariable)object).isChromosome;
+		
+		
+		if (isChr) panel.sortCHR();
+		
 		this.setVisible(true);
 
 	}
@@ -246,6 +262,8 @@ class BarchartPanel extends JPanel implements KeyListener, MouseListener,
 
 		});
 
+		
+		
 	}
 
 	public int indexOf(String s) {
@@ -256,59 +274,7 @@ class BarchartPanel extends JPanel implements KeyListener, MouseListener,
 		return -1;
 	}
 
-	public boolean isPointInRect(int x, int y, Point point1, Point point2) {
-		if ((point1.x <= x) && (point2.x >= x) && (point1.y <= y)
-				&& (point2.y >= y))
-			return true;
-		else
-			return false;
-	}
-
-	public boolean containsRectInRect(int x1, int y1, int x2, int y2, int Sx1,
-			int Sy1, int Sx2, int Sy2) {
-		if (isLineInRect(x1, y1, x2, y2, Sx1, Sy1, Sx2, Sy2))
-			return true;
-		if (isLineInRect(x1, y2, x2, y1, Sx1, Sy1, Sx2, Sy2))
-			return true;
-		if (isLineInRect(x2, y1, x1, y2, Sx1, Sy1, Sx2, Sy2))
-			return true;
-		if (isLineInRect(x2, y2, x1, y1, Sx1, Sy1, Sx2, Sy2))
-			return true;
-		if (isLineInRect(Sx1, Sy1, Sx2, Sy2, x1, y1, x2, y2))
-			return true;
-		if (isLineInRect(Sx2, Sy1, Sx1, Sy2, x1, y1, x2, y2))
-			return true;
-		if (isLineInRect(Sx1, Sy2, Sx2, Sy1, x1, y1, x2, y2))
-			return true;
-		if (isLineInRect(Sx2, Sy2, Sx1, Sy1, x1, y1, x2, y2))
-			return true;
-
-		return false;
-	}
-
-	public boolean isLineInRect(int x1, int y1, int x2, int y2, int Rx1,
-			int Ry1, int Rx2, int Ry2) {
-		for (int i = x1; i <= x2; i++) {
-			if (x1 != x2)
-				if (isPointInRect(i, y1 + (y2 - y1) * (i - x1) / (x2 - x1),
-						Rx1, Ry1, Rx2, Ry2))
-					return true;
-
-		}
-		if (x1 == x2)
-			if (isPointInRect(x1, y2, Rx1, Ry1, Rx2, Ry2))
-				return true;
-
-		return false;
-	}
-
-	public boolean isPointInRect(int x, int y, int Rx1, int Ry1, int Rx2,
-			int Ry2) {
-		if ((Rx1 <= x) && (Rx2 >= x) && (Ry1 <= y) && (Ry2 >= y))
-			return true;
-		else
-			return false;
-	}
+	
 
 	public void brush() {
 
@@ -374,7 +340,7 @@ class BarchartPanel extends JPanel implements KeyListener, MouseListener,
 		boolean[] selectedBalken = new boolean[balken.size()];
 
 		for (int i = 0; i < balken.size(); i++) {
-			if (this.containsRectInRect(
+			if (Tools.containsRectInRect(
 
 			abstandLinks,
 
@@ -392,7 +358,9 @@ class BarchartPanel extends JPanel implements KeyListener, MouseListener,
 		}
 
 		seurat.dataManager.deleteSelection();
-	
+	    /*for (int i = 0; i < variables.size(); i++) {
+	    	variables.elementAt(i).unselect(true);
+	    }*/
 	
 			
 		
@@ -412,7 +380,7 @@ class BarchartPanel extends JPanel implements KeyListener, MouseListener,
 		}
 		
 		
-		
+		/*
 		
 		if (selected) { 
 		if (variables.elementAt(0).isGene() || variables.elementAt(0).isClone()) {
@@ -425,7 +393,7 @@ class BarchartPanel extends JPanel implements KeyListener, MouseListener,
 		
 		
 		
-		}
+		}*/
 
 	}
 
@@ -441,7 +409,7 @@ class BarchartPanel extends JPanel implements KeyListener, MouseListener,
 		if (!(e.getButton() == MouseEvent.BUTTON3 || e.isControlDown())) {
 
 			
-			seurat.dataManager.deleteSelection();
+			//seurat.dataManager.deleteSelection();
 			if (point1 != null && point2 != null) {
 
 				addSelection(point1, point2);
@@ -789,6 +757,11 @@ class BarchartPanel extends JPanel implements KeyListener, MouseListener,
 	}
 
 	public void sortByLexico() {
+		
+		if (barchart.isChr) {
+			sortCHR();
+			return;
+		}
 
 		Vector<Balken> balkenTemp = new Vector();
 		for (int i = 0; i < balken.size(); i++) {
@@ -805,6 +778,64 @@ class BarchartPanel extends JPanel implements KeyListener, MouseListener,
 		this.balken = balkenTemp;
 		repaint();
 	}
+	
+	
+public void sortCHR() {
+		
+
+	
+		for (int i = 0; i < balken.size(); i++) {
+			for (int j = 0; j < balken.size(); j++) {
+			
+			Balken balk1 = balken.elementAt(i);
+			Balken balk2 = balken.elementAt(j);
+		
+			if ( compareCHR(balk1.name, balk2.name)) {
+				if (i<j) {
+					balken.set(j,balk1);
+					balken.set(i,balk2);
+				}
+			}
+			}
+		}
+
+		
+
+		
+		
+		
+		repaint();
+	}
+	
+
+
+
+
+public boolean compareCHR(String a, String b) {
+	int i = 0;
+
+	String tA = a.replace("\"","");
+	String tB = b.replace("\"","");
+	if (tA.equals("X") || tA.equals("x")) tA = "23";
+	if (tB.equals("X") || tB.equals("x")) tB = "23";
+
+	if (tA.equals("Y") || tA.equals("y")) tA = "24";
+	if (tB.equals("Y") || tB.equals("y")) tB = "24";
+	
+	if (tA.equals("NA")) return true;
+	if (tB.equals("NA")) return false;
+	
+	
+	int aa = Integer.parseInt(tA);
+	int bb = Integer.parseInt(tB);
+	
+	if (aa < bb) return false;
+	return true;
+}
+
+
+
+	
 
 	public boolean compareLexico(String a, String b) {
 		int i = 0;

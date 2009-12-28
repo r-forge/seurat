@@ -283,7 +283,7 @@ public class GeneDescriptionFrame extends JFrame {
 						buffer.add("not assigned");
 					}
 					
-					seurat.dataManager.GeneClusters.add(new Clustering(this.geneVariables.elementAt(j).getName(),Clusters,buffer));
+					seurat.dataManager.GeneClusters.add(new Clustering(this.geneVariables.elementAt(j).getName(),Clusters,buffer, true));
 				
 					}
 					
@@ -312,7 +312,14 @@ public class GeneDescriptionFrame extends JFrame {
 			seurat.openGeneAnnotationsItem.setEnabled(false);
 			seurat.openCGHItem.setEnabled(true);
 			
-		} catch (IOException e) {
+		} catch (Exception e) {
+			
+			JOptionPane.showMessageDialog(this,
+				    "Wrong file format.",
+				    "Load Error",
+				    JOptionPane.ERROR_MESSAGE);
+			
+			
 			System.out.println("Wrong file format  " + e);
 		}
 
@@ -366,8 +373,11 @@ public class GeneDescriptionFrame extends JFrame {
 			if (geneVariables.elementAt(i).name.contains(seurat.dataManager.ChromosomeNumber)) chromosomeVar = geneVariables.elementAt(i);
 		}
 		
-		chromosomeVar.sortBuffer();
-		
+		if (chromosomeVar != null) {
+			chromosomeVar.isChromosome = true;
+			chromosomeVar.sortChromosomes();
+		}
+		else System.out.println("WARNING  Variable \"ChromosomeNumber\" not found");
 		
 		GeneVariable nucleoVar = null;
 		for (int i = 0; i < geneVariables.size(); i++) {
@@ -375,7 +385,10 @@ public class GeneDescriptionFrame extends JFrame {
 		}
 		
 		
+		if (nucleoVar == null) System.out.println("WARNING  Variable \"NucleoPosition\" not found");
 		
+		
+		if (nucleoVar != null && chromosomeVar != null) {
 		
 		for (int i = 0; i < AnnGenes.size(); i++) {
 			
@@ -393,7 +406,7 @@ public class GeneDescriptionFrame extends JFrame {
 			 //   System.out.println(gene.chrName + "   " + gene.nucleotidePosition);
 		
 		}
-		
+		}
 		
 		
 		for (int i = 0; i < geneVariables.size(); i++) {

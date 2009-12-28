@@ -42,11 +42,15 @@ public class CGHVariable implements ISelectable{
 	
 	public Vector<Variable> vars = new Vector();
 	
+	public boolean isChromosome = false;
 	
 	Seurat seurat;
 
-	public CGHVariable(String name, int type, Vector variables, Seurat seurat) {
+	public int ID;
+	
+	public CGHVariable(String name, int ID,int type, Vector variables, Seurat seurat) {
 		this.name = name;
+		this.ID = ID;
 		this.type = type;
 		this.variables = variables;
 		this.seurat = seurat;
@@ -114,7 +118,7 @@ public class CGHVariable implements ISelectable{
 
 	public int getID() {
 		// TODO Auto-generated method stub
-		return 0;
+		return ID;
 	}
 
 	public java.lang.String getName() {

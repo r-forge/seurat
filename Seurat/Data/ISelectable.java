@@ -58,5 +58,7 @@ public interface ISelectable {
 	/**Continuous == 1, Discrete == 2, List == 3*/
 	public int getType();
 	
+	 
+	
 	
 }

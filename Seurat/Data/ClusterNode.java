@@ -18,34 +18,16 @@ public class ClusterNode {
 	
 	public CoordinateNode cNode;
 	
+	public String name;
+	
+	public boolean isRows;
+	
 	
 	public ClusterNode(Vector<ISelectable> cases) {
 		this.Cases = cases;
 	}
 
 
-	
-	/*
-	public void calculateWeights() {
-
-		if (nodeR == null && nodeR == null) {
-		} else {
-			Weight = 0;
-			nodeR.calculateWeights();
-			Weight += nodeR.Weight * nodeR.ClusterNumber;
-
-			nodeL.calculateWeights();
-			Weight += nodeL.Weight * nodeL.ClusterNumber;
-
-			ClusterNumber = nodeR.ClusterNumber + nodeL.ClusterNumber;
-			Weight /= ClusterNumber;
-			// System.out.println(Weight + " "+ ClusterNumber);
-
-		}
-
-   }
-	
-	*/
 	
 	
 	
@@ -56,49 +38,7 @@ public class ClusterNode {
 		
 	}
 
-	/*
 
-	public void sort() {
-		if (nodeR == null && nodeR == null) {
-		} else {
-			double wR = nodeR.Weight;
-			double wL = nodeL.Weight;
-			System.out.println(wR + "  " + wL);
-			if (wR < wL) {
-
-				ClusterNode temp = nodeR;
-				System.out.println("UMTAUSgrCHEN");
-				nodeR = nodeL;
-				nodeL = temp;
-
-			}
-
-			wR = nodeR.Weight;
-			wL = nodeL.Weight;
-			System.out.println(wR + "  " + wL);
-			System.out.println();
-
-			nodeR.sort();
-			nodeL.sort();
-
-		}
-
-	}*/
-	
-	
-/*
-	public void printWeights(String s) {
-		if (nodeR == null && nodeR == null) {
-		} else {
-
-			System.out.println(nodeR.Weight + "  XXX   " + nodeL.Weight);
-
-			nodeR.printWeights("  " + s);
-			nodeL.printWeights("  " + s);
-
-		}
-
-	}*/
 
 	public Vector<ClusterNode> getLeafList() {
 
@@ -119,28 +59,6 @@ public class ClusterNode {
 
 	}
 	
-	/*
-
-	public void output(String s) {
-		System.out.println();
-		for (int i = 0; i < cases.size(); i++) {
-			System.out.print(s + cases.elementAt(i) + " ");
-		}
-		System.out.println();
-		System.out.print(s + "Left: ");
-		if (this.nodeL != null)
-			nodeL.output(s + "  ");
-		else
-			System.out.println(s + "null");
-		System.out.print(s + "Right: ");
-		if (this.nodeR != null)
-			nodeR.output(s + "  ");
-		else
-			System.out.println(s + "null");
-	}
-	
-	
-	*/
 
 	public Vector<ISelectable> getOrder() {
 
@@ -189,21 +107,6 @@ public class ClusterNode {
 	}
 
 	
-	/*
-	public ClusterNode getClusterNode(int i) {
-		if (nodeL == null) {
-			for (int j = 0; j < Cases.size(); j++) {
-				if (Cases.elementAt(j) == i)
-					return this;
-
-			}
-			return null;
-		}
-		ClusterNode node = this.nodeL.getClusterNode(i);
-		if (node == null)
-			return nodeR.getClusterNode(i);
-		return node;
-	}*/
 
 	public int getTiefe() {
 		if (nodeL == null)
@@ -212,36 +115,7 @@ public class ClusterNode {
 			return Math.max(nodeL.getTiefe() + 1, nodeR.getTiefe() + 1);
 	}
 	
-	/*
-
-	public boolean isSelectedV() {
-		for (int i = 0; i < cases.size(); i++) {
-			int id = cases.elementAt(i);
-			ISelectable var = Experiments.elementAt(id);
-		//	for (int k = 0; k < var.isSelected.length; k++) {
-			//	if (var.isSelected[k])
-				//	return true;
-			//}
-			if (var.isSelected()) return true;
-		}
-		return false;
-	}
-
-	public boolean isSelectedG() {
-		for (int i = 0; i < cases.size(); i++) {
-			int row = cases.elementAt(i);
-			
-
-		//	System.out.println(row + "  "+Genes.elementAt(row));
-			if (Genes.elementAt(row).isSelected()) return true;
-		//	for (int k = 0; k < dataManager.getExperiments().size(); k++) {
-			//	if (dataManager.getExperiments().elementAt(k).isSelected[row])
-				//	return true;
-			//}
-		}
-		return false;
-	}
-	*/
+	
 	
 	
 	

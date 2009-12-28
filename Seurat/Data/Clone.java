@@ -19,8 +19,8 @@ public class Clone implements ISelectable{
 	
 	CGHViewer viewer;
 	
-//	public double chrStart;
-	//public double chrEnd;
+	public double chrStart;
+	public double chrEnd;
 	//public double chrCen;
 
 	public double NucleoPosition;
@@ -176,5 +176,10 @@ public class Clone implements ISelectable{
 		// TODO Auto-generated method stub
 		return null;
 	}
+	
+	
+	
+	
+	
 
 }

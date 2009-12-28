@@ -36,6 +36,8 @@ public class GeneVariable implements ISelectable{
 	
     public boolean isLink = false;
 	
+    public boolean isChromosome = false;
+    
 
 	public GeneVariable(String name, int type, Vector variables) {
 		this.name = name;
@@ -119,6 +121,11 @@ public class GeneVariable implements ISelectable{
 	
 	
 	public void sortBuffer() {
+		
+		if (isChromosome) {
+			sortChromosomes();
+			return;
+		}
 
 		Vector<String> newBuffer = new Vector();
 		for (int i = 0; i < stringBuffer.size(); i++) {
@@ -135,6 +142,77 @@ public class GeneVariable implements ISelectable{
 		this.stringBuffer = newBuffer;
 		
 	}
+	
+	
+	
+	
+	public void sortChromosomes() {
+
+		Vector<String> newBuffer = new Vector();
+		for (int i = 0; i < stringBuffer.size(); i++) {
+			String s = stringBuffer.elementAt(i);
+			int j = 0;
+			while (j < newBuffer.size()
+					&& compareCHRs(s, newBuffer.elementAt(j))) {
+				j++;
+			}
+			newBuffer.insertElementAt(s, j);
+
+		}
+		
+		
+		this.stringBuffer = newBuffer;
+		
+		
+		newBuffer = new Vector();
+		for (int i = 0; i < stringBuffer.size(); i++) {
+			String s = stringBuffer.elementAt(i);
+			int j = 0;
+			while (j < newBuffer.size()
+					&& compareCHRs(s, newBuffer.elementAt(j))) {
+				j++;
+			}
+			newBuffer.insertElementAt(s, j);
+
+		}
+		
+		
+		this.stringBuffer = newBuffer;
+		
+		for (int i = 0; i < stringBuffer.size(); i++) System.out.print(stringBuffer.elementAt(i) + " ");
+			
+
+		this.stringBuffer = newBuffer;
+		
+	}
+	
+	
+	
+	
+	public boolean compareCHRs(String a, String b) {
+		int i = 0;
+
+		String tA = a.replace("\"","");
+		String tB = b.replace("\"","");
+		if (tA.equals("X") || tA.equals("x")) tA = "23";
+		if (tB.equals("X") || tB.equals("x")) tB = "23";
+
+		if (tA.equals("Y") || tA.equals("y")) tA = "24";
+		if (tB.equals("Y") || tB.equals("y")) tB = "24";
+		
+		if (tA.equals("NA") || tB.equals("NA")) return true;
+		
+		
+		int aa = Integer.parseInt(tA);
+		int bb = Integer.parseInt(tB);
+		
+		if (aa < bb) return false;
+		return true;
+	}
+	
+	
+	
+	
 
 	public boolean compareLexico(String a, String b) {
 		int i = 0;

@@ -66,9 +66,12 @@ class CorrelationFrame extends JFrame implements MatrixWindow, IPlot {
 		});
 
 		this.getContentPane().setLayout(new BorderLayout());
+		
+		
 		panel = new CorrelationPanel(seurat, this,Genes, Experiments, Width,
 				isColumns,size);
 
+		
 		int length = 0;
 		if (isColumns)
 			length = Experiments.size() * pixelSize;
@@ -92,11 +95,27 @@ class CorrelationFrame extends JFrame implements MatrixWindow, IPlot {
 
 		
 		
+		
 		panel.setSize(length, length);
 		panel.setPreferredSize(new Dimension(length, length));
 
 		this.getContentPane().add(panel, BorderLayout.CENTER);
 
+		
+		int Aggregation = Width;
+		length = Genes.size()/Aggregation*pixelSize;
+		if (isVariables) length = Experiments.size()/Aggregation * pixelSize;
+		
+		panel.PixelCount = Math.max(Math.min(Math.min(this.getWidth(), this.getHeight())
+				/ pixelSize, length),1);
+
+		// System.out.println(count + " " + PixelCount);
+ 
+		panel.Aggregation = Aggregation;
+		
+		panel.calculateCorrs();
+		
+		
 		panel.calculateCorrs();
 
 		for (int i = 0; i < panel.data.length; i++) {
@@ -120,6 +139,8 @@ class CorrelationFrame extends JFrame implements MatrixWindow, IPlot {
 				correlationFrame.seurat.windowMenu.remove(item);
 			}
 		});
+		
+		this.addKeyListener(panel);
 
 		this.addComponentListener(new ComponentAdapter() {
 
@@ -127,9 +148,12 @@ class CorrelationFrame extends JFrame implements MatrixWindow, IPlot {
 			public void componentResized(ComponentEvent e) {
 
 				
-				panel.calculateCorrs();
-				repaint();
-				panel.repaint();
+				
+				
+				
+				//panel.calculateCorrs();
+				//repaint();
+				//panel.repaint();
 
 			}
 		});
@@ -189,7 +213,7 @@ class CorrelationFrame extends JFrame implements MatrixWindow, IPlot {
 }
 
 class CorrelationPanel extends JPanel implements MouseListener,
-		MouseMotionListener {
+		MouseMotionListener,ColorListener,KeyListener {
 
 	Seurat seurat;
 
@@ -207,7 +231,7 @@ class CorrelationPanel extends JPanel implements MouseListener,
 
 	boolean[] selection;
 
-	int Width;
+	int Aggregation;
 
 	// double [][] dataG;
 
@@ -220,6 +244,8 @@ class CorrelationPanel extends JPanel implements MouseListener,
 
 	int pixelSize;
 	
+	int PixelCount;
+	
 	CorrelationFrame frame;
 
 	public CorrelationPanel(Seurat seurat, CorrelationFrame frame, Vector Genes,
@@ -227,14 +253,13 @@ class CorrelationPanel extends JPanel implements MouseListener,
 
 		this.seurat = seurat;
 		this.frame = frame;
-		this.Width = Width;
+		this.Aggregation = Width;
 		this.Genes = Genes;
 		this.dataManager = seurat.dataManager;
 		this.isVariables = isColumns;
 		this.pixelSize = size;
 
 		this.Experiments = Experiments;
-		calculateCorrs();
 
 		dataManager = seurat.dataManager;
 
@@ -242,6 +267,7 @@ class CorrelationPanel extends JPanel implements MouseListener,
 
 		this.addMouseListener(this);
 		this.addMouseMotionListener(this);
+		this.addKeyListener(this);
 
 		ToolTipManager.sharedInstance().registerComponent(this);
 		ToolTipManager.sharedInstance().setInitialDelay(0);
@@ -328,27 +354,32 @@ class CorrelationPanel extends JPanel implements MouseListener,
 
 		int count = data.length;
 
+		
+		/*
 		int PixelCount = Math.max(Math.min(Math.min(this.getWidth(), this.getHeight())
 				/ pixelSize, count),1);
 
 		// System.out.println(count + " " + PixelCount);
  
-		Width = data.length / PixelCount;
-		if (Width * PixelCount < data.length) Width++;
-		PixelCount = data.length / Width;
+		Aggregation = data.length / PixelCount;
+		if (Aggregation * PixelCount < data.length) Aggregation++;
+		PixelCount = data.length / Aggregation;
 		
 		
-		  if ( (count - PixelCount * Width)> Width) { Width++; PixelCount =
-		  count / Width; }
-		 
-
+		  if ( (count - PixelCount * Aggregation)> Aggregation) { Aggregation++; PixelCount =
+		  count / Aggregation; }
+		 */
+		
+		
+        System.out.println("PixelCount  " + PixelCount);
+		
 		
 		double[][] correlations = new double[PixelCount][PixelCount];
 		for (int i = 0; i < correlations.length; i++) {
 			for (int j = 0; j < correlations.length; j++) {
 				count = 0;
-				for (int ii = i * this.Width; ii < Math.min((i + 1) * this.Width, data.length); ii++) {
-					for (int jj = j * this.Width; jj < Math.min((j + 1)	* this.Width, data.length); jj++) {
+				for (int ii = i * this.Aggregation; ii < Math.min((i + 1) * this.Aggregation, data.length); ii++) {
+					for (int jj = j * this.Aggregation; jj < Math.min((j + 1)	* this.Aggregation, data.length); jj++) {
 						correlations[i][j] += corr[ii][jj];
 						count++;
 					}
@@ -370,10 +401,7 @@ class CorrelationPanel extends JPanel implements MouseListener,
 		
 		
 
-		if (isVariables)
-			this.selection = new boolean[Experiments.size()];
-		else
-			this.selection = new boolean[Genes.size() / Width];
+		this.selection = new boolean[PixelCount];
 
 		for (int i = 0; i < selection.length; i++) {
 			selection[i] = false;
@@ -385,15 +413,14 @@ class CorrelationPanel extends JPanel implements MouseListener,
 				ISelectable var = Experiments.elementAt(i);
 				// if (var.isSelected()) selection [order [i-2]] = true;
 				if (Experiments.elementAt(i).isSelected())
-					selection[i] = true;
-				else
-					selection[i] = false;
+					selection[i/Aggregation] = true;
+				
 			}
 		} else {
 			for (int i = 0; i < Genes.size(); i++) {
 				// if (amlTool.isRowSelected(i)) selection [order [i]] = true;
 				if (Genes.elementAt(i).isSelected())
-					selection[i / Width] = true;
+					selection[i / Aggregation] = true;
 
 			}
 		}
@@ -403,7 +430,7 @@ class CorrelationPanel extends JPanel implements MouseListener,
 
 	public void addSelection(int start, int end) {
 		this.selection = new boolean[data.length];
-		this.dataManager.selectAll();
+		this.dataManager.deleteSelection();
 
 		
 		
@@ -417,7 +444,7 @@ class CorrelationPanel extends JPanel implements MouseListener,
 
 			for (int i = 0; i < Experiments.size(); i++) {
 				ISelectable var = Experiments.elementAt(i);
-				if (i < end && start <= i) {
+				if (i < end* Aggregation && start* Aggregation <= i) {
 					var.select(true);
 				} else
 					var.unselect(true);
@@ -429,7 +456,7 @@ class CorrelationPanel extends JPanel implements MouseListener,
 				Genes.elementAt(i).unselect(true);
 			}
 
-			for (int i = start * Width; i < end * Width; i++) {
+			for (int i = start * Aggregation; i < Math.min(end * Aggregation, Genes.size()); i++) {
 				int row = Genes.elementAt(i).getID();
 				if (i < Genes.size()) {
 					Genes.elementAt(i).select(true);
@@ -457,7 +484,7 @@ class CorrelationPanel extends JPanel implements MouseListener,
 			int start = Math.min(point1.x, point1.x) / pixelSize;
 			int end = Math.min(point2.x, point2.x) / pixelSize;
 			if (start == end) end++;
-			addSelection(start, end);
+			if (start<=PixelCount) addSelection(start, end);
 
 		}
 		point1 = null;
@@ -487,6 +514,42 @@ class CorrelationPanel extends JPanel implements MouseListener,
 
 				JPopupMenu menu = new JPopupMenu();
 				JMenuItem item;
+				
+				
+				
+				item = new JMenuItem("set pixel dimension");
+				item.addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent e) {
+						// createCorrelationExperiments();
+
+					    
+					    ColorDialog dialog =  new ColorDialog(seurat, frame.panel, pixelSize);
+					  //  dialog.pixelWField.addKeyListener(globalView.gPanel);
+					  //  dialog.pixelHField.addKeyListener(globalView.gPanel);
+					    
+					}
+				});
+				menu.add(item);
+				
+				
+				
+				item = new JMenuItem("set aggregation");
+				item.addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent e) {
+						// createCorrelationExperiments();
+
+					    
+					    AggregationDialog dialog =  new AggregationDialog(seurat,frame.panel, Aggregation);
+					  //  dialog.field.addKeyListener(globalView.gPanel);
+					   
+					    
+					}
+				});
+				menu.add(item);
+				
+				
+				menu.addSeparator();
+				
 
 			    item = new JMenuItem("Print");
 			    item.addActionListener(new ActionListener() {
@@ -573,7 +636,6 @@ class CorrelationPanel extends JPanel implements MouseListener,
 				selection = true;
 		}
 		
-		
 
 		for (int i = 0; i < data.length; i++) {
 			for (int j = 0; j < data[i].length; j++) {
@@ -581,7 +643,7 @@ class CorrelationPanel extends JPanel implements MouseListener,
 				double koeff = 0;
 
 				if (data[i][j] > 0) {
-					koeff = Math.pow(data[i][j] / max,
+					koeff = Math.pow(data[i][j],
 							seurat.settings.colorParam);
 
 					Color c = (Color.getHSBColor(0, (float) koeff, 1));
@@ -591,33 +653,24 @@ class CorrelationPanel extends JPanel implements MouseListener,
 					
 					
 					if (this.selection[i] || this.selection[j]) {
+						c = c.darker();
+						c = c.darker();
 						
 					}
-					else {
-						if (selection) {
-							c = c.darker();
-							c = c.darker();
-						}
-						
-					}
+					
 
 					g.setColor(c);
 
 				} else {
-					koeff = Math.pow(data[i][j] / min,
+					koeff = Math.pow(-data[i][j],
 							seurat.settings.colorParam);
 					Color c = Color.getHSBColor((float) 0.66, (float) koeff, 1);
 
 if (this.selection[i] || this.selection[j]) {
-						
+	c = c.darker();
+	c = c.darker();
 					}
-					else {
-						if (selection) {
-							c = c.darker();
-							c = c.darker();
-						}
-						
-					}
+					
 					g.setColor(c);
 				}
 
@@ -636,6 +689,121 @@ if (this.selection[i] || this.selection[j]) {
 
 		}
 
+	}
+
+	public void applyNewPixelSize(int pixelW, int pixelH) {
+		// TODO Auto-generated method stub
+		
+		this.pixelSize = pixelW;
+		
+		
+		
+		
+		
+		int length = Genes.size()/Aggregation*pixelSize;
+		if (isVariables) length = Experiments.size()/Aggregation * pixelSize;
+		
+		
+		if (seurat.SYSTEM == seurat.WINDOWS) {
+
+			frame.setSize( length  + 17,
+					      length + 38);
+
+		} else
+			frame.setSize(length +1,
+					     length + 23);
+
+		
+		
+		
+	}
+
+	public void applyNewPixelSize() {
+		// TODO Auto-generated method stub
+		repaint();
+	}
+
+	public void setAggregation(int aggr) {
+		// TODO Auto-generated method stub
+		Aggregation = aggr;
+		
+		
+		PixelCount = Genes.size()/Aggregation;
+		if (isVariables) PixelCount = Experiments.size()/Aggregation;
+		
+		
+		int length = PixelCount * pixelSize;
+		
+	
+		
+		
+		if (seurat.SYSTEM == seurat.WINDOWS) {
+
+			frame.setSize( length  + 17,
+					      length + 38);
+
+		} else
+			frame.setSize(length +1,
+					     length + 23);
+
+		
+		
+		calculateCorrs();
+		
+		
+	}
+
+	public void setModel(int model) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void keyPressed(KeyEvent e) {
+		// TODO Auto-generated method stub
+		
+		
+		  int size = Genes.size();
+	   		if (isVariables) size = Experiments.size();
+		
+       if (e.getKeyCode() == 38) {
+    	   
+    	   
+    	 
+			
+			if (Aggregation < size) {
+				Aggregation++;
+				setAggregation(Aggregation);
+			}
+			
+			  
+			
+			
+			
+		}
+		
+		
+        if (e.getKeyCode() == 40) {
+        	
+        	
+        	if (Aggregation > 1) {
+				Aggregation--;
+				setAggregation(Aggregation);
+			}
+			
+		}
+        
+        
+		
+	}
+
+	public void keyReleased(KeyEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void keyTyped(KeyEvent e) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

@@ -241,7 +241,7 @@ public class ExperimentDescriptionFrame extends JFrame {
 					}
 					
 					
-					seurat.dataManager.ExpClusters.add(new Clustering(this.descriptionVariables.elementAt(j).getName(),Clusters,this.descriptionVariables.elementAt(j).stringBuffer));
+					seurat.dataManager.ExpClusters.add(new Clustering(this.descriptionVariables.elementAt(j).getName(),Clusters,this.descriptionVariables.elementAt(j).stringBuffer,false));
 					
 				}
 					
@@ -257,7 +257,11 @@ public class ExperimentDescriptionFrame extends JFrame {
 		
 			
 			
-		} catch (IOException e) {
+		} catch (Exception e) {
+			JOptionPane.showMessageDialog(this,
+				    "Wrong file format.",
+				    "Load Error",
+				    JOptionPane.ERROR_MESSAGE);
 			System.out.println("Wrong file format  " + e);
 		}
 

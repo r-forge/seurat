@@ -1,22 +1,22 @@
 package Settings;
 
 public class Settings {
-	public int PixelW = 4;
+	public int PixelW = 8;
 	public int PixelH = 1;
 
 	public int Model = 1;
 
 	public double colorParam = 0.5;
 	
-	public double aPos = 0.5,bPos = 1;
-	public double aNeg = 0.5,bNeg = 1;
+	public static double aPos = 0.5,bPos = 1;
+	public static double aNeg = 0.5,bNeg = 1;
 	
-	public double posMin = 0, posMax = 1;
-	public double negMax = 1, negMin = 0;
+	public static double posMin = 0, posMax = 1;
+	public static double negMax = 1, negMin = 0;
 	
 	public double MAXP,MINP;
 	
-	public boolean invertShading = false;
+//	public boolean invertShading = false;
 	
 	public static int DiscretLimit = 25;
 
@@ -123,13 +123,13 @@ public class Settings {
 		MINP = minp;
 	}
 
-	public boolean isInvertShading() {
-		return invertShading;
-	}
+	//public boolean isInvertShading() {
+	//	return invertShading;
+	//}
 
-	public void setInvertShading(boolean invertShading) {
-		this.invertShading = invertShading;
-	}
+	//public void setInvertShading(boolean invertShading) {
+		//this.invertShading = invertShading;
+	//}
 	
 	
 }

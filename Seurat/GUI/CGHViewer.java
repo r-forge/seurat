@@ -93,7 +93,7 @@ public class CGHViewer extends JFrame {
 				
 				
 				GlobalView v = new GlobalView(seurat,"Heatmap CGH Data", vars,
-						CLONES, false);
+						CLONES);
 				v.applyNewPixelSize(seurat.settings.PixelW,seurat.settings.PixelH);
 			
 			}
@@ -118,7 +118,7 @@ public class CGHViewer extends JFrame {
 				
 				
 				new GlobalView(seurat,"Heatmap CGH Data", vars,
-						CLONES, false);
+						CLONES);
 			
 			}
 		});
@@ -139,7 +139,7 @@ public class CGHViewer extends JFrame {
 				
 				
 				GlobalView v = new GlobalView(seurat,"Heatmap states", vars,
-						CLONES, false);
+						CLONES);
 				v.applyNewPixelSize(seurat.settings.PixelW,seurat.settings.PixelH);
 			
 			}
@@ -236,7 +236,7 @@ public class CGHViewer extends JFrame {
 			int col = 0;
 			while (stk.hasMoreTokens()) {
 				cghVariables.add(new CGHVariable(stk
-						.nextToken(), CGHVariable.Double,null,seurat));
+						.nextToken(), col,CGHVariable.Double,null,seurat));
 				col++;
 			}
 
@@ -363,7 +363,12 @@ public class CGHViewer extends JFrame {
 			
 			seurat.openCGHItem.setEnabled(false);
 
-		} catch (IOException e) {
+		} catch (Exception e) {
+			JOptionPane.showMessageDialog(this,
+				    "Wrong file format.",
+				    "Load Error",
+				    JOptionPane.ERROR_MESSAGE);
+			
 			System.out.println("Wrong file format  " + e);
 		}
 
@@ -388,6 +393,12 @@ public class CGHViewer extends JFrame {
 			}
 		}
 		
+		if (varChr != null) varChr.isChromosome = true;
+		else JOptionPane.showMessageDialog(this,
+			    "Variable ChromosomeNumber not found.",
+			    "Connection Error",
+			    JOptionPane.ERROR_MESSAGE);
+		
 		
 		
 		for (int i = 0; i < seurat.dataManager.Experiments.size(); i++) {
@@ -411,6 +422,11 @@ public class CGHViewer extends JFrame {
 			if (cghVariables.elementAt(i).name.contains(seurat.dataManager.ChrStart)) varChrStart = cghVariables.elementAt(i);
 		}
 		
+		if (varChrStart == null) JOptionPane.showMessageDialog(this,
+			    "Variable ChrStart not found.",
+			    "Connection Error",
+			    JOptionPane.ERROR_MESSAGE);
+		
 		
 		CGHVariable varChrEnd = null;
 		for (int i = 0; i < cghVariables.size(); i++) {
@@ -418,10 +434,21 @@ public class CGHViewer extends JFrame {
 		}
 		
 		
+		if (varChrEnd == null) JOptionPane.showMessageDialog(this,
+			    "Variable ChrEnd not found.",
+			    "Connection Error",
+			    JOptionPane.ERROR_MESSAGE);
+		
+		
 		CGHVariable varChrCen = null;
 		for (int i = 0; i < cghVariables.size(); i++) {
 			if (cghVariables.elementAt(i).name.contains(seurat.dataManager.ChrCen)) varChrCen = cghVariables.elementAt(i);
 		}
+		
+		if (varChrCen == null) JOptionPane.showMessageDialog(this,
+			    "Variable ChromosomeCen not found.",
+			    "Connection Error",
+			    JOptionPane.ERROR_MESSAGE);
 		
 		
 		/*
@@ -436,6 +463,11 @@ public class CGHViewer extends JFrame {
 		for (int i = 0; i < cghVariables.size(); i++) {
 			if (cghVariables.elementAt(i).name.contains(seurat.dataManager.CloneCytoBand)) varCloneCytoBand = cghVariables.elementAt(i);
 		}
+		
+		if (varCloneCytoBand == null) JOptionPane.showMessageDialog(this,
+			    "Variable Mapping not found.",
+			    "Connection Error",
+			    JOptionPane.ERROR_MESSAGE);
 		
 		
 		
@@ -584,8 +616,8 @@ public class CGHViewer extends JFrame {
 							
 							if (chromosome.length == -1) chromosome.length = 2*clone.getValue("ChromosomeCen");
 								
-							clone.chromosome.chrStart = start;
-							clone.chromosome.chrEnd = end;
+							clone.chrStart = start;
+							clone.chrEnd = end;
 							clone.chromosome.chrCen = cen;
 							clone.NucleoPosition = Math.round((end + start)/2);
 							

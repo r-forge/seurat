@@ -174,8 +174,10 @@ public class DataLoader {
 			
 			dataManager.Experiments = new Vector();
 			dataManager.ExperimentDescr = new Vector();
+			
+			dataManager.ExperimentDescr.add(dataManager.variables.elementAt(0));
 
-			for (int i = 0; i < dataManager.variables.size(); i++) {
+			for (int i = 1; i < dataManager.variables.size(); i++) {
 				System.out.println(dataManager.variables.elementAt(i).name);
 				if (dataManager.variables.elementAt(i).isExperiment && !dataManager.variables.elementAt(i).name.equals(dataManager.ChromosomeNumber) && !dataManager.variables.elementAt(i).name.equals(dataManager.NucleotidePosition) )
 					dataManager.Experiments.add(dataManager.variables.elementAt(i));
