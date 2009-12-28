@@ -24,7 +24,7 @@ public class ConfusionsPlot extends JFrame implements IPlot {
 
 	public ConfusionsPlot(Seurat seurat, String method1, String method2,
 			Clustering Experiments1, Clustering Experiments2) {
-		super("ComparePlot: ( " + method1 + " , " + method2 + " )");
+		super("Confusion Matrix: ( " + method1 + " , " + method2 + " )");
 		this.seurat = seurat;
 
 		panel = new ConfusionsPanel(seurat, this, method1, method2,
@@ -391,6 +391,7 @@ class ConfusionsPanel extends JPanel implements KeyListener, MouseListener,
 			item.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
 					originalOrder();
+					
 				}
 			});
 			menu.add(item);
@@ -527,6 +528,8 @@ class ConfusionsPanel extends JPanel implements KeyListener, MouseListener,
 
 		ClusterColumns = null;
 		ClusterRows = null;
+		
+		repaint();
 	}
 
 	public void permute() {

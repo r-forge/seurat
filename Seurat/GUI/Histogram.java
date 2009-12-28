@@ -191,7 +191,7 @@ class HistogramPanel extends JPanel implements KeyListener, MouseListener,
 		if (width == 0)
 			width = 1;
 
-		System.out.println("Width " + width);
+	//	System.out.println("Width " + width);
 
 		this.calculateBalken(-1);
 		this.setVisible(true);
@@ -235,9 +235,11 @@ class HistogramPanel extends JPanel implements KeyListener, MouseListener,
             
             
             this.calculateBalken(width);
-            removeColoring();	
-            seurat.applyNewPixelSize();
-			seurat.repaintWindows();
+          
+            removeColoring();
+            repaint();
+           // seurat.applyNewPixelSize();
+		//	seurat.repaintWindows();
 		    }
 		    
 		    
@@ -252,9 +254,12 @@ class HistogramPanel extends JPanel implements KeyListener, MouseListener,
 	            if (count == 1)  this.width = (max - anchor)*1.1;
 	            
 	            this.calculateBalken(width);
-	            removeColoring();	
-                seurat.applyNewPixelSize();
-				seurat.repaintWindows();
+	     
+	            removeColoring();
+	            repaint();
+              
+	            //  seurat.applyNewPixelSize();
+			//	seurat.repaintWindows();
 			    }
 		    
 		    
@@ -441,6 +446,8 @@ class HistogramPanel extends JPanel implements KeyListener, MouseListener,
 		for (int i = 0; i < color.length; i++) {
 			color[i] = GRAY;
 		}
+		
+		this.updateSelection();
 
 	}
 
@@ -524,7 +531,15 @@ class HistogramPanel extends JPanel implements KeyListener, MouseListener,
 
 			g.drawString(round(anchor), abstandLinks, this.getHeight() - 9);
 
-			g.drawString(round(anchor + width*balken.length), (this.getWidth() - 2 * abstandLinks), this
+			
+			int labelWidth = getStringWidth(g,round(anchor + width*balken.length)+"");
+			
+int sWidth = 	getStringWidth(g,round(anchor)+"");
+			
+			
+			if (sWidth + labelWidth < getWidth() - 2*abstandLinks - 5)
+				
+				g.drawString(round(anchor + width*balken.length), (this.getWidth() - abstandLinks- labelWidth), this
 					.getHeight() - 9);
 
 		} else {
@@ -638,12 +653,18 @@ class HistogramPanel extends JPanel implements KeyListener, MouseListener,
 			);
 			g.drawString(round(anchor), abstandLinks, this.getHeight() - 9);
 
-			g.drawString(round(anchor + width*balken.length), balken.length
-					* (this.getWidth() - 3 * abstandLinks)
+			
+			
+			int labelWidth = getStringWidth(g,round(anchor + width*balken.length)+"");
+		
+			int sWidth = 	getStringWidth(g,round(anchor)+"");
+			
+			
+			if (sWidth + labelWidth < getWidth() - 3*abstandLinks - 5) g.drawString(round(anchor + width*balken.length), balken.length
+					* (this.getWidth() - 2 * abstandLinks-labelWidth)
 					/ (balken.length + 1) - 7, this.getHeight() - 9);
 
-			if (max < 10000)
-				g.drawString("NA", 2 * abstandLinks + balken.length
+			g.drawString("NA", 2 * abstandLinks + balken.length
 						* (this.getWidth() - 3 * abstandLinks)
 						/ (balken.length + 1), this.getHeight() - 9);
 
@@ -718,7 +739,13 @@ class HistogramPanel extends JPanel implements KeyListener, MouseListener,
 	
 	public void addSelection(Point point1, Point point2) {
 		boolean[] selectedBalken = new boolean[balken.length];
-
+		seurat.dataManager.deleteSelection();
+		 for (int i = 0; i < variables.size(); i++) {
+		    	variables.elementAt(i).unselect(true);
+		    }
+		
+		
+		
 		if (this.NABalken == 0) {
 
 			for (int i = 0; i < balken.length; i++) {
@@ -738,15 +765,16 @@ class HistogramPanel extends JPanel implements KeyListener, MouseListener,
 
 			}
 
-			seurat.dataManager.deleteSelection();
 			
+			
+/*
 			if (variables.elementAt(0).isGene() || variables.elementAt(0).isClone()) {
 				seurat.dataManager.selectExperiments(); 
 			}
 			if (variables.elementAt(0).isVariable() || variables.elementAt(0).isCGHVariable()) {
 				seurat.dataManager.selectGenesClones(); 
 		   }
-		
+	*/	
 			
 			
 			
@@ -805,12 +833,16 @@ class HistogramPanel extends JPanel implements KeyListener, MouseListener,
 			point1.x, point1.y, point2.x, point2.y))
 				isNASelected = true;
 
+			
+			/*
 			seurat.dataManager.deleteSelection();
 			
 			seurat.dataManager.selectAll();
 			for (int i = 0; i < variables.size(); i++) {
 				if (variables.elementAt(i)!=null) variables.elementAt(i).unselect(true); 
-			}
+			}*/
+			
+			
 		
 			for (int j = 0; j < data.length; j++) {
 				if (data[j] != NA) {
@@ -989,15 +1021,57 @@ class HistogramPanel extends JPanel implements KeyListener, MouseListener,
 	
 				/ (this.getWidth() - 2 * abstandLinks);
 		}
-		else i =  		(x - abstandLinks) * (balken.length+1)
+		else {
+			i =  (x - abstandLinks) * (balken.length+1)/ (this.getWidth() - 3 * abstandLinks);
 		
-		/ (this.getWidth() - 3 * abstandLinks);
+			System.out.println("sdfsv" + i);
+			
+		if (x>  2*abstandLinks + balken.length*(this.getWidth() - 3 * abstandLinks)/(balken.length + 1)) {
+			
+			/**NA Balken**/
+			i = -1;
+			
+			
+			
+			int maxY = this.getHeight() - abstandUnten;
+			int minY = this.getHeight()
+					- abstandUnten
+					- (int) Math.round((this.getHeight() - 3 * abstandUnten)
+							* NABalken);
+			
+			if (y > minY && y < maxY)
+				return i;
+			
+				return -222;
+				
+				
+				
+					} 
+		
+		}
 
 		int maxY = this.getHeight() - abstandUnten;
 		int minY = this.getHeight()
 				- abstandUnten
 				- (int) Math.round((this.getHeight() - 3 * abstandUnten)
 						* balken[i]);
+		/*
+		
+		g.fillRect(2 * abstandLinks + balken.length
+				* (this.getWidth() - 3 * abstandLinks)
+				/ (balken.length + 1),
+
+		this.getHeight() - abstandUnten - (int) Math
+		.round((this.getHeight() - 3 * abstandUnten)*this.NAHightSelection),
+
+		(this.getWidth() - 3 * abstandLinks) / (balken.length + 1),
+		(int) Math
+		.round((this.getHeight() - 3 * abstandUnten)*this.NAHightSelection)
+
+		);
+		
+		*/
+
 
 		if (y > minY && y < maxY)
 			return i;
@@ -1008,13 +1082,13 @@ class HistogramPanel extends JPanel implements KeyListener, MouseListener,
 
 	@Override
 	public String getToolTipText(MouseEvent e) {
-		if (e.isControlDown()) {
+		if (e.isControlDown() && this.getBalken(e) !=-1 && this.getBalken(e) !=-222) {
 			int i = this.getBalken(e);
 
 			int count = 0;
 
 			for (int j = 0; j < this.data.length; j++) {
-				if (this.getVariable(i) != null
+				if (this.getVariable(j) != null
 						&& this.getVariable(j).isSelected()) {
 					if ((int) Math.floor((data[j] - anchor) / width) == i)
 						count++;
@@ -1042,7 +1116,57 @@ class HistogramPanel extends JPanel implements KeyListener, MouseListener,
 					+ Math.round(balkenHightSelection[i]/balken [i] * 10000) / (double) 100 + "%)";
 
 		}
+		
+		
+		
+		/*NA**/
+		
+		if (e.isControlDown() && this.getBalken(e) == -1) {
+			  
+			
+			int count = 0;
+
+			for (int j = 0; j < this.data.length; j++) {
+				if (this.getVariable(j) != null
+						&& this.getVariable(j).isSelected()) {
+					if (data[j] == NA)
+						count++;
+				}
+
+			}
+
+			double koeff = count / (this.maxCount);
+
+			
+
+			return "<HTML><BODY BGCOLOR = 'WHITE'><FONT FACE = 'Verdana'><STRONG>"
+					+ "<FONT FACE = 'Arial'>"
+					+ "NA"
+					+ "<BR><STRONG></STRONG>"
+					+ (int) Math.round(this.maxCount * NAHightSelection)
+					+ "/"
+					+ (int) Math.round(this.maxCount * NABalken)
+					+ "	"
+					+ "("
+					+ Math.round(NAHightSelection/NABalken * 10000) / (double) 100 + "%)";
+
+		}
+		
+		
+		
 		return null;
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
 	}
 
 	public String round(double zahl) {
@@ -1055,9 +1179,7 @@ class HistogramPanel extends JPanel implements KeyListener, MouseListener,
 		s = s.replaceAll("\"", "");
 		String ss = this.cutLabelsHelp(s, availablePlace, g);
 
-		int Width = 0;
-		for (int i = 0; i < ss.length(); i++)
-			Width += g.getFontMetrics().charWidth(ss.charAt(i));
+		int Width = getStringWidth(g,ss);
 		if (Width < availablePlace)
 			return ss;
 
@@ -1072,6 +1194,14 @@ class HistogramPanel extends JPanel implements KeyListener, MouseListener,
 		return ss;
 
 	};
+	
+	
+	public int getStringWidth(Graphics g, String ss){
+		int Width = 0;
+		for (int i = 0; i < ss.length(); i++)
+			Width += g.getFontMetrics().charWidth(ss.charAt(i));
+		return Width;
+	}
 
 	public String cutLabelsHelp(String s, int availablePlace, Graphics g) {
 		int Width = 0;
@@ -1162,7 +1292,13 @@ class HistogramPanel extends JPanel implements KeyListener, MouseListener,
 
 	public void removeColoring() {
 
+		
+		boolean repaint = false;
+		
 		for (int i = 0; i < this.variables.size(); i++) {
+		
+			if (this.getVariable(i) instanceof Variable) { 
+			
 			int index = ((Variable) this.getVariable(i)).getBarchartToColors()
 					.indexOf(hist);
 			if (index != -1) {
@@ -1170,8 +1306,21 @@ class HistogramPanel extends JPanel implements KeyListener, MouseListener,
 				((Variable) this.getVariable(i)).getColorNames().remove(index);
 				((Variable) this.getVariable(i)).getBarchartToColors()
 						.remove(index);
+			
+			repaint = true;
 			}
+			
+			}
+			
+			
+			else {
+				
+				break;
+			}
+			
 		}
+		
+		if (repaint) seurat.repaintWindows();
 
 		for (int i = 0; i < color.length; i++) {
 			color[i] = GRAY;

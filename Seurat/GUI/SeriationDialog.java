@@ -58,12 +58,16 @@ Vector<ISelectable> Experiments;
 	
 	Vector<ISelectable> Genes;
 	
+	int pixelW,pixelH;
 	
 
-	public SeriationDialog(Seurat seurat,Vector Genes, Vector Exps) {
+	public SeriationDialog(Seurat seurat,Vector Genes, Vector Exps, int pixelW, int pixelH) {
 		super("Seriation");
 		this.seurat = seurat;
 		this.dialog = this;
+		
+		this.pixelW = pixelW;
+		this.pixelH = pixelH;
 		
         this.Genes = Genes;
         
@@ -196,8 +200,8 @@ Vector<ISelectable> Experiments;
 			
 			
 
-			GlobalView globalView = new GlobalView(seurat, "Heatmap "+method, E,G,false);
-            globalView.applyNewPixelSize(seurat.settings.PixelW,seurat.settings.PixelH);
+			GlobalView globalView = new GlobalView(seurat, "Heatmap "+method, E,G);
+            globalView.applyNewPixelSize(dialog.pixelW,dialog.pixelH);
 		
 			globalView.setLocation(333, 0);
 			globalView.setVisible(true);

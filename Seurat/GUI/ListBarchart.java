@@ -259,7 +259,12 @@ class ListBarchartPanel extends JPanel implements KeyListener, MouseListener,
 
 		}
 
-		seurat.dataManager.deleteSelection();
+		//seurat.dataManager.deleteSelection();
+		
+		 for (int i = 0; i < variables.size(); i++) {
+		    	variables.elementAt(i).unselect(true);
+		    }
+		
 		
 		boolean selected = false;
 		
@@ -283,13 +288,15 @@ class ListBarchartPanel extends JPanel implements KeyListener, MouseListener,
 			}
 		}
 		
+		
+		/*
 		if (selected) {
 			Vector<Variable> vars = seurat.dataManager.Experiments;
 			for (int i = 0; i < vars.size();i++) {
 				vars.elementAt(i).select(true);
 			}
 		}
-
+*/
 		
 		
 		

@@ -6,9 +6,14 @@ public class DataTreeNode extends DefaultMutableTreeNode{
 
     public ISelectable object;
     
+    
+    
+    /**TYPE = 4 for clustering*/
     public int TYPE;
     
     public String name;
+    
+    public Object cObject;
     
     public DataTreeNode(ISelectable object) {
     	super(object.getName());

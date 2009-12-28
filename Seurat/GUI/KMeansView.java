@@ -8,7 +8,9 @@ import java.awt.event.*;
 import java.awt.*;
 
 import Data.*;
+import GUI.KmeansPanel.Block;
 import Settings.*;
+import Tools.Tools;
 
 class KMeansView extends JFrame implements MatrixWindow, IPlot {
 	
@@ -71,46 +73,70 @@ int abstandUnten = 2;
 		  
 		  int shiftY = 2;
 		  
+		  
+		  /*
 		  for (int j = 0; j < Genes.size(); j++) {
 			  
-				shiftY = shiftY
-				+ (Genes.elementAt(j).size() * pixelH/ panel.Aggregation + 1);
+				shiftY = shiftY + (Genes.elementAt(j).size() * pixelH/ panel.Aggregation + 1);
 		  
 		  }
+		  */
+		  
+		 
+		  
+		  
 		  shiftY = shiftY
 			+ this.dataManager.Experiments.elementAt(0).getBarchartToColors().size() * (2 * pixelH + 2);
 		  
-		  int row = Genes.size();
+		  
+		  plot.infoLabel.setText("Aggregation: 1 : " + panel.Aggregation);
+		  
+		  
+		  
+		
+		
+		  
+		  
+		 updateSelection(); 
+		 
+		 for (int i = 0; i < panel.blocks [0].length; i++) {
+			  Block b = panel.blocks [0] [i];
+			  
+			  
+			  int pixelC = b.Genes.size() /panel.Aggregation;
+	            if (pixelC*panel.Aggregation < b.Genes.size()) pixelC++; 
+	            
+	            
+	            
+				shiftY += pixelC * pixelH + 1;
+				  
+		  }
 		  
 		 panel.setPreferredSize(new Dimension(shiftX+2, shiftY+2));
-		  
-		
-		
-		  
-		  
-		  
-		  
-		  
+			
+		 
 		 if (seurat.SYSTEM == seurat.WINDOWS) {
 		  
 		  this .setSize( shiftX + 14, (int)Math.min(800,shiftY + + infoPanel.getHeight()  + 41 +abstandUnten));
 		   } else this .setSize(shiftX + 7,(int)Math.min(800,shiftY + abstandUnten + infoPanel.getHeight()  + 28));
 		 
-		 updateSelection();
+		repaint();
+		 
+		 
 		 
 
 	}
 
 	public KMeansView(Seurat seurat, String name,
-			Vector<Vector<ISelectable>> Experiments, Vector<Vector<ISelectable>> Genes) {
+			Clustering c1, Clustering c2) {
 		super(name);
 		System.out.println("KMeansView");
 		item = new JMenuItem(name);
 
 		this.seurat = seurat;
 		this.dataManager = seurat.dataManager;
-		this.Experiments = Experiments;
-		this.Genes = Genes;
+		this.Experiments = c1.clusters;
+		this.Genes = c2.clusters;
 		
 		this.getContentPane().setLayout(new BorderLayout());
 		panel = new KmeansPanel(seurat, this, Experiments, Genes);
@@ -227,6 +253,8 @@ int abstandUnten = 2;
 			}
 			s+="}";
 			
+			
+			s = c1.name;
 			JLabel label = new JLabel("Columns: " + s);
 			label.setFont(myFont);
 			infoPanel.add(label);
@@ -241,8 +269,8 @@ int abstandUnten = 2;
 			s+="}";
 			
 			
-			
-			label = new JLabel(" Rows: "+s+"  ");
+			s = c2.name;
+			label = new JLabel("   Rows: "+s+"   ");
 			label.setFont(myFont);
 			infoPanel.add(label);
 			
@@ -341,7 +369,7 @@ class KmeansPanel extends JPanel implements MouseListener, IPlot,
 	Block[][] blocks;
 
 	
-	
+	public boolean exclusiveSelection = true;
 	
 	int Aggregation = 1;
 
@@ -366,6 +394,14 @@ class KmeansPanel extends JPanel implements MouseListener, IPlot,
 		this.addMouseMotionListener(this);
 		this.addKeyListener(this);
 
+	}
+	
+	
+	
+	
+	public boolean selected(boolean a, boolean b) {
+		if (exclusiveSelection) return (a || b);
+		return a&&b;
 	}
 
 	public void mouseEntered(MouseEvent e) {
@@ -397,6 +433,35 @@ class KmeansPanel extends JPanel implements MouseListener, IPlot,
 			}
 
 		}
+		
+		
+		
+		
+       exclusiveSelection = true;
+		
+		boolean cols = true;
+
+		for (int i = 0; i < this.Experiments.size(); i++) {
+			Vector<ISelectable> Cluster = Experiments.elementAt(i);
+			for (int j = 0; j < Cluster.size(); j++) {
+				 if (Cluster.elementAt(j).isSelected()) cols = false;
+			}	 
+		}
+		
+		boolean rows = true;
+		
+		for (int i = 0; i < this.Genes.size(); i++) {
+			Vector<ISelectable> Cluster = Genes.elementAt(i);
+		    for (int j = 0; j < Cluster.size(); j++) {
+			      if (Cluster.elementAt(j).isSelected()) 
+				rows = false;
+		    }
+		}
+		
+		exclusiveSelection = cols || rows;
+		
+		
+		
 
 		int shiftX = abstandLinks+1;
 
@@ -428,8 +493,14 @@ class KmeansPanel extends JPanel implements MouseListener, IPlot,
 				int a = 0;
 				if ((blocks[i][j].Genes.size()-1) % this.Aggregation ==0) a =1;
 				
-				blocks[i][j].values = new double [blocks[i][j].Experiments.size()]   [(blocks[i][j].Genes.size()-1) / this.Aggregation +1];
-				blocks[i][j].isSelected = new boolean [blocks[i][j].Experiments.size()]   [(blocks[i][j].Genes.size()-1) / this.Aggregation +1];
+				
+				int pixelC = genes.size() /Aggregation;
+                if (pixelC*Aggregation < genes.size()) pixelC++; 
+                
+                
+				
+				blocks[i][j].values = new double [blocks[i][j].Experiments.size()]   [pixelC];
+				blocks[i][j].isSelected = new boolean [blocks[i][j].Experiments.size()]   [pixelC];
 				
 			
 				
@@ -439,7 +510,7 @@ class KmeansPanel extends JPanel implements MouseListener, IPlot,
 					for (int jj = 0; jj < blocks[i][j].Genes.size(); jj++) {
 						blocks[i][j].values [ii][jj/Aggregation] = 0;
 						//if (blocks[i][j].Experiments.elementAt(ii).isSelected [blocks[i][j].Genes.elementAt(jj).ID]  )  {
-						if (blocks[i][j].Experiments.elementAt(ii).isSelected() &&  blocks[i][j].Genes.elementAt(jj).isSelected()  )  {
+						if (selected(blocks[i][j].Experiments.elementAt(ii).isSelected() ,blocks[i][j].Genes.elementAt(jj).isSelected()  ))  {
 							
 						blocks[i][j].isSelected [ii][jj/Aggregation] = true;
 						//	isSelection = true;
@@ -493,9 +564,9 @@ class KmeansPanel extends JPanel implements MouseListener, IPlot,
 				
 				
 				
-
-				shiftY = shiftY + genes.size() * pixelH/Aggregation
-						+ 1;
+				
+				
+				shiftY = shiftY + pixelC * pixelH + 1;
 			}
 			
 			
@@ -531,8 +602,7 @@ class KmeansPanel extends JPanel implements MouseListener, IPlot,
 			
 		}
 		
-		
-		
+	
 this.repaint();
 	}
 	
@@ -687,7 +757,7 @@ this.repaint();
 		
 		if (!(e.getButton() == MouseEvent.BUTTON3) && e.getClickCount() == 2) {
 		
-		GlobalView g = new GlobalView(seurat, "GlobalView", this.getBlockInThePoint(e.getPoint()).Experiments, this.getBlockInThePoint(e.getPoint()).Genes,false);
+		GlobalView g = new GlobalView(seurat, "GlobalView", this.getBlockInThePoint(e.getPoint()).Experiments, this.getBlockInThePoint(e.getPoint()).Genes);
         g.applyNewPixelSize(pixelW,pixelH);
 		}
 		
@@ -944,6 +1014,8 @@ this.repaint();
 
 	}
 
+	
+	/*
 	public double fPos(double xx) {
 		double a = seurat.settings.aPos;
 		double b = seurat.settings.bPos;
@@ -963,10 +1035,7 @@ this.repaint();
 			value = 1 - (1 - a) * Math.pow((1 - x) / (1 - a), b);
 		}
 
-		if (seurat.settings.invertShading)
-			return 1 - value;
-		else
-			return value;
+		return value;
 
 	}
 
@@ -994,7 +1063,7 @@ this.repaint();
 		else
 			return value;
 
-	}
+	}*/
 
 	public void brush() {
 		// TODO Auto-generated method stub
@@ -1175,6 +1244,7 @@ this.repaint();
 		
 		boolean isSelection;
 		
+		int pixelC;
 		
 
 		public Block(Seurat seurat, Vector<ISelectable> Experiments,
@@ -1190,7 +1260,13 @@ this.repaint();
 		public void applySelection(int xx1,int yy1, int xx2, int yy2) {
 			int x1,x2,y1,y2;
 			int width = Experiments.size() * pixelW;
-			int height = Genes.size() * pixelH / Aggregation;
+			
+			pixelC = Genes.size() /Aggregation;
+            if (pixelC*Aggregation < Genes.size()) pixelC++; 
+			
+			
+			int height = pixelC * pixelH;
+			
 			
 			
 			if (xx1>x+width || xx2<x || y + height < yy1 || y >yy2) return;
@@ -1205,7 +1281,11 @@ this.repaint();
 			for (int i = 0; i < Experiments.size(); i++) {
 				for (int j =0; j < Genes.size(); j++) {
 					
-					if (   x1<=(x+ i*pixelW) && x2>=(x+ i*pixelW) &&  y1<=(y+ j*pixelH/Aggregation) && y2>=(y+ j*pixelH/Aggregation) ) {
+				//	if (   x1<=(x+ i*pixelW) && x2>=(x+ i*pixelW) &&  y1<=(y+ j*pixelH/Aggregation) && y2>=(y+ j*pixelH/Aggregation) ) {
+						
+						
+					if	(Tools.containsRectInRect(x1, y1, x2, y2, 
+							x+ i*pixelW,	y+ (j/Aggregation)*pixelH,  x+ (i+1)*pixelW,	y+ (j/Aggregation+1)*pixelH)) {	
 						
 			//			Experiments.elementAt(i).isSelected [Genes.elementAt(j).ID] = true;
 				        Experiments.elementAt(i).select(true);
@@ -1249,16 +1329,98 @@ this.repaint();
 
 						koeff = values [i][j] / max;
 
-						if (Model == 1)  c = Color.getHSBColor(0, (float) fPos(koeff), 1);
-						if (Model == 2)  c = new Color((float) fPos(koeff), 0, 0);
+						if (Model == 1)  c = Color.getHSBColor(0, (float) Tools.fPos(koeff), 1);
+						if (Model == 2)  c = new Color((float) Tools.fPos(koeff), 0, 0);
 						
 					} else {
 						koeff = values [i][j] / min;
+						if (min == 0) koeff = 0;
 
 						if (Model == 1) c = (Color.getHSBColor((float) 0.33,
-								(float) fNeg(koeff), 1));
+								(float) Tools.fNeg(koeff), 1));
 						
-						if (Model == 2)  c = new Color(0, (float) fNeg(koeff), 0);
+						if (Model == 2)  c = new Color(0, (float) Tools.fNeg(koeff), 0);
+					}
+					
+					
+					
+					if (values [i][j] == dataManager.NA)
+						   c = Color.WHITE;
+					
+					
+					
+					
+					
+					if (isSelected [i][j]) {
+						
+						if (Model == 1) {
+						c = c.darker();
+						
+						}
+						
+						if (Model == 2) {
+							c = c.brighter();
+							c = c.brighter();
+							c = c.brighter();
+							c = c.brighter();
+						}
+					} 
+					
+
+					g.setColor(c);
+
+					g.fillRect(x + i * pixelW, y + j
+							* pixelH, pixelW, pixelH);
+
+				}
+
+			}
+
+		}
+
+		
+		
+		
+		
+		
+		/*
+		 * 
+		
+
+		public void paint(Graphics g) {
+			
+			
+			if (Model == 2)  g.setColor(Color.white);
+			if (Model == 1)  g.setColor(Color.black);
+			
+			g.fillRect(x-1, y-1
+					, this.values.length*pixelW+2, this.values [0].length*pixelH+2);
+
+			for (int i = 0; i < this.values.length; i++) {
+				
+
+				for (int j = 0; j < this.values [i].length; j++) {
+
+		
+
+					double koeff = 0;
+					Color c = null;
+
+					if (values [i][j] > 0) {
+
+						koeff = values [i][j] / max;
+
+						if (Model == 1)  c = Color.getHSBColor(0, (float) Tools.fPos(koeff), 1);
+						if (Model == 2)  c = new Color((float) Tools.fPos(koeff), 0, 0);
+						
+					} else {
+						koeff = values [i][j] / min;
+						if (min == 0) koeff = 0;
+
+						if (Model == 1) c = (Color.getHSBColor((float) 0.33,
+								(float) Tools.fNeg(koeff), 1));
+						
+						if (Model == 2)  c = new Color(0, (float) Tools.fNeg(koeff), 0);
 					}
 					
 					
@@ -1301,7 +1463,8 @@ this.repaint();
 			}
 
 		}
-
+		 * 
+		 * **/
 	}
 
 
@@ -1330,6 +1493,13 @@ int panelH = this.dataManager.Experiments.elementAt(0).getBarchartToColors().siz
 		
 		if (arg0.getKeyCode() == 38) {
 			
+			
+			 if (pixelH>1) pixelH--;
+	           plot.applyNewPixelSize(pixelW,pixelH);
+	           
+	           
+			
+			/*
 			int maxAggr = 0;
 			for (int i = 0; i < Genes.size(); i++) {
 				maxAggr = (int)Math.max(maxAggr,Genes.elementAt(i).size());
@@ -1339,13 +1509,9 @@ int panelH = this.dataManager.Experiments.elementAt(0).getBarchartToColors().siz
 			
 			if (Aggregation < maxAggr) Aggregation++;
 			
-			
-			
-			
-			
 		    plot.infoLabel.setText("Aggregation: 1 : " + Aggregation);
 		    plot.applyNewPixelSize(pixelW,pixelH);
-			
+			*/
 			
 			
 		}
@@ -1353,12 +1519,18 @@ int panelH = this.dataManager.Experiments.elementAt(0).getBarchartToColors().siz
 		
         if (arg0.getKeyCode() == 40) {
         	
+        	pixelH++;
+            plot.applyNewPixelSize(pixelW,pixelH);
+            
+            
         	
+        	/*
         	if (Aggregation > 1) Aggregation--;
         	
 			
 			plot.infoLabel.setText("Aggregation: 1 : " + Aggregation);
 			plot.applyNewPixelSize();
+			*/
 		}
         
         

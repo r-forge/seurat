@@ -194,4 +194,5 @@ public class Gene implements ISelectable,NodeCase{
 		return null;
 	}
 
+
 }

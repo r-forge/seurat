@@ -21,8 +21,8 @@ public class Chromosome implements ISelectable{
 	public Vector<CytoBand> CytoBands;
 	
 	
-	public double chrStart;
-	public double chrEnd;
+//	public double chrStart;
+//	public double chrEnd;
 	public double chrCen;
 	public double Center;
 	
@@ -94,8 +94,8 @@ public class Chromosome implements ISelectable{
 	    java.util.Iterator<Clone> iter = Clones.iterator();
 		while (iter.hasNext()) {
 			Clone clone = iter.next();
-		    int start = (int)Math.round(chrStart*len/length);
-		    int end = (int)Math.round(chrEnd*len/length);
+		    int start = (int)Math.round(clone.chrStart*len/length);
+		    int end = (int)Math.round(clone.chrEnd*len/length);
 		    
 		//    System.out.println(name + "   "+ clone.chrCen + "  "+ clone.chrStart + "  " + clone.chrEnd);
 		    
@@ -143,8 +143,8 @@ public class Chromosome implements ISelectable{
 	    java.util.Iterator<Clone> iter = Clones.iterator();
 		while (iter.hasNext()) {
 			Clone clone = iter.next();
-		    int start = (int)Math.round(chrStart*len/length);
-		    int end = (int)Math.round(chrEnd*len/length);
+		    int start = (int)Math.round(clone.chrStart*len/length);
+		    int end = (int)Math.round(clone.chrEnd*len/length);
 		    
 		    for (int i = start; i <= end; i++) {
 		    	if (i < hist.length) {

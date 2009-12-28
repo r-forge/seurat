@@ -25,6 +25,7 @@ public class DataManager {
 
 	public double minValue, maxValue;
 	
+	public int ClusteringNumber = 1;
 	
 	
 	public Vector<Variable> Experiments;

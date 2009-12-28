@@ -247,7 +247,7 @@ class ChrPanel extends JPanel implements MouseListener, IPlot,
 	int [] posSelectionHist;
 	
 	int [] Position;
-	
+	int CloneWidth = 0;
 	
 	Vector <Double> selection;
 	
@@ -325,8 +325,23 @@ class ChrPanel extends JPanel implements MouseListener, IPlot,
 	    int i = 0;
 		while (iter.hasNext()) {
 			Clone clone = iter.next();
-			Position [i] = (int)Math.round(clone.NucleoPosition *(this.getWidth()-2*abstandLinks)/chr.length); 
-			  	
+		//	System.out.println(clone.chrStart + "   "+ clone.chrEnd);
+			Position [i] = (int)Math.round(clone.chrStart *(this.getWidth()-2*abstandLinks)/chr.length); 
+		
+			
+			//	if ( CloneWidth == 0 || CloneWidth == DataManager.NA || CloneWidth == -DataManager.NA) {
+			//	System.out.println(clone.chrStart + "   "+ clone.chrEnd);
+				int newCloneWidth = (int)Math.floor((this.getWidth()-2*abstandLinks)*(-clone.chrStart + clone.chrEnd)/chr.length/2);
+				if ( newCloneWidth != 0 && newCloneWidth != DataManager.NA && newCloneWidth != -DataManager.NA) {
+					
+						CloneWidth = newCloneWidth;
+						
+					}
+				
+				  System.out.println("-->"+CloneWidth);
+			//}
+			
+			
 		    	for (int j = 0; j < Cases.size(); j++) {
 		    		
 		    		
@@ -348,6 +363,12 @@ class ChrPanel extends JPanel implements MouseListener, IPlot,
 		    i++;
 		    
 		}
+		
+		
+		
+		//if ( CloneWidth == 0 || CloneWidth == DataManager.NA || CloneWidth == -DataManager.NA) 
+			CloneWidth = 1;
+		
 		
 		
 		double max = getMax(posDHist,negDHist);
@@ -965,7 +986,7 @@ public void selectPoint(int xx1, int yy1) {
 			//	g.setColor(Color.BLUE);
 				g.fillRect(abstandLinks + Position[j],
 						   abstandOben + width - posHist [j],
-						   1,
+						   CloneWidth,
 				           posHist [j]
 				           );
 				
@@ -973,7 +994,7 @@ public void selectPoint(int xx1, int yy1) {
 				
 				g.fillRect(abstandLinks + Position[j],
 						   abstandOben + width - posSelectionHist [j],
-						   1,
+						   CloneWidth,
 				           posSelectionHist [j]
 				           );
 				
@@ -985,7 +1006,7 @@ public void selectPoint(int xx1, int yy1) {
 		//	g.setColor(Color.RED);
 			g.fillRect(abstandLinks + Position[j],
 					   abstandOben + width,
-					   1,
+					   CloneWidth,
 			           negHist [j]
 			           );
 			
@@ -994,7 +1015,7 @@ public void selectPoint(int xx1, int yy1) {
 			g.setColor(Color.BLUE);
 			g.fillRect(abstandLinks + Position[j],
 					   abstandOben + width,
-					   1,
+					   CloneWidth,
 			           negSelectionHist [j]
 			           );
 			

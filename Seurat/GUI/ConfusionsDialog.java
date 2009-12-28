@@ -12,6 +12,7 @@ import java.awt.image.BufferedImage;
 import java.awt.*;
 
 import javax.swing.table.*;
+import javax.swing.tree.TreePath;
 import javax.swing.border.*;
 import javax.swing.event.*;
 import java.awt.datatransfer.*;
@@ -54,6 +55,16 @@ public class ConfusionsDialog extends JFrame {
 		super("Confusion Matrix");
 		this.seurat = seurat;
 		this.dialog = this;
+		
+		
+		TreePath [] paths = seurat.tree.getSelectionPaths();
+		for (int i = 0; i < paths.length; i++) {
+			Object o = paths [i].getLastPathComponent();
+			if (o != null) {
+			DataTreeNode node = (DataTreeNode)o;
+			System.out.println(o);
+			}
+		}
 		
 		this.dataManager = seurat.dataManager;
 		

@@ -7,6 +7,7 @@ import java.io.*;
 
 import javax.swing.*;
 
+
 import java.awt.event.*;
 import java.awt.image.BufferedImage;
 import java.awt.*;
@@ -71,7 +72,7 @@ import RConnection.RConnectionManager;
 import Settings.*;
 import Tools.Tools;
 
-public class Seurat extends JFrame implements ColorListener {
+public class Seurat extends JFrame implements ColorListener,WindowListener{
 
 	JPanel MainPanel = new JPanel();
 
@@ -106,9 +107,11 @@ public class Seurat extends JFrame implements ColorListener {
 	PicCanvas logoIcon;
 
 	PicCanvas contIcon, numIcon;
+	
+	ClusteringManager clusteringManager;
 
 	ImageIcon contImageIcon, numImageIcon, geneImageIcon,geneImageIconS, cloneImageIcon,cloneImageIconS,
-			chrImageIcon, chrImageIconS,expImageIcon;
+			chrImageIcon, chrImageIconS,expImageIcon,hclustIcon;
 
 	public DataManager dataManager = new DataManager();
 
@@ -128,6 +131,8 @@ public class Seurat extends JFrame implements ColorListener {
 
 	DefaultMutableTreeNode topObj;
 	DefaultMutableTreeNode topData;
+	DefaultMutableTreeNode topClustering;
+	
 
 	JTree tree;
 
@@ -142,10 +147,25 @@ public class Seurat extends JFrame implements ColorListener {
 	JMenuItem openGeneAnnotationsItem;
 	JMenuItem saveGeneExpressions;
 	JMenuItem closeDataset;
+	
+	
+	
+	
+	
+	Vector<ISelectable> Genes;
+	Vector<ISelectable> Clones;
+	Vector<ISelectable> Samples;
+	Vector<Clustering> Clusterings;	
+	Vector<ClusterNode> HClusterings;	
+	
+	
+	
 
 	public Seurat() {
 		super("Seurat");
 		this.setBounds(0, 0, 330, 400);
+		
+		
 
 		System.out.println((System.getProperties().getProperty("os.name")));
 
@@ -174,6 +194,8 @@ public class Seurat extends JFrame implements ColorListener {
 
 		loadMainWindow();
 
+		this.addWindowListener(this);
+		
 		/*
 		 * 
 		 * infoPanel.removeAll();
@@ -209,6 +231,10 @@ public class Seurat extends JFrame implements ColorListener {
 		treeNode.add(topObj);
 		topData = new DefaultMutableTreeNode("Datasets");
 		treeNode.add(topData);
+		topClustering = new DefaultMutableTreeNode("Clusterings");
+		treeNode.add(topClustering);
+		this.clusteringManager = null;
+		
 
 		// objectsPane.setBorder(BorderFactory.createEtchedBorder());
 		// objectsPane.setBackground(Color.WHITE);
@@ -233,10 +259,11 @@ public class Seurat extends JFrame implements ColorListener {
 		DataCellRenderer renderer =
 
 		new DataCellRenderer(numImageIcon, contImageIcon, geneImageIcon, geneImageIconS,
-				chrImageIcon,chrImageIconS, cloneImageIcon, cloneImageIconS, expImageIcon);
+				chrImageIcon,chrImageIconS, cloneImageIcon, cloneImageIconS, expImageIcon,hclustIcon);
 
 		tree.setCellRenderer(renderer);
-
+		
+		
 		west.setLayout(new BorderLayout());
 		west.add(new JScrollPane(tree), BorderLayout.CENTER);
 
@@ -257,6 +284,285 @@ public class Seurat extends JFrame implements ColorListener {
 
 		MouseListener ml = new MouseAdapter() {
 			public void mousePressed(MouseEvent e) {
+				
+				
+				
+				if (e.getButton() == MouseEvent.BUTTON3 || e.isControlDown()) {
+
+					TreePath [] paths = seurat.tree.getSelectionPaths();
+					
+					JPopupMenu menu = new JPopupMenu();
+					
+					 Genes = new Vector();
+					 Clones = new Vector();
+					 Samples = new Vector();
+					 Clusterings = new Vector();	
+					 HClusterings = new Vector();
+					
+						
+					for (int i = 0; i < paths.length; i++) {
+						Object o = paths [i].getLastPathComponent();
+						if (o != null && o instanceof DataTreeNode) {
+						DataTreeNode node = (DataTreeNode)o;
+						if (node.object instanceof Gene) {
+							Genes.add(node.object);
+							
+							
+						}
+						if (node.object instanceof Clone) Clones.add(node.object);
+						if (node.object instanceof Variable) {
+							
+							Samples.add(node.object);
+							
+							
+						}
+						
+						if (node.cObject!= null && node.cObject instanceof Clustering) {
+							Clustering c = (Clustering)node.cObject;
+							Clusterings.add((Clustering)node.cObject);
+						}
+						
+						
+						
+						if (node.cObject!= null && node.cObject instanceof ClusterNode) {
+							ClusterNode c = (ClusterNode)node.cObject;
+							HClusterings.add((ClusterNode)node.cObject);
+						}
+
+						
+						
+						
+						}
+					}
+					
+					
+					Genes = Tools.sortIDs(Genes);
+					Samples = Tools.sortIDs(Samples);
+					
+					
+
+					if (Genes.size() > 0 && Samples.size() >0 
+							&& ((Genes.elementAt(0) instanceof Gene && Samples.elementAt(0) instanceof Variable)||
+								(Genes.elementAt(0) instanceof Clone && Samples.elementAt(0) instanceof CGHVariable)	)) {
+					
+					JMenuItem item = new JMenuItem("Heatmap");
+					item.addActionListener(new ActionListener() {
+						public void actionPerformed(ActionEvent e) {
+							// createCorrelationExperiments();
+
+							GlobalView frame = new GlobalView(seurat, "Heatmap Gene Expressions",
+									Samples, Genes);
+							
+							
+							int pixelW = settings.PixelW;
+							int pixelH = settings.PixelH;
+							
+							if (Genes.size() < 400) {
+								pixelH = 400 / Genes.size();
+							}
+							
+							
+							if (Samples.size() < 400) {
+								pixelW = 400 / Samples.size();
+							}
+							
+							
+							frame.applyNewPixelSize(pixelW,pixelH);
+							
+							
+						}
+					});
+					menu.add(item);
+					}					
+					
+					if (Genes.size() == 0 && Samples.size() == 0 && HClusterings.size() < 2) {
+					
+					if (Clusterings.size() == 2 && (Clusterings.elementAt(0).isRows != Clusterings.elementAt(1).isRows)) {
+						JMenuItem item = new JMenuItem("Heatmap");
+						item.addActionListener(new ActionListener() {
+							public void actionPerformed(ActionEvent e) {
+								// createCorrelationExperiments();
+								
+								Clustering c1 = Clusterings.elementAt(0);
+								Clustering c2 = Clusterings.elementAt(1);
+								
+								Vector<Vector<ISelectable>> Exps = null;
+								Vector<Vector<ISelectable>> Gens = null;
+
+								KMeansView globalView = null;
+								
+								if (c1.isRows) {
+									Exps = c2.clusters;
+									Gens = c1.clusters;
+									globalView = new KMeansView(seurat,"Clustering", c2,c1);
+								}
+								else {
+									Exps = c1.clusters;
+									Gens = c2.clusters;
+									globalView = new KMeansView(seurat,"Clustering", c1,c2);
+								}
+									
+								
+
+							
+								
+								int count = 0;
+								for (int i = 0; i < Gens.size(); i++) {
+									count+=Gens.elementAt(i).size();
+								}
+								
+								int aggr = 1;
+								while (count/seurat.settings.PixelH/aggr > 700) aggr++;
+								 	
+								globalView.panel.Aggregation = aggr;
+								System.out.println("Aggregation: " + aggr);
+								globalView.setLocation(350, 0);
+								globalView.panel.Model = seurat.settings.Model;
+								
+								
+								int pixelW = settings.PixelW;
+								int pixelH = settings.PixelH;
+								
+								
+								if (count < 400) {
+									pixelH = 400 / count;
+								}
+								
+								
+								count = 0;
+								for (int i = 0; i < Exps.size(); i++) {
+									count+=Exps.elementAt(i).size();
+								}
+						
+								
+								if (count < 560) {
+									pixelW = 560 /count;
+								}
+								
+								
+								
+								globalView.applyNewPixelSize(pixelW,pixelH);
+								
+							}
+						});
+						menu.add(item);
+					
+					}	
+					
+					
+					if (Clusterings.size() == 2 && (Clusterings.elementAt(0).isRows == Clusterings.elementAt(1).isRows)) {
+					
+					
+				   JMenuItem item = new JMenuItem("Confusion Matrix");
+					item.addActionListener(new ActionListener() {
+						public void actionPerformed(ActionEvent e) {
+							// createCorrelationExperiments();
+							
+							Clustering c1 = Clusterings.elementAt(0);
+							Clustering c2 = Clusterings.elementAt(1);
+
+							new ConfusionsPlot(seurat,c1.name, c2.name, c1,c2); 
+							
+							
+						}
+					});
+					menu.add(item);
+					}
+					
+					}
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					if (Genes.size() == 0 && Samples.size() == 0 && Clusterings.size() < 2) {
+						
+						if (HClusterings.size() == 2 && (HClusterings.elementAt(0).isRows != HClusterings.elementAt(1).isRows)) {
+							JMenuItem item = new JMenuItem("Heatmap");
+							item.addActionListener(new ActionListener() {
+								public void actionPerformed(ActionEvent e) {
+									// createCorrelationExperiments();
+									
+									ClusterNode c1 = HClusterings.elementAt(0);
+									ClusterNode c2 = HClusterings.elementAt(1);
+									
+									
+									GlobalView globalView = null;
+									
+									
+									int pixelW = settings.PixelW;
+									int pixelH = settings.PixelH;
+
+									
+									if (c1.isRows) {
+										globalView = new GlobalView(seurat,
+												"Clustering" + dataManager.ClusteringNumber, c2,c1);
+
+										if (c1.getOrder().size() < 400) {
+											pixelH = 400 / c1.getOrder().size();
+										}
+										
+										
+										if (c2.getOrder().size() < 560) {
+											pixelW = 560 / c2.getOrder().size();
+										}
+										
+									}
+									else {
+										globalView = new GlobalView(seurat,
+												"Clustering" + dataManager.ClusteringNumber, c1,c2);
+
+										
+										if (c2.getOrder().size() < 400) {
+											pixelH = 400 / c2.getOrder().size();
+										}
+										
+										
+										if (c1.getOrder().size() < 560) {
+											pixelW = 560 / c1.getOrder().size();
+										}
+										
+									}
+										
+									
+									
+																	
+
+									
+									
+									
+									
+									globalView.applyNewPixelSize(pixelW,pixelH);
+									
+								}
+							});
+							menu.add(item);
+						
+						}	
+					}
+					
+					
+					
+					
+					
+
+					menu.show(tree, e.getX(), e.getY());
+					
+					
+					
+					
+				}
+				
+				
+				
+				
+				
 				int selRow = tree.getRowForLocation(e.getX(), e.getY());
 				TreePath selPath = tree.getPathForLocation(e.getX(), e.getY());
 				if (selRow != -1 && e.getClickCount() == 2) {
@@ -266,6 +572,49 @@ public class Seurat extends JFrame implements ColorListener {
 					if (obj instanceof DataTreeNode) {
 
 						ISelectable object = ((DataTreeNode) obj).object;
+						
+						
+						if (((DataTreeNode) obj).object == null) {
+							if (((DataTreeNode) obj).cObject != null && ((DataTreeNode) obj).cObject instanceof Clustering) {
+								// System.out.println(object.getName() + "  "
+								// +object.getType());
+
+								
+								
+								Vector variables = new Vector();
+								Clustering c = (Clustering)((DataTreeNode) obj).cObject;
+								
+								int size = 0;
+								for (int i = 0; i < c.clusters.size(); i++){
+									size+=c.clusters.elementAt(i).size();
+								}
+								
+								String [] data = new String [size];
+								
+								int s = 0;
+								for (int i = 0; i < c.clusters.size(); i++){
+									for (int j = 0; j < c.clusters.elementAt(i).size();j++) {
+									variables.add(c.clusters.elementAt(i).elementAt(j));
+									
+									
+									data [s] = ""+i;
+									s++;
+									}
+								}
+								
+							//	for (int i = 0; i < data.length; i++) {
+								//	System.out.print("__" + data [i]);
+								//}
+								
+								
+								
+								new Barchart(seurat, c.name, variables,data);
+								return;
+							}
+
+							
+							return;
+						}
 
 						if (object.isVariable()) {
 
@@ -292,7 +641,9 @@ public class Seurat extends JFrame implements ColorListener {
 							createCloneInfo((Clone) object);
 							return;
 						}
-
+						
+						
+						
 
 					}
 
@@ -702,8 +1053,23 @@ public class Seurat extends JFrame implements ColorListener {
 				}
 
 				GlobalView frame = new GlobalView(seurat, "Heatmap Gene Expressions",
-						Experiments, Genes, false);
-				frame.applyNewPixelSize(seurat.settings.PixelW,seurat.settings.PixelH);
+						Experiments, Genes);
+				
+				
+				int pixelW = settings.PixelW;
+				int pixelH = settings.PixelH;
+				
+				if (dataManager.Genes.size() < 400) {
+					pixelH = 400 / dataManager.Genes.size();
+				}
+				
+				
+				if (dataManager.Experiments.size() < 560) {
+					pixelW = 560 / dataManager.Experiments.size();
+				}
+				
+				
+				frame.applyNewPixelSize(pixelW,pixelH);
 				// GlobalView frame = new GlobalView(seurat, "GlobalView",
 				// Experiments,Genes,false);
 
@@ -717,8 +1083,23 @@ public class Seurat extends JFrame implements ColorListener {
 		item = new JMenuItem("Seriation");
 		item.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				
+				int pixelW = settings.PixelW;
+				int pixelH = settings.PixelH;
+				
+				if (dataManager.Genes.size() < 400) {
+					pixelH = 400 / dataManager.Genes.size();
+				}
+				
+				
+				if (dataManager.Experiments.size() < 560) {
+					pixelW = 560 / dataManager.Experiments.size();
+				}
+					
+					
+					
 				new SeriationDialog(seurat, dataManager.Genes,
-						dataManager.Experiments);
+						dataManager.Experiments, pixelW,pixelH);
 
 			}
 		});
@@ -734,8 +1115,21 @@ public class Seurat extends JFrame implements ColorListener {
 		item.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				// new ClusteringDialog(seurat);
+				
+				int pixelW = settings.PixelW;
+				int pixelH = settings.PixelH;
+				
+				if (dataManager.Genes.size() < 400) {
+					pixelH = 400 / dataManager.Genes.size();
+				}
+				
+				
+				if (dataManager.Experiments.size() < 560) {
+					pixelW = 560 / dataManager.Experiments.size();
+				}
+				
 				new ClusteringDialog(seurat, seurat.dataManager.Genes,
-						seurat.dataManager.Experiments);
+						seurat.dataManager.Experiments, pixelW,pixelH);
 			}
 		});
 		plotsMenu.add(item);
@@ -750,13 +1144,19 @@ public class Seurat extends JFrame implements ColorListener {
 		
 		plotsMenu.addSeparator();
 		
-		item = new JMenuItem("Confusions Matrix");
+		item = new JMenuItem("Confusion Matrix");
 		item.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				new ConfusionsDialog(seurat);
+				new NewConfusionDialog(seurat);
 			}
 		});
 		plotsMenu.add(item);
+		
+		
+		
+		
+		
+		
 
 		menuBar.add(optionsMenu);
 
@@ -833,6 +1233,9 @@ public class Seurat extends JFrame implements ColorListener {
 
 		chrImageIconS = new ImageIcon(this.readGif("ChromosomS.gif"));
 		System.out.println("ChromosomeS Logo loaded...");
+
+		hclustIcon = new ImageIcon(this.readGif("hclust.gif"));
+		System.out.println("HClustering Logo loaded...");
 
 		
 		
@@ -993,6 +1396,15 @@ public class Seurat extends JFrame implements ColorListener {
 		this.setVisible(true);
 
 	}
+	
+	
+	public ClusteringManager getClusteringManager() {
+		if (clusteringManager == null) this.clusteringManager = new ClusteringManager(this,tree,topClustering);
+		return clusteringManager;
+	}
+	
+	
+	
 
 	public void openFile(String fileName) {
 		if (fileName == null) {
@@ -1059,7 +1471,7 @@ public class Seurat extends JFrame implements ColorListener {
 
 				new DataCellRenderer(numImageIcon, contImageIcon,
 						geneImageIcon,geneImageIconS, chrImageIcon, chrImageIconS,cloneImageIcon,cloneImageIconS,
-						expImageIcon);
+						expImageIcon,hclustIcon);
 
 				tree.setCellRenderer(renderer);
 
@@ -1130,7 +1542,7 @@ public class Seurat extends JFrame implements ColorListener {
 						}
 						
 						
-						seurat.dataManager.GeneClusters.add(new Clustering(var.getName(),Clusters,var.Buffer));
+						seurat.dataManager.GeneClusters.add(new Clustering(var.getName(),Clusters,var.Buffer,true));
 						
 					
 						
@@ -1146,6 +1558,10 @@ public class Seurat extends JFrame implements ColorListener {
 
 			} catch (Exception e) {
 				System.out.println("Load Error ");
+				JOptionPane.showMessageDialog(this,
+					    "Wrong file format.",
+					    "Load Error",
+					    JOptionPane.ERROR_MESSAGE);
 				e.printStackTrace();
 			}
 
@@ -1201,6 +1617,7 @@ public class Seurat extends JFrame implements ColorListener {
 		if (this.descriptionFrame != null)
 			this.descriptionFrame.setVisible(false);
 		this.descriptionFrame = null;
+		this.clusteringManager = null;
 		this.dataManager = new DataManager();
 		MainPanel.removeAll();
 		this.getContentPane().removeAll();
@@ -1214,12 +1631,14 @@ public class Seurat extends JFrame implements ColorListener {
 		
 	}
 
+	
+
 	/**
 	 * @param args
 	 */
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
-
+     //   System.out.println(new Double("2.3653757256299777766544"));
 		Seurat s = new Seurat();
 
 	}
@@ -1613,6 +2032,52 @@ public class Seurat extends JFrame implements ColorListener {
 		// TODO Auto-generated method stub
 		
 	}
+
+	public void windowActivated(WindowEvent e) {
+		// TODO Auto-generated method stub
+		
+	}		
+
+	public void windowClosed(WindowEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void windowClosing(WindowEvent e) {
+		// TODO Auto-generated method stub
+		System.exit(0);		
+	
+		
+	}
+
+	public void windowDeactivated(WindowEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void windowDeiconified(WindowEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void windowIconified(WindowEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void windowOpened(WindowEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
 
 }
 
