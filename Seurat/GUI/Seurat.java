@@ -12,6 +12,7 @@ import java.awt.event.*;
 import java.awt.image.BufferedImage;
 import java.awt.*;
 
+import javax.swing.plaf.basic.BasicTreeUI;
 import javax.swing.table.*;
 import javax.swing.border.*;
 import javax.swing.event.*;
@@ -96,7 +97,7 @@ public class Seurat extends JFrame implements ColorListener,WindowListener{
 
 	FileDialog fileDialog;
 
-	CGHViewer cghViewer;
+	//CGHViewer cghViewer;
 
 	VariablesTable variablesTable;
 
@@ -111,7 +112,7 @@ public class Seurat extends JFrame implements ColorListener,WindowListener{
 	ClusteringManager clusteringManager;
 
 	ImageIcon contImageIcon, numImageIcon, geneImageIcon,geneImageIconS, cloneImageIcon,cloneImageIconS,
-			chrImageIcon, chrImageIconS,expImageIcon,hclustIcon;
+			chrImageIcon, chrImageIconS,expImageIcon,hclustIcon, CollapsedIcon, ExpandedIcon;
 
 	public DataManager dataManager = new DataManager();
 
@@ -141,6 +142,7 @@ public class Seurat extends JFrame implements ColorListener,WindowListener{
 	public final byte MAC = 1;
 	public final byte OTHERSYSTEM = 2;
 
+	JMenuItem openSNPItem;
 	JMenuItem openCGHItem;
 	JMenuItem openGeneExpressionItem;
 	JMenuItem openDescriptionItem;
@@ -191,6 +193,26 @@ public class Seurat extends JFrame implements ColorListener,WindowListener{
 			e.printStackTrace();
 			JOptionPane.showMessageDialog(this, "Connection to R failed.");
 		}
+		
+		
+		
+		
+		try {
+
+			
+			BufferedReader bfr = new BufferedReader(new FileReader("loadingSettings"));
+			
+			
+		   LoadingDialog.loadFile(this,bfr);
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			
+		}
+		
+		
+		
+		
 
 		loadMainWindow();
 
@@ -235,7 +257,6 @@ public class Seurat extends JFrame implements ColorListener,WindowListener{
 		treeNode.add(topClustering);
 		this.clusteringManager = null;
 		
-
 		// objectsPane.setBorder(BorderFactory.createEtchedBorder());
 		// objectsPane.setBackground(Color.WHITE);
 		// objectsPane.setPreferredSize(new Dimension(230,200));
@@ -256,6 +277,14 @@ public class Seurat extends JFrame implements ColorListener,WindowListener{
 		// west.add(datasetsPane);
 
 		tree = new JTree(treeNode);
+		
+		BasicTreeUI ui = (BasicTreeUI) tree.getUI();
+		ui.setCollapsedIcon(CollapsedIcon);
+		ui.setExpandedIcon(ExpandedIcon);
+
+		tree.putClientProperty("JTree.lineStyle","None");
+		
+		
 		DataCellRenderer renderer =
 
 		new DataCellRenderer(numImageIcon, contImageIcon, geneImageIcon, geneImageIconS,
@@ -881,7 +910,7 @@ public class Seurat extends JFrame implements ColorListener,WindowListener{
 					seurat.setVisible(true);
 					seurat.update(seurat.getGraphics());
 
-					cghViewer = new CGHViewer(seurat, fileDialog, progressBar);
+					CGHViewer cghViewer = new CGHViewer(seurat, fileDialog, progressBar);
 
 					DataTreeNode CGHData = new DataTreeNode("CGHData");
 					for (int i = 0; i < dataManager.cghVariables.size(); i++) {
@@ -932,6 +961,111 @@ public class Seurat extends JFrame implements ColorListener,WindowListener{
 			}
 		});
 		fileMenu.add(openCGHItem);
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		openSNPItem = new JMenuItem("Open SNP File");
+		openSNPItem.setEnabled(false);
+
+		openSNPItem.addActionListener(new ActionListener() {
+
+			public void actionPerformed(ActionEvent e) {
+				fileDialog = new FileDialog(seurat, "Open SNP File", 0);
+				fileDialog.setVisible(true);
+
+				if (fileDialog.getFile() != null) {
+
+					infoLabel.setText("Loading SNP Data...");
+					MainPanel.remove(infoPanel);
+					infoPanel.removeAll();
+					infoPanel.add(progressBar, BorderLayout.CENTER);
+					MainPanel.add(infoPanel, BorderLayout.SOUTH);
+					seurat.setVisible(true);
+					seurat.update(seurat.getGraphics());
+
+					SNPLoader cghViewer = new SNPLoader(seurat, fileDialog, progressBar);
+
+					DataTreeNode CGHData = new DataTreeNode("SNPData");
+					for (int i = 0; i < dataManager.cghVariables.size(); i++) {
+						CGHVariable var = dataManager.cghVariables.elementAt(i);
+						DataTreeNode Experiment = new DataTreeNode(var);
+						CGHData.add(Experiment);
+
+					}
+
+					((DefaultTreeModel) tree.getModel()).insertNodeInto(
+							CGHData, topData, topData.getChildCount());
+
+					tree.scrollPathToVisible(new TreePath(topData.getPath()));
+
+					DataTreeNode Clones = new DataTreeNode("Clones");
+					for (int i = 0; i < dataManager.CLONES.size(); i++) {
+						Clone var = dataManager.CLONES.elementAt(i);
+						DataTreeNode Experiment = new DataTreeNode(var);
+						Clones.add(Experiment);
+					}
+
+					((DefaultTreeModel) tree.getModel()).insertNodeInto(Clones,
+							topObj, topObj.getChildCount());
+
+					DataTreeNode Chromosomes = new DataTreeNode("Chromosomes");
+					for (int i = 0; i < dataManager.Chromosomes.size(); i++) {
+						Chromosome var = dataManager.Chromosomes.elementAt(i);
+						DataTreeNode Experiment = new DataTreeNode(var);
+						Chromosomes.add(Experiment);
+					}
+
+					((DefaultTreeModel) tree.getModel()).insertNodeInto(
+							Chromosomes, topObj, topObj.getChildCount());
+
+					tree.scrollPathToVisible(new TreePath(topObj.getPath()));
+
+					
+
+					infoLabel.setText("");
+					infoPanel.remove(progressBar);
+					MainPanel.remove(infoPanel);
+					MainPanel.add(infoPanel, BorderLayout.SOUTH);
+					seurat.update(seurat.getGraphics());
+
+				}
+				repaintWindows();
+				// new DescriptionFrame(amlTool);
+			}
+		});
+		fileMenu.add(openSNPItem);
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+fileMenu.addSeparator();
+		
+		JMenuItem m = new JMenuItem("Loading Settings");
+		
+		m.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+
+				new LoadingDialog(seurat);
+
+			}
+		});
+		fileMenu.add(m);
+		
+		
+		
 
 		fileMenu.addSeparator();
 		
@@ -946,6 +1080,11 @@ public class Seurat extends JFrame implements ColorListener,WindowListener{
 			}
 		});
 		fileMenu.add(saveGeneExpressions);
+		
+		
+		
+		
+		
 		
 		
 		
@@ -1076,6 +1215,20 @@ public class Seurat extends JFrame implements ColorListener,WindowListener{
 			}
 		});
 		plotsMenu.add(item);
+		
+		
+		item = new JMenuItem("EventChart");
+		item.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				
+				new EventDialog(seurat);
+
+			}
+		});
+		plotsMenu.add(item);
+
+		
+		
 		
 		
 		plotsMenu.addSeparator();
@@ -1237,7 +1390,12 @@ public class Seurat extends JFrame implements ColorListener,WindowListener{
 		hclustIcon = new ImageIcon(this.readGif("hclust.gif"));
 		System.out.println("HClustering Logo loaded...");
 
-		
+		CollapsedIcon = new ImageIcon(this.readGif("Collapsed.GIF"));
+		System.out.println("Collapsed Logo loaded...");
+
+		ExpandedIcon = new ImageIcon(this.readGif("Expanded.GIF"));
+		System.out.println("Expanded Logo loaded...");
+
 		
 		logoIcon = new PicCanvas(new ImageIcon(this.readGif("logo.gif"))
 				.getImage(), this);

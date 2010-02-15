@@ -23,7 +23,9 @@ public class AnnGene implements ISelectable,NodeCase{
 	
 	public String chrName;
 	
-	public double nucleotidePosition;
+	public double nucleotideStart;
+	
+	public double nucleotideEnd;
 	
 	public Gene gene;
 	

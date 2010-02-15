@@ -5,6 +5,7 @@ import java.util.Vector;
 
 import GUI.CGHViewer;
 import GUI.IPlot;
+import GUI.Seurat;
 
 public class Clone implements ISelectable{
 	
@@ -17,7 +18,7 @@ public class Clone implements ISelectable{
 	
 	boolean isSelected = false;
 	
-	CGHViewer viewer;
+//	CGHViewer viewer;
 	
 	public double chrStart;
 	public double chrEnd;
@@ -28,11 +29,13 @@ public class Clone implements ISelectable{
 	public String CytoBand;
 	
     public Chromosome chromosome;
+    
+    Seurat seurat;
 	
-	public Clone(String NAME, int ID,CGHViewer viewer) {
+	public Clone(Seurat seurat,String NAME, int ID) {
+		this.seurat = seurat;
 		this.ID = ID;
 		this.NAME = NAME;
-		this.viewer = viewer;
 	}
 	
 	public void select(boolean weiter) {
@@ -82,19 +85,19 @@ public class Clone implements ISelectable{
 		return NAME;
 	}
 
-	public double getRealValue(int varID) {
+	public double getRealValue(int varID, Vector<CGHVariable> cghVariables) {
 		// TODO Auto-generated method stub
-		return viewer.cghVariables.elementAt(varID).doubleData [ID];
+		return cghVariables.elementAt(varID).doubleData [ID];
 	}
 
-	public double getValue(int varID) {
+	public double getValue(int varID, Vector<CGHVariable> cghVariables) {
 		// TODO Auto-generated method stub
-		return viewer.cghVariables.elementAt(varID).doubleData [ID];
+		return cghVariables.elementAt(varID).doubleData [ID];
 	}
 	
-	public double getValue(String varName) {
-		for (int i = 0; i < viewer.cghVariables.size(); i++) {
-			CGHVariable var = viewer.cghVariables.elementAt(i);
+	public double getValue(String varName, Vector<CGHVariable> cghVariables) {
+		for (int i = 0; i < cghVariables.size(); i++) {
+			CGHVariable var = cghVariables.elementAt(i);
 			if (var.name.contains(varName)) return var.doubleData [ID];
 		}
 		return 0/0;
@@ -175,6 +178,18 @@ public class Clone implements ISelectable{
 	public Vector<IPlot> getBarchartToColors() {
 		// TODO Auto-generated method stub
 		return null;
+	}
+	
+	
+
+	public double getRealValue(int varID) {
+		// TODO Auto-generated method stub
+		return seurat.dataManager.cghVariables.elementAt(varID).doubleData [ID];
+	}
+
+	public double getValue(int varID) {
+		// TODO Auto-generated method stub
+		return seurat.dataManager.cghVariables.elementAt(varID).doubleData [ID];
 	}
 	
 	

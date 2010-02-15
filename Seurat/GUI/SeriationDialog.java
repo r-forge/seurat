@@ -34,8 +34,7 @@ public class SeriationDialog extends JFrame {
 
 	JButton okBtn = new JButton("Ok");
 
-	String[] SeriationMethods = { "ARSA", "BBURCG", "BBWRCG", "TSP", "Chen",
-			"MDS","BEA", "PCA"};
+	String[] SeriationMethods = { "PCA", "MDS","BEA", "ARSA", "BBURCG", "BBWRCG", "TSP", "Chen"};
 
 	JComboBox box = new JComboBox(SeriationMethods);
 
@@ -87,7 +86,7 @@ Vector<ISelectable> Experiments;
 		JPanel panel2 = new JPanel();
 		panel2.add(box);
 		panel.add(panel2);
-		panel.add(new JLabel("Distance:"));
+		panel.add(new JLabel("Distance:   "));
 		panel2 = new JPanel();
 		panel2.add(boxD);
 		panel.add(panel2);
