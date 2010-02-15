@@ -169,6 +169,13 @@ for (int i =0; i < dataManager.cghVariables.size(); i++) {
 	}
 	
 	
+	public String getStringValue(DescriptionVariable dVar) {
+		
+			return dVar.stringData[ID];
+		
+	}
+	
+	
 	public double [] getColumn() { 
 		double [] column = new double [this.doubleData.length];
 		for (int i = 0; i < doubleData.length;i++) {

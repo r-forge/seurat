@@ -179,7 +179,7 @@ public class DataLoader {
 
 			for (int i = 1; i < dataManager.variables.size(); i++) {
 				System.out.println(dataManager.variables.elementAt(i).name);
-				if (dataManager.variables.elementAt(i).isExperiment && !dataManager.variables.elementAt(i).name.equals(dataManager.ChromosomeNumber) && !dataManager.variables.elementAt(i).name.equals(dataManager.NucleotidePosition) )
+				if (dataManager.variables.elementAt(i).isExperiment && !dataManager.variables.elementAt(i).name.equals(dataManager.ChromosomeNumber) && !dataManager.variables.elementAt(i).name.equals(dataManager.TranscriptStart) )
 					dataManager.Experiments.add(dataManager.variables.elementAt(i));
 				else {
 					dataManager.ExperimentDescr.add(dataManager.variables.elementAt(i));

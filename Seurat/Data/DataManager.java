@@ -37,7 +37,11 @@ public class DataManager {
     
     public Vector<CGHVariable> cghVariables;
     
+  
+    
     public Vector<Clone> CLONES;
+    
+   
     
     public Vector<AnnGene> AnnGenes;
 	
@@ -70,14 +74,20 @@ public class DataManager {
 
 	/**Konstanten */
 	
+	
+	public String NucleotidePosition = "Physical.Position";
 	public String ChromosomeNumber = "ChromosomeNumber";
-	public String NucleotidePosition = "NucleotidePosition";
-	public String ChrStart = "ChrStart";
-	public String ChrEnd = "ChrEnd";
+	public String TranscriptStart = "transcript_start";
+	public String TranscriptEnd = "transcript_end";
+	
+	
+	public String CloneStart = "ChrStart";
+	public String CloneEnd = "ChrEnd";
 	public String ChrCen = "ChromosomeCen";
 	//public String CloneMidPoint = "CloneMidpoint";
-	public String CloneCytoBand = "Mapping";
+	public String CytoBand = "Mapping";
 	public String States = ".States";
+	public String SurvivalDays = "Overall.Survival..days.";
 	
 	
 	public DataManager()
@@ -98,6 +108,19 @@ public class DataManager {
 			
 		}
 		return v;
+	}
+	
+	
+	
+	public DescriptionVariable getDescriptionVariable(String s) {
+		
+		
+		for (int i= 0; i < descriptionVariables.size(); i++) {
+			DescriptionVariable var = descriptionVariables.elementAt(i);
+			if (var.name.contains(s)) return var;
+			
+		}
+		return null;
 	}
 	
 	

@@ -234,6 +234,20 @@ public static boolean isLineInRect(int x1, int y1, int x2, int y2, int Rx1,
 	}
 	
 	
+	
+	public static int getStringWidth(String s, Graphics g) {
+		
+
+		int Width = 0;
+		for (int i = 0; i < s.length(); i++)
+			Width += g.getFontMetrics().charWidth(s.charAt(i));
+		return Width;
+
+	};
+
+	
+	
+	
 	public static Vector<String> sortByLexico(Vector<String> buffer) {
 
 		Vector<String> Temp = new Vector();

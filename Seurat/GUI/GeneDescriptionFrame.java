@@ -311,6 +311,7 @@ public class GeneDescriptionFrame extends JFrame {
 
 			seurat.openGeneAnnotationsItem.setEnabled(false);
 			seurat.openCGHItem.setEnabled(true);
+			seurat.openSNPItem.setEnabled(true);
 			
 		} catch (Exception e) {
 			
@@ -379,28 +380,44 @@ public class GeneDescriptionFrame extends JFrame {
 		}
 		else System.out.println("WARNING  Variable \"ChromosomeNumber\" not found");
 		
-		GeneVariable nucleoVar = null;
+		GeneVariable nucleoStart = null;
 		for (int i = 0; i < geneVariables.size(); i++) {
-			if (geneVariables.elementAt(i).name.contains(seurat.dataManager.NucleotidePosition)) nucleoVar = geneVariables.elementAt(i);
+			if (geneVariables.elementAt(i).name.contains(seurat.dataManager.TranscriptStart)) nucleoStart = geneVariables.elementAt(i);
 		}
 		
 		
-		if (nucleoVar == null) System.out.println("WARNING  Variable \"NucleoPosition\" not found");
+		if (nucleoStart == null) System.out.println("WARNING  Variable \"NucleoStart\" not found");
 		
 		
-		if (nucleoVar != null && chromosomeVar != null) {
+		GeneVariable nucleoEnd = null;
+		for (int i = 0; i < geneVariables.size(); i++) {
+			if (geneVariables.elementAt(i).name.contains(seurat.dataManager.TranscriptEnd)) nucleoEnd = geneVariables.elementAt(i);
+		}
+		
+		
+		if (nucleoEnd== null) System.out.println("WARNING  Variable \"NucleoEnd\" not found");
+		
+		
+		
+		
+		
+		
+		
+		if (nucleoStart != null && chromosomeVar != null) {
 		
 		for (int i = 0; i < AnnGenes.size(); i++) {
 			
 			    AnnGene gene = AnnGenes.elementAt(i);
 			    gene.chrName = chromosomeVar.stringData [i];
 			    
-			    gene.nucleotidePosition = nucleoVar.doubleData [i];
+			    gene.nucleotideStart = nucleoStart.doubleData [i];
+			    if (nucleoEnd!=null)  gene.nucleotideEnd = nucleoEnd.doubleData [i];
 			    
 			    if (gene.gene != null) {
 			    	 gene.gene.chrName = chromosomeVar.stringData [i];
 					    
-					    gene.gene.nucleotidePosition = nucleoVar.doubleData [i];
+					    gene.gene.nucleotideStart = nucleoStart.doubleData [i];
+					 if (nucleoEnd!=null)    gene.gene.nucleotideEnd = nucleoEnd.doubleData [i];
 			    } 
 			    
 			 //   System.out.println(gene.chrName + "   " + gene.nucleotidePosition);

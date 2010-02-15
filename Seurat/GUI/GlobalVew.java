@@ -1577,7 +1577,7 @@ class GlobalViewAbstractPanel extends JPanel implements MouseListener, IPlot,
 			if (gene.chrName != null)
 				chr = gene.chrName;
 
-			double pos = gene.nucleotidePosition;
+			double pos = gene.nucleotideStart;
 
 			Vector<Gene> genes = findChrInList(Chromosomes, chr);
 
@@ -1657,7 +1657,7 @@ class GlobalViewAbstractPanel extends JPanel implements MouseListener, IPlot,
 	public void insertGene(Gene gene, Vector<Gene> genes) {
 		boolean insert = true;
 		for (int i = 0; i < genes.size(); i++) {
-			if (gene.nucleotidePosition <= genes.elementAt(i).nucleotidePosition) {
+			if (gene.nucleotideStart <= genes.elementAt(i).nucleotideStart) {
 				genes.insertElementAt(gene, i);
 				insert = false;
 				break;
@@ -1926,8 +1926,7 @@ class GlobalViewAbstractPanel extends JPanel implements MouseListener, IPlot,
 
 	}
 
-	public void sortExperimentsByVar(DescriptionVariable var) {
-	}
+
 
 	public void calculateClusteringColumns(ClusterNode node) {
 
