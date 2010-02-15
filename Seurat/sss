@@ -1,0 +1,10 @@
+Chromosome Number(GeneAnnotations)=ChromosomeNumber
+Nucleotide Position=NucleotidePosition
+Chromosome Number(CGH)=ChromosomeNumber
+ChrStart=ChrStart
+ChrEnd=ChrEnd
+Chromosome center=ChromosomeCen
+CloneCytoBand=Mapping
+States=.States
+SurvivalDays=Overall.Survival..days.
+Status=Status
