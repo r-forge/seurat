@@ -211,12 +211,12 @@ public class LoadingDialog extends JFrame{
 		
 		//  Geneannotations
 		
-		bfr.write("Chromosome Number  ="+fieldChromosomeNumber.getText()+"\n");
-		bfr.write("Nucleotide Position="+fieldNucleotidePosition.getText()+"\n");
+		bfr.write("Chromosome number  ="+fieldChromosomeNumber.getText()+"\n");
+		bfr.write("Nucleotide position="+fieldNucleotidePosition.getText()+"\n");
 		bfr.write("Transcription start="+fieldTranscriptStart.getText()+"\n");
 		bfr.write("Transcription end="+fieldTranscriptEnd.getText()+"\n");
-		bfr.write("Clone Start="+fieldCloneStart.getText()+"\n");
-		bfr.write("Clone End="+fieldCloneEnd.getText()+"\n");
+		bfr.write("Clone start="+fieldCloneStart.getText()+"\n");
+		bfr.write("Clone end="+fieldCloneEnd.getText()+"\n");
 		bfr.write("Chromosome center="+fieldChrCen.getText()+"\n");
 		bfr.write("CytoBand="+fieldCytoBand.getText()+"\n");
 		bfr.write("States="+fieldStates.getText()+"\n");
@@ -243,15 +243,15 @@ public class LoadingDialog extends JFrame{
                 String name = str.nextToken();
                 String value = str.nextToken();
                 
-                if (name.equals("Chromosome Number")) seurat.dataManager.ChromosomeNumber = value;
-                if (name.equals("Nucleotide Position")) seurat.dataManager.NucleotidePosition = value;
-                if (name.equals("Transcription Start")) seurat.dataManager.TranscriptStart = value;
-                if (name.equals("Transcription End")) seurat.dataManager.TranscriptEnd = value;
-                if (name.equals("Clone Start")) seurat.dataManager.CloneStart = value;
-                if (name.equals("Clone End"))  seurat.dataManager.CloneEnd = value;
-                if (name.equals("Chromosome center")) seurat.dataManager.ChrCen = value;
-                if (name.equals("CytoBand"))  seurat.dataManager.CytoBand = value;
-                if (name.equals("States")) seurat.dataManager.States = value;
+                if (name.contains("Chromosome number")) seurat.dataManager.ChromosomeNumber = value;
+                if (name.contains("Nucleotide position")) seurat.dataManager.NucleotidePosition = value;
+                if (name.contains("Transcription start")) seurat.dataManager.TranscriptStart = value;
+                if (name.contains("Transcription end")) seurat.dataManager.TranscriptEnd = value;
+                if (name.contains("Clone start")) seurat.dataManager.CloneStart = value;
+                if (name.contains("Clone end"))  seurat.dataManager.CloneEnd = value;
+                if (name.contains("Chromosome center")) seurat.dataManager.ChrCen = value;
+                if (name.contains("CytoBand"))  seurat.dataManager.CytoBand = value;
+                if (name.contains("States")) seurat.dataManager.States = value;
                 
         		
 			}

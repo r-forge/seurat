@@ -17,6 +17,15 @@ public class DataManager {
 
 	//public boolean[] selectedRows;
 	
+	
+	public String geneexpressionName;
+	
+	public String geneannotationName;
+	
+	public String clinicalName;
+	
+	public String CGH_SNPName;
+	
 	public Vector<Gene> Genes;
 	
 	public RConnection rConnection;
@@ -285,7 +294,7 @@ public class DataManager {
 			for (int i = 0; i < cghVariables.size(); i++) {
 				CGHVariable var= cghVariables.elementAt(i);
 				
-				if (var.isSelected || var.vars == null) bfr.write(var.name+"	");
+				if (var.isSelected || var.vars == null || (var.vars != null && var.vars.size()==0) )  bfr.write(var.name+"	");
 			//	 System.out.print(Genes.elementAt(i).name+"	"); 
 			}
 			//System.out.println();

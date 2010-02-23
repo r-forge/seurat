@@ -103,6 +103,8 @@ public class SNPLoader {
 					.getDirectory()
 					+ "/" + fileDialog.getFile()));
 
+			
+			seurat.dataManager.CGH_SNPName = fileDialog.getFile();
 			this.snpVariables = new Vector();
 
 			String line = bfr.readLine();

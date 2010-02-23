@@ -107,6 +107,10 @@ public class GeneDescriptionFrame extends JFrame {
 			BufferedReader bfr = new BufferedReader(new FileReader(fileDialog
 					.getDirectory()
 					+ "/" + fileDialog.getFile()));
+			
+			
+			seurat.dataManager.geneannotationName = fileDialog.getFile();
+
 
 			this.geneVariables = new Vector();
 

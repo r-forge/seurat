@@ -68,7 +68,7 @@ public class ConfusionsDialog extends JFrame {
 		
 		this.dataManager = seurat.dataManager;
 		
-		this.setBounds(100, 300, 380, 210);
+		this.setBounds(100, 300, 480, 210);
          this.setResizable(false);
 		
 		this.getContentPane().setLayout(new BorderLayout());

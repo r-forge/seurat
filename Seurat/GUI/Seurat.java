@@ -73,7 +73,7 @@ import RConnection.RConnectionManager;
 import Settings.*;
 import Tools.Tools;
 
-public class Seurat extends JFrame implements ColorListener,WindowListener{
+public class Seurat extends JFrame implements ColorListener{
 
 	JPanel MainPanel = new JPanel();
 
@@ -216,21 +216,24 @@ public class Seurat extends JFrame implements ColorListener,WindowListener{
 
 		loadMainWindow();
 
-		this.addWindowListener(this);
-		
-		/*
-		 * 
-		 * infoPanel.removeAll();
-		 * infoLabel.setText("Loading Geneexpression dataset...");
-		 * MainPanel.remove(infoPanel);
-		 * infoPanel.add(progressBar,BorderLayout.CENTER);
-		 * MainPanel.add(infoPanel,BorderLayout.SOUTH); seurat.setVisible(true);
-		 * this.update(this.getGraphics());
-		 * this.MainPanel.setBackground(Color.RED);
-		 * JOptionPane.showMessageDialog(this, "Connection to R failed.");
-		 * this.setSize(800,800); this.setVisible(true);
-		 */
+		//this.addWindowListener(this);
 
+		this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+		
+		addWindowListener(new WindowAdapter() 
+		{
+		public void windowClosing(WindowEvent we)
+		{
+			if (shouldExit()) {
+				
+				System.exit(0);
+			}
+		}
+		});
+		 
+
+		
+		
 	}
 
 	public void loadMainWindow() {
@@ -645,14 +648,14 @@ public class Seurat extends JFrame implements ColorListener,WindowListener{
 							return;
 						}
 
-						if (object.isVariable()) {
+						if (!((DataTreeNode) obj).datasetVar &&object.isVariable()) {
 
 							if (((Variable) object).isExperiment)
 								createExperimentInfo((Variable) object);
 							return;
 						}
 
-						if (object.isGene()) {
+						if (!((DataTreeNode) obj).datasetVar &&object.isGene()) {
 							// System.out.println(object.getName() + "  "
 							// +object.getType());
 
@@ -663,7 +666,7 @@ public class Seurat extends JFrame implements ColorListener,WindowListener{
 						
 						
 						
-						if (object.isClone()) {
+						if (!((DataTreeNode) obj).datasetVar && object.isClone()) {
 							// System.out.println(object.getName() + "  "
 							// +object.getType());
 
@@ -682,19 +685,18 @@ public class Seurat extends JFrame implements ColorListener,WindowListener{
 					if (obj instanceof DataTreeNode) {
 						ISelectable object = ((DataTreeNode) obj).object;
 
-						if ((!object.isVariable() && !object.isGene())
-								&& object.getType() == 1) {
+						if ( ((DataTreeNode) obj).datasetVar &&
+								 object.getType() == 1) {
 							new Histogram(seurat, object);
 						}
 
-						if ((!object.isVariable() && !object.isGene())
-								&& object.getType() == 2) {
+						if (((DataTreeNode) obj).datasetVar && object.getType() == 2) {
 							System.out.println("Barchart");
 							new Barchart(seurat, object);
 						}
 						// Liste
-						if (object.getType() == 3) {
-							System.out.println("Histogram");
+						if (((DataTreeNode) obj).datasetVar && object.getType() == 3) {
+							
                              new ListBarchart(seurat,(GeneVariable)object,((GeneVariable)object).AnnGenes);
 						}
 
@@ -793,7 +795,7 @@ public class Seurat extends JFrame implements ColorListener,WindowListener{
 					for (int i = 0; i < dataManager.descriptionVariables.size(); i++) {
 						DescriptionVariable var = dataManager.descriptionVariables
 								.elementAt(i);
-						DataTreeNode Experiment = new DataTreeNode(var);
+						DataTreeNode Experiment = new DataTreeNode(var,true);
 						ClinicalData.add(Experiment);
 
 						infoLabel.setText("");
@@ -851,7 +853,7 @@ public class Seurat extends JFrame implements ColorListener,WindowListener{
 					for (int i = 0; i < dataManager.geneVariables.size(); i++) {
 						GeneVariable var = dataManager.geneVariables
 								.elementAt(i);
-						DataTreeNode Experiment = new DataTreeNode(var);
+						DataTreeNode Experiment = new DataTreeNode(var,true);
 						GeneAnnotations.add(Experiment);
 
 					}
@@ -915,7 +917,7 @@ public class Seurat extends JFrame implements ColorListener,WindowListener{
 					DataTreeNode CGHData = new DataTreeNode("CGHData");
 					for (int i = 0; i < dataManager.cghVariables.size(); i++) {
 						CGHVariable var = dataManager.cghVariables.elementAt(i);
-						DataTreeNode Experiment = new DataTreeNode(var);
+						DataTreeNode Experiment = new DataTreeNode(var, true);
 						CGHData.add(Experiment);
 
 					}
@@ -994,7 +996,7 @@ public class Seurat extends JFrame implements ColorListener,WindowListener{
 					DataTreeNode CGHData = new DataTreeNode("SNPData");
 					for (int i = 0; i < dataManager.cghVariables.size(); i++) {
 						CGHVariable var = dataManager.cghVariables.elementAt(i);
-						DataTreeNode Experiment = new DataTreeNode(var);
+						DataTreeNode Experiment = new DataTreeNode(var,true);
 						CGHData.add(Experiment);
 
 					}
@@ -1107,7 +1109,7 @@ fileMenu.addSeparator();
 		fileMenu.addSeparator();
 		
 		
-		JMenuItem exitItem = new JMenuItem("Exit");
+		JMenuItem exitItem = new JMenuItem("Quit");
 		exitItem.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				if (shouldExit()) System.exit(0);
@@ -1576,6 +1578,9 @@ fileMenu.addSeparator();
 			try {
 
 				// infoPanel.removeAll();
+				dataManager.geneexpressionName = fileDialog.getFile();
+					
+				
 				infoPanel.removeAll();
 				infoLabel.setText("Loading Geneexpression dataset...");
 				MainPanel.remove(infoPanel);
@@ -1620,7 +1625,7 @@ fileMenu.addSeparator();
 						"Genexpression data");
 				for (int i = 0; i < dataManager.variables.size(); i++) {
 					Variable var = dataManager.variables.elementAt(i);
-					DataTreeNode Experiment = new DataTreeNode(var);
+					DataTreeNode Experiment = new DataTreeNode(var,true);
 					GeneExpressions.add(Experiment);
 
 				}
@@ -2153,9 +2158,19 @@ fileMenu.addSeparator();
 	
 	public boolean shouldExit()
 	{    
-		if (JOptionPane.showConfirmDialog(this,"Close all datasets and quit Seurat?","Choose one of the following options",0) == 1)
-		return false;
-		else return true;
+		if (dataManager != null && dataManager.Genes != null) {
+		
+			if (JOptionPane.showConfirmDialog(this,"Close all datasets and quit Seurat?","Choose one of the following options",0) == 1)
+		    return false;
+		    else return true;
+		}
+		else {
+			 if (JOptionPane.showConfirmDialog(this,"Exit Seurat?","Choose one of the following options",0) == 1)
+			 return false;
+		     else return true;
+			
+		}
+		
 	}
 	
 	
@@ -2191,42 +2206,6 @@ fileMenu.addSeparator();
 		
 	}
 
-	public void windowActivated(WindowEvent e) {
-		// TODO Auto-generated method stub
-		
-	}		
-
-	public void windowClosed(WindowEvent e) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	public void windowClosing(WindowEvent e) {
-		// TODO Auto-generated method stub
-		System.exit(0);		
-	
-		
-	}
-
-	public void windowDeactivated(WindowEvent e) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	public void windowDeiconified(WindowEvent e) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	public void windowIconified(WindowEvent e) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	public void windowOpened(WindowEvent e) {
-		// TODO Auto-generated method stub
-		
-	}
 	
 	
 	
