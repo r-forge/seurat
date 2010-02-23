@@ -20,7 +20,7 @@ public class SaveSelectionFrame extends JFrame {
 	JCheckBox experimentsBox = new JCheckBox(
 			"  Experiments Descriptions  ");
 	JCheckBox genesBox = new JCheckBox("  Gene Annotations  ");
-	JCheckBox cghBox = new JCheckBox("  CGH Data   ");
+	JCheckBox cghBox = new JCheckBox("  CGH/SNP Data   ");
 	Seurat seurat;
 	SaveSelectionFrame zeiger = this;
 
@@ -31,7 +31,7 @@ public class SaveSelectionFrame extends JFrame {
 		
 		this.getContentPane().setLayout(new BorderLayout());
 		JPanel panel = new JPanel();
-		panel.setLayout(new GridLayout(3, 1));
+		panel.setLayout(new GridLayout(4, 1));
 		panel.add(expressionBox);
 		panel.add(experimentsBox);
 		panel.setBorder(BorderFactory.createEtchedBorder());
@@ -44,7 +44,7 @@ public class SaveSelectionFrame extends JFrame {
 			genesBox.setEnabled(false);
 		else
 			genesBox.setSelected(true);
-		
+	
 		
 		if (seurat.dataManager.cghVariables == null)
 			cghBox.setEnabled(false);
@@ -71,9 +71,10 @@ public class SaveSelectionFrame extends JFrame {
 					
 				if (expressionBox.isSelected()) {
 					 FileDialog fileDialog = new FileDialog(zeiger.seurat, "Save Geneexpression Selection", 1);
-						fileDialog.setVisible(true);
-				
-						
+				       fileDialog.setFile(zeiger.seurat.dataManager.geneexpressionName);
+				       fileDialog.setVisible(true);
+				       
+				       
 						BufferedWriter bfr = null;
 						bfr = new BufferedWriter(new FileWriter(fileDialog
 									.getDirectory()
@@ -103,8 +104,8 @@ public class SaveSelectionFrame extends JFrame {
 					
 					
 					FileDialog fileDialog = new FileDialog(zeiger.seurat, "Save Experiment Descriptions", 1);
-					fileDialog.setVisible(true);
-			
+					 fileDialog.setFile(zeiger.seurat.dataManager.clinicalName);
+					 fileDialog.setVisible(true);		
 					
 					BufferedWriter bfr = null;
 					bfr = new BufferedWriter(new FileWriter(fileDialog
@@ -129,9 +130,10 @@ public class SaveSelectionFrame extends JFrame {
 				}
 				if (genesBox.isSelected()) {
 					FileDialog fileDialog = new FileDialog(zeiger.seurat, "Save Gene Annotations", 1);
-					fileDialog.setVisible(true);
-			
 					
+					 fileDialog.setFile(zeiger.seurat.dataManager.geneannotationName);
+					 fileDialog.setVisible(true);
+					 
 					BufferedWriter bfr = null;
 					bfr = new BufferedWriter(new FileWriter(fileDialog
 								.getDirectory()
@@ -157,8 +159,8 @@ public class SaveSelectionFrame extends JFrame {
 				
 				if (cghBox.isSelected()) {
 					FileDialog fileDialog = new FileDialog(zeiger.seurat, "Save CGH Data", 1);
-					fileDialog.setVisible(true);
-			
+					 fileDialog.setFile(zeiger.seurat.dataManager.CGH_SNPName);
+					 fileDialog.setVisible(true);		
 					
 					BufferedWriter bfr = null;
 					bfr = new BufferedWriter(new FileWriter(fileDialog

@@ -104,6 +104,9 @@ public class ExperimentDescriptionFrame extends JFrame {
 			BufferedReader bfr = new BufferedReader(new FileReader(fileDialog
 					.getDirectory()
 					+ "/" + fileDialog.getFile()));
+			
+			
+			seurat.dataManager.clinicalName = fileDialog.getFile();
 
 			this.descriptionVariables = new Vector();
 

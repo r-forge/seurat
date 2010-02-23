@@ -120,6 +120,9 @@ public class CGHViewer {
 					.getDirectory()
 					+ "/" + fileDialog.getFile()));
 
+			seurat.dataManager.CGH_SNPName = fileDialog.getFile();
+
+			
 			this.cghVariables = new Vector();
 
 			String line = bfr.readLine();

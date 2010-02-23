@@ -346,6 +346,7 @@ class CorrelationPanel extends JPanel implements MouseListener,
 						p += (a - m1) * (b - m2);
 					}
 
+				
 					corr[i][j] = p / s1 / s2;
 
 				}

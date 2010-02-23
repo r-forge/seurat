@@ -1,9 +1,9 @@
-Chromosome Number  =ChromosomeNumber
-Nucleotide Position=Physical.Position
+Chromosome number  =ChromosomeNumber
+Nucleotide position=Physical.Position
 Transcription start=transcript_start
 Transcription end=transcript_end
-Clone Start=ChrStart
-Clone End=ChrEnd
+Clone start=ChrStart
+Clone end=ChrEnd
 Chromosome center=ChromosomeCen
 CytoBand=Mapping
 States=.States
