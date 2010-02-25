@@ -589,10 +589,7 @@ class GlobalViewAbstractPanel extends JPanel implements MouseListener, IPlot,
 							c = c.brighter();
 							c = c.brighter();
 
-							// c = new Color((float)
-							// (Math.sqrt(Math.sqrt(Math.sqrt(Math.sqrt((float)fPos(koeff)))))),
-							// 0, 0);
-							// c = new Color( 255,211,211);
+							
 
 							if (PixelCount == Rows.size()
 									&& Columns.elementAt(i).getRealValue(
@@ -680,218 +677,7 @@ class GlobalViewAbstractPanel extends JPanel implements MouseListener, IPlot,
 	
 	
 	
-	
-	
-	
-	
-	/**
-	 * 
-	 * 
-	 * 
-	
-	public void updateSelection() {
-
-		cellColor = new Color[this.Columns.size()][this.data[0].length];
-
-		boolean selection = false;
-
-		for (int i = 0; i < this.Columns.size(); i++) {
-			if (this.Columns.elementAt(i).isSelected())
-				selection = true;
-		}
-		for (int i = 0; i < this.Rows.size(); i++) {
-			if (this.Rows.elementAt(i).isSelected())
-				selection = true;
-		}
-
-		if (Model == 1) {
-
-			for (int i = 0; i < data.length; i++) {
-				for (int j = 0; j < PixelCount; j++) {
-
-					if (data[i][j] > 0) {
-
-						double koeff = data[i][j] / Max[i];
-
-						Color c = Color.getHSBColor(0, (float) Tools
-								.fPos(koeff), 1);
-
-						if (PixelCount == Rows.size()
-								&& Columns.elementAt(i).getRealValue(
-										Rows.elementAt(j).getID()) == dataManager.NA)
-							c = Color.WHITE;
-
-						if (selection) {
-							c = c.darker();
-							c = c.darker();
-						}
-
-						boolean selected = false;
-
-						for (int k = j * Aggregation; k < (j + 1) * Aggregation; k++) {
-							if (k < Rows.size()) {
-								if (Columns.elementAt(i).isSelected()
-										&& Rows.elementAt(k).isSelected()) {
-									selected = true;
-								}
-
-							}
-						}
-
-						if (selected) {
-							c = c.brighter();
-							c = c.brighter();
-						}
-
-						cellColor[i][j] = c;
-
-					} else {
-						double koeff = data[i][j] / Min[i];
-
-						if (Min[i] == 0)
-							koeff = 0;
-
-						Color c = (Color.getHSBColor((float) 0.33,
-								(float) Tools.fNeg(koeff), 1));
-
-						if (selection) {
-							c = c.darker();
-							c = c.darker();
-						}
-
-						boolean selected = false;
-
-						for (int k = j * Aggregation; k < (j + 1) * Aggregation; k++) {
-							if (k < Rows.size()) {
-								if (Columns.elementAt(i).isSelected()
-										&& Rows.elementAt(k).isSelected()) {
-									selected = true;
-								}
-							}
-						}
-
-						if (selected) {
-							c = c.brighter();
-							c = c.brighter();
-						}
-
-						// c = Color.WHITE;
-						cellColor[i][j] = c;
-					}
-
-				}
-
-			}
-
-		}
-
-		if (Model == 2) {
-
-			for (int i = 0; i < data.length; i++) {
-				for (int j = 0; j < PixelCount; j++) {
-
-					if (data[i][j] > 0) {
-
-						double koeff = data[i][j] / Max[i];
-
-						Color c = new Color((float) Tools.fPos(koeff), 0, 0);
-
-						if (PixelCount == Rows.size()
-								&& Columns.elementAt(i).getRealValue(
-										Rows.elementAt(j).getID()) == dataManager.NA)
-							c = Color.WHITE;
-
-						if (selection) {
-							c = c.darker();
-							c = c.darker();
-							c = c.darker();
-						}
-
-						boolean selected = false;
-
-						for (int k = j * Aggregation; k < (j + 1) * Aggregation; k++) {
-							if (k < Rows.size()) {
-								if (Columns.elementAt(i).isSelected()
-										&& Rows.elementAt(k).isSelected()) {
-									selected = true;
-								}
-
-							}
-						}
-
-						if (selected) {
-							c = c.brighter();
-							c = c.brighter();
-							c = c.brighter();
-							c = c.brighter();
-
-							// c = new Color((float)
-							// (Math.sqrt(Math.sqrt(Math.sqrt(Math.sqrt((float)fPos(koeff)))))),
-							// 0, 0);
-							// c = new Color( 255,211,211);
-
-							if (PixelCount == Rows.size()
-									&& Columns.elementAt(i).getRealValue(
-											Rows.elementAt(j).getID()) == dataManager.NA)
-								c = Color.WHITE;
-
-						}
-
-						cellColor[i][j] = c;
-					} else {
-						
-						// Color c = new Color(0,(float)(0.5*koeff),0);
-						double koeff = data[i][j] / Min[i];
-
-						Color c = new Color(0, (float) Tools.fNeg(koeff), 0);
-
-						if (selection) {
-							c = c.darker();
-							c = c.darker();
-							c = c.darker();
-						}
-
-						boolean selected = false;
-
-						for (int k = j * Aggregation; k < (j + 1) * Aggregation; k++) {
-							if (k < Rows.size()) {
-								if (Columns.elementAt(i).isSelected()
-										&& Rows.elementAt(k).isSelected()) {
-									selected = true;
-								}
-
-							}
-						}
-
-						if (selected) {
-							c = c.brighter();
-							c = c.brighter();
-							c = c.brighter();
-							c = c.brighter();
-							// c = new Color(0,(float)
-							// Math.sqrt(Math.sqrt((float)fNeg(koeff))), 0);
-
-						}
-						cellColor[i][j] = c;
-					}
-
-				}
-			}
-		}
-
-		if (clustering) {
-			if (nodeZeilen != null)
-				updateClustering(nodeZeilen);
-			if (nodeSpalten != null)
-				updateClustering(nodeSpalten);
-
-		}
-
-		this.repaint();
-	}
-	
-	**/
-	
+		
 	
 	
 	
@@ -1722,6 +1508,9 @@ class GlobalViewAbstractPanel extends JPanel implements MouseListener, IPlot,
 		return Rows.elementAt(row).getID();
 	}
 
+	
+	
+	
 	@Override
 	public void paint(Graphics g) {
 
