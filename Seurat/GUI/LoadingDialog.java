@@ -122,11 +122,29 @@ public class LoadingDialog extends JFrame{
 
 		
 		this.getContentPane().setLayout(new BorderLayout());
-		JButton b = new JButton("Save file");
+		
+
+		JPanel panel = new JPanel();
+		panel.setLayout(new FlowLayout(FlowLayout.RIGHT));
+		
+		JButton b = new JButton("Save");
+		b.addActionListener(
+			new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					save();
+					setVisible(false);
+				}
+			}
+		);
+		
+		panel.add(b);
+		
+		b = new JButton("Save file");
 		b.addActionListener(
 			new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
 					saveFile();
+					setVisible(false);
 				}
 			}
 		);
@@ -137,8 +155,6 @@ public class LoadingDialog extends JFrame{
 		
 		
 		
-		JPanel panel = new JPanel();
-		panel.setLayout(new FlowLayout(FlowLayout.RIGHT));
 		panel.add(b);
 		
 		b = new JButton("Load file");
@@ -177,7 +193,7 @@ public class LoadingDialog extends JFrame{
 								    JOptionPane.ERROR_MESSAGE);
 					}	
 					
-					
+					setVisible(false);
 						
 						
 					}
@@ -211,7 +227,7 @@ public class LoadingDialog extends JFrame{
 		
 		//  Geneannotations
 		
-		bfr.write("Chromosome number  ="+fieldChromosomeNumber.getText()+"\n");
+		bfr.write("Chromosome number="+fieldChromosomeNumber.getText()+"\n");
 		bfr.write("Nucleotide position="+fieldNucleotidePosition.getText()+"\n");
 		bfr.write("Transcription start="+fieldTranscriptStart.getText()+"\n");
 		bfr.write("Transcription end="+fieldTranscriptEnd.getText()+"\n");
@@ -231,6 +247,31 @@ public class LoadingDialog extends JFrame{
 		}
 		
 	}
+	
+	
+	
+	
+	
+
+	public void save() {
+		
+		
+		seurat.dataManager.ChromosomeNumber = fieldChromosomeNumber.getText();
+        seurat.dataManager.NucleotidePosition = fieldNucleotidePosition.getText();
+        seurat.dataManager.TranscriptStart = fieldTranscriptStart.getText();
+        seurat.dataManager.TranscriptEnd = fieldTranscriptEnd.getText();
+        seurat.dataManager.CloneStart = fieldCloneStart.getText();
+        seurat.dataManager.CloneEnd = fieldCloneEnd.getText();
+        seurat.dataManager.ChrCen = fieldChrCen.getText();
+        seurat.dataManager.CytoBand = fieldCytoBand.getText();
+        seurat.dataManager.States = fieldStates.getText();
+		
+		
+		
+	}
+	
+	
+	
 	
 	
 	public static void loadFile(Seurat seurat, BufferedReader bfr) throws IOException {
