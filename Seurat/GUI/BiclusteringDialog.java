@@ -325,7 +325,7 @@ public class BiclusteringDialog extends JFrame{
 	    	
 	    	bicresult.add(new Bicluster("Bicluster"+i+"(PlaidModel,Rows:"+rowresult.elementAt(i-1).size()+",Columns:"+colresult.elementAt(i-1).size()+")",
 	    			rowresult.elementAt(i-1),colresult.elementAt(i-1)));
-	    	new GlobalView(seurat,bicresult.elementAt(i-1).name,bicresult.elementAt(i-1).colums,bicresult.elementAt(i-1).rows).applyNewPixelSize(15, 15);
+	    	new GlobalView(seurat,bicresult.elementAt(i-1).name,bicresult.elementAt(i-1).colums,bicresult.elementAt(i-1).rows).applyNewPixelSize(15, 5);
 	    	}    
 
 	} catch (Exception e) {
@@ -406,7 +406,7 @@ public class BiclusteringDialog extends JFrame{
 		    	
 		    	bicresult.add(new Bicluster("Bicluster"+i+"(Bimax,Rows:"+rowresult.elementAt(i-1).size()+",Columns:"+colresult.elementAt(i-1).size()+")",
 		    			rowresult.elementAt(i-1),colresult.elementAt(i-1)));
-		    	new GlobalView(seurat,bicresult.elementAt(i-1).name,bicresult.elementAt(i-1).colums,bicresult.elementAt(i-1).rows).applyNewPixelSize(15, 15);
+		    	new GlobalView(seurat,bicresult.elementAt(i-1).name,bicresult.elementAt(i-1).colums,bicresult.elementAt(i-1).rows).applyNewPixelSize(15, 5);
 		    	}    
 
 		} catch (Exception e) {
