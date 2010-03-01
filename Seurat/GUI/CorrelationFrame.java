@@ -14,6 +14,8 @@ import Data.Variable; //import org.rosuda.JRclient.*;
 import Data.*;
 import javax.swing.*;
 
+import Tools.Tools;
+
 import java.awt.event.*;
 import java.awt.*;
 
@@ -647,9 +649,14 @@ class CorrelationPanel extends JPanel implements MouseListener,
 					koeff = Math.pow(data[i][j],
 							seurat.settings.colorParam);
 
-					Color c = (Color.getHSBColor(0, (float) koeff, 1));
+					//Color c = (Color.getHSBColor(0, (float) koeff, 1));
+					float h = Color.RGBtoHSB(seurat.PosColor.getRed(), seurat.PosColor.getGreen(), seurat.PosColor.getBlue(), null) [0];
+					float s = Color.RGBtoHSB(seurat.PosColor.getRed(), seurat.PosColor.getGreen(), seurat.PosColor.getBlue(), null) [1];
+					float v = Color.RGBtoHSB(seurat.PosColor.getRed(), seurat.PosColor.getGreen(), seurat.PosColor.getBlue(), null) [2];
+
 					
-					
+					Color c = Color.getHSBColor(h, (float) (koeff)*s, v);
+					if (seurat.settings.Model == 2) c = Color.getHSBColor(h, s,(float) koeff*v);
 					
 					
 					
@@ -665,7 +672,19 @@ class CorrelationPanel extends JPanel implements MouseListener,
 				} else {
 					koeff = Math.pow(-data[i][j],
 							seurat.settings.colorParam);
-					Color c = Color.getHSBColor((float) 0.66, (float) koeff, 1);
+					//Color c = Color.getHSBColor((float) 0.66, (float) koeff, 1);
+					
+					
+					float h = Color.RGBtoHSB(seurat.NegColor.getRed(), seurat.NegColor.getGreen(), seurat.NegColor.getBlue(), null) [0];
+					float s = Color.RGBtoHSB(seurat.NegColor.getRed(), seurat.NegColor.getGreen(), seurat.NegColor.getBlue(), null) [1];
+					float v = Color.RGBtoHSB(seurat.NegColor.getRed(), seurat.NegColor.getGreen(), seurat.NegColor.getBlue(), null) [2];
+
+					Color c = (Color.getHSBColor(h,
+							(float)koeff*s, v));
+					if (seurat.settings.Model == 2) c = Color.getHSBColor(h,
+							s,(float) koeff*v);
+
+					
 
 if (this.selection[i] || this.selection[j]) {
 	c = c.darker();
