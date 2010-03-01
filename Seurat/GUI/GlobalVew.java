@@ -38,7 +38,7 @@ class GlobalView extends JFrame implements MatrixWindow, IPlot {
 
 	boolean resize = true;
 
-	int abstandUnten = 2;
+	int abstandUnten = 20;
 
 	long timeResized;
 

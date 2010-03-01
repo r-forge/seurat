@@ -20,9 +20,12 @@ import javax.swing.event.*;
 import java.awt.datatransfer.*;
 import javax.imageio.*;
 
+import Data.Bicluster;
+import Data.Biclustering;
 import Data.CGHVariable;
 import Data.Chromosome;
 import Data.Clustering;
+import Data.DataTreeNode;
 import Data.DescriptionVariable;
 import Data.Gene;
 import Data.ISelectable;
@@ -162,7 +165,7 @@ public class Seurat extends JFrame implements ColorListener{
 	Vector<ISelectable> Samples;
 	Vector<Clustering> Clusterings;	
 	Vector<ClusterNode> HClusterings;	
-	
+	Vector<Biclustering> Biclusterings;
 	
 	
 
@@ -333,7 +336,7 @@ public class Seurat extends JFrame implements ColorListener{
 					 Samples = new Vector();
 					 Clusterings = new Vector();	
 					 HClusterings = new Vector();
-					
+					 Biclusterings = new Vector();
 						
 					for (int i = 0; i < paths.length; i++) {
 						Object o = paths [i].getLastPathComponent();
@@ -363,7 +366,11 @@ public class Seurat extends JFrame implements ColorListener{
 							ClusterNode c = (ClusterNode)node.cObject;
 							HClusterings.add((ClusterNode)node.cObject);
 						}
-
+						
+						if (node.cObject!= null && node.cObject instanceof Biclustering) {
+							Biclustering c = (Biclustering)node.cObject;
+							Biclusterings.add((Biclustering)node.cObject);
+						}
 						
 						
 						
@@ -608,6 +615,11 @@ public class Seurat extends JFrame implements ColorListener{
 
 						ISelectable object = ((DataTreeNode) obj).object;
 						
+						if (((DataTreeNode) obj).cObject instanceof Bicluster){
+							Bicluster bic = (Bicluster)((DataTreeNode) obj).cObject;
+							new GlobalView(seurat,bic.name,bic.colums,bic.rows).applyNewPixelSize(20, 20);
+							//System.out.println("is Bicluster");
+						}
 						
 						if (((DataTreeNode) obj).object == null) {
 							if (((DataTreeNode) obj).cObject != null && ((DataTreeNode) obj).cObject instanceof Clustering) {
@@ -1292,6 +1304,20 @@ fileMenu.addSeparator();
 		});
 		plotsMenu.add(item);
 
+		item = new JMenuItem("Biclustering");
+		item.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				
+				int pixelW = settings.PixelW;
+				int pixelH = settings.PixelH;				
+				
+				new BiclusteringDialog(seurat, seurat.dataManager.Genes,
+						seurat.dataManager.Experiments, pixelW,pixelH);
+						
+			}
+		});
+		plotsMenu.add(item);
+		
 		/*
 		 * item = new JMenuItem("Compare Seriation Methods");
 		 * item.addActionListener(new ActionListener() { public void
