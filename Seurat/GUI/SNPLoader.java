@@ -42,7 +42,7 @@ public class SNPLoader {
 		openSNPFile(fileDialog,progressBar);
 
 		
-		JMenuItem openItem = new JMenuItem("Heatmap SNP Data");
+		JMenuItem openItem = new JMenuItem("Heatmap Genomic Variations");
 		openItem.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				
@@ -54,7 +54,7 @@ public class SNPLoader {
 				}
 				
 				
-				GlobalView v = new GlobalView(seurat,"Heatmap CGH Data", vars,
+				GlobalView v = new GlobalView(seurat,"Heatmap Genomic Variations", vars,
 						SNPs);
 				v.applyNewPixelSize(seurat.settings.PixelW,seurat.settings.PixelH);
 			
