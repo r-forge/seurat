@@ -2,6 +2,7 @@ package GUI;
 
 import java.util.Vector;
 
+import Data.Biclustering;
 import Data.Chromosome;
 import Data.Clone;
 import Data.ClusterNode;
@@ -41,9 +42,10 @@ public class ClusteringManager{
 	DefaultMutableTreeNode root;
 	DataTreeNode Rows = new DataTreeNode("Rows");
 	DataTreeNode Columns= new DataTreeNode("Columns");
-
+	DataTreeNode Bics = new DataTreeNode("Biclusterings");
 	
 	Vector <Clustering> Clusterings = new Vector();
+	Vector <Biclustering> Biclusterings = new Vector();
 /*
 	JPanel panel = new JPanel();
 	JPanel p = new JPanel();
@@ -57,10 +59,9 @@ public class ClusteringManager{
         this.tree = tree;
 	//	this.getContentPane().setLayout(new BorderLayout());
 		
-		this.root = root;
 		root.add(Rows);
 		root.add(Columns);
-		
+		root.add(Bics);
 		
 		//tree = new JTree(root);
 	/*
@@ -208,6 +209,28 @@ public class ClusteringManager{
 		
 	}
 	
+public void addBiclustering(Biclustering bic) {
+		
+		root.add(Bics);
+		DataTreeNode node = new DataTreeNode(bic.name);
+		node.cObject = bic;
+		
+		
+		((DefaultTreeModel) tree.getModel()).insertNodeInto(
+				node, Bics, Bics.getChildCount());
+		
+		for (int i = 1; i <= bic.biclusters.size(); i++) {
+			DataTreeNode nod = new DataTreeNode(bic.biclusters.elementAt(i-1).name);
+			nod.cObject = bic.biclusters.elementAt(i-1);
+			((DefaultTreeModel) tree.getModel()).insertNodeInto(
+					nod, node, node.getChildCount());
+		}
+
+		tree.scrollPathToVisible(new TreePath(Columns.getPath()));
+		
+		
+		
+	}
 	
 	
 	

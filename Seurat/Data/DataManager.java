@@ -36,6 +36,7 @@ public class DataManager {
 	
 	public int ClusteringNumber = 1;
 	
+	public int BiclusteringNumber = 1;
 	
 	public Vector<Variable> Experiments;
 
@@ -75,6 +76,8 @@ public class DataManager {
 	
 	public Vector<Clustering> GeneClusters = new Vector();
 	public Vector<Clustering> ExpClusters = new Vector();
+	
+	public Vector<Biclustering> Biclusterings = new Vector();
 	
 	public Vector<Chromosome> Chromosomes;
 	
