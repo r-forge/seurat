@@ -479,8 +479,7 @@ class GlobalViewAbstractPanel extends JPanel implements MouseListener, IPlot,
 
 		
 		
-		if (Model == 1) {
-
+	
 			for (int i = 0; i < data.length; i++) {
 				for (int j = 0; j < PixelCount; j++) {
 
@@ -488,8 +487,17 @@ class GlobalViewAbstractPanel extends JPanel implements MouseListener, IPlot,
 
 						double koeff = data[i][j] / Max[i];
 
-						Color c = Color.getHSBColor(0, (float) Tools
-								.fPos(koeff), 1);
+						float h = Color.RGBtoHSB(seurat.PosColor.getRed(), seurat.PosColor.getGreen(), seurat.PosColor.getBlue(), null) [0];
+						float s = Color.RGBtoHSB(seurat.PosColor.getRed(), seurat.PosColor.getGreen(), seurat.PosColor.getBlue(), null) [1];
+						float v = Color.RGBtoHSB(seurat.PosColor.getRed(), seurat.PosColor.getGreen(), seurat.PosColor.getBlue(), null) [2];
+
+						
+						Color c = Color.getHSBColor(h, (float) Tools
+								.fPos(koeff)*s, v);
+						
+						if (Model == 2) c = Color.getHSBColor(h, s,(float) Tools
+								.fPos(koeff)*v);
+
 
 						if (PixelCount == Rows.size()
 								&& Columns.elementAt(i).getRealValue(
@@ -510,7 +518,13 @@ class GlobalViewAbstractPanel extends JPanel implements MouseListener, IPlot,
 						}
 
 						if (selected) {
-							c = c.darker();
+							if (Model == 1) c = c.darker();
+							if (Model ==2) {
+							c = c.brighter();
+							c = c.brighter();
+							c = c.brighter();
+							c = c.brighter();
+							}
 							
 						}
 
@@ -521,10 +535,17 @@ class GlobalViewAbstractPanel extends JPanel implements MouseListener, IPlot,
 
 						if (Min[i] == 0)
 							koeff = 0;
+						
+						
 
-						Color c = (Color.getHSBColor((float) 0.33,
-								(float) Tools.fNeg(koeff), 1));
+						float h = Color.RGBtoHSB(seurat.NegColor.getRed(), seurat.NegColor.getGreen(), seurat.NegColor.getBlue(), null) [0];
+						float s = Color.RGBtoHSB(seurat.NegColor.getRed(), seurat.NegColor.getGreen(), seurat.NegColor.getBlue(), null) [1];
+						float v = Color.RGBtoHSB(seurat.NegColor.getRed(), seurat.NegColor.getGreen(), seurat.NegColor.getBlue(), null) [2];
 
+						Color c = (Color.getHSBColor(h,
+								(float) Tools.fNeg(koeff)*s, v));
+                        if (Model == 2) c = Color.getHSBColor(h,
+								s,(float) Tools.fNeg(koeff)*v);
 						
 
 						boolean selected = false;
@@ -539,7 +560,13 @@ class GlobalViewAbstractPanel extends JPanel implements MouseListener, IPlot,
 						}
 
 						if (selected) {
-							c = c.darker();
+							if (Model == 1) c = c.darker();
+							if (Model ==2) {
+							c = c.brighter();
+							c = c.brighter();
+							c = c.brighter();
+							c = c.brighter();
+							}
 							
 						}
 
@@ -551,8 +578,10 @@ class GlobalViewAbstractPanel extends JPanel implements MouseListener, IPlot,
 
 			}
 
-		}
-
+		
+		
+		
+/*
 		if (Model == 2) {
 
 			for (int i = 0; i < data.length; i++) {
@@ -600,13 +629,7 @@ class GlobalViewAbstractPanel extends JPanel implements MouseListener, IPlot,
 
 						cellColor[i][j] = c;
 					} else {
-						/*
-						 * double koeff = Math.pow(
-						 * Experiments.elementAt(i).doubleData[j] /
-						 * Experiments.elementAt(i).min,
-						 * dataManager.colorParam);
-						 */
-						// Color c = new Color(0,(float)(0.5*koeff),0);
+						
 						double koeff = data[i][j] / Min[i];
 
 						Color c = new Color(0, (float) Tools.fNeg(koeff), 0);
@@ -641,6 +664,9 @@ class GlobalViewAbstractPanel extends JPanel implements MouseListener, IPlot,
 			}
 		}
 
+		
+		*/
+		
 		if (clustering) {
 			if (nodeZeilen != null)
 				updateClustering(nodeZeilen);

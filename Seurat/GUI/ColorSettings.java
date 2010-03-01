@@ -1,10 +1,13 @@
 package GUI;
 import Settings.*;
+import Tools.Tools;
+
 import javax.swing.*;
 
 import java.awt.event.*;
 import java.awt.*;
 
+import javax.swing.colorchooser.AbstractColorChooserPanel;
 import javax.swing.event.*;
 
 import Data.Variable;
@@ -426,6 +429,8 @@ implements MouseListener, MouseMotionListener{
 	int [] posBinsColor;
 	int posMaxColor;
 	
+	JColorChooser chooser;
+	
 	int [] negBinsColor;
 	int negMaxColor;
 	boolean dragPosMin=false,dragPosMax=false,dragNegMin= false,dragNegMax= false;
@@ -514,36 +519,25 @@ implements MouseListener, MouseMotionListener{
 		
 		
 		for (int i = 0; i < segments; i++) {
-			if (settings.Model == 2) {
 			
-			g.setColor(new Color(1-(float)i/32,0,0));
-			g.fillRect(WIDTH +abstandLinks - abstandLinks/8, 
+			float h = Color.RGBtoHSB(seurat.PosColor.getRed(), seurat.PosColor.getGreen(), seurat.PosColor.getBlue(), null) [0];
+			float s = Color.RGBtoHSB(seurat.PosColor.getRed(), seurat.PosColor.getGreen(), seurat.PosColor.getBlue(), null) [1];
+			float v = Color.RGBtoHSB(seurat.PosColor.getRed(), seurat.PosColor.getGreen(), seurat.PosColor.getBlue(), null) [2];
+
+			float koeff = 1-(float)i/segments;
+				
+			Color c = (Color.getHSBColor(h,
+					koeff*s, v));
+            if (settings.Model == 2) c = Color.getHSBColor(h,
+					s,(float) koeff*v);
+            
+            g.setColor(c);
+        		
+			
+			g.fillRect(WIDTH+abstandLinks - abstandLinks/8, 
 					   abstandUnten/8  +  (this.getHeight()-abstandUnten -abstandUnten/8)*i/segments , 
 					    abstandLinks/10,
 					    (this.getHeight()- abstandUnten)/segments +1 );
-			}
-			
-			
-			if (settings.Model == 1) {
-
-					
-			    double koeff = (float) Math.pow((double)i/segments,
-
-						1);
-
-			    Color c = (Color.getHSBColor(0,
-						1-(float) koeff, 1));
-
-				g.setColor(c);
-				
-				
-				g.fillRect(WIDTH +abstandLinks - abstandLinks/8, 
-						   abstandUnten/8  +  (this.getHeight()-abstandUnten -abstandUnten/8)*i/segments , 
-						    abstandLinks/10,
-						    (this.getHeight()- abstandUnten)/segments +1 );
-				
-			
-			}
 			
 			
 		}
@@ -615,40 +609,40 @@ implements MouseListener, MouseMotionListener{
 		}
 		
 		
+		
+		
+		
+		
+		
+		
+		
 		for (int i = 0; i < segments; i++) {
-			if (settings.Model == 2) {
+				
 			
-			g.setColor(new Color(0,1-(float)i/32,0));
+			float h = Color.RGBtoHSB(seurat.NegColor.getRed(), seurat.NegColor.getGreen(), seurat.NegColor.getBlue(), null) [0];
+			float s = Color.RGBtoHSB(seurat.NegColor.getRed(), seurat.NegColor.getGreen(), seurat.NegColor.getBlue(), null) [1];
+			float v = Color.RGBtoHSB(seurat.NegColor.getRed(), seurat.NegColor.getGreen(), seurat.NegColor.getBlue(), null) [2];
+
+			float koeff = (float)i/segments;
+				
+			Color c = (Color.getHSBColor(h,
+					(float) koeff*s, v));
+            if (settings.Model == 2) c = Color.getHSBColor(h,
+					s,(float) koeff*v);
+            
+            g.setColor(c);
+        		
+			
 			g.fillRect(abstandLinks - abstandLinks/8, 
 					   abstandUnten/8  +  (this.getHeight()-abstandUnten -abstandUnten/8)*i/segments , 
 					    abstandLinks/10,
 					    (this.getHeight()- abstandUnten)/segments +1 );
 			}
 			
-			
-			if (settings.Model == 1) {
-
-					
-			    double koeff = (float) Math.pow((double)i/segments,
-
-						1);
-
-			    Color c = (Color.getHSBColor((float) 0.33,
-						1-(float) koeff, 1));
-
-				g.setColor(c);
-				
-				
-				g.fillRect(abstandLinks - abstandLinks/8, 
-						   abstandUnten/8  +  (this.getHeight()-abstandUnten -abstandUnten/8)*i/segments , 
-						    abstandLinks/10,
-						    (this.getHeight()- abstandUnten)/segments +1 );
-				
-			
-			}
+		
 			
 			
-		}
+		
 		
 		paintZeiger(g);
 		
@@ -831,6 +825,49 @@ implements MouseListener, MouseMotionListener{
 	public void mouseClicked(MouseEvent e) {
 		// TODO Auto-generated method stub
 		
+		
+		
+		
+		
+		//*Click on negative scale/
+		if (e.getX() >=abstandLinks - abstandLinks/8 &&
+			e.getX() <=	abstandLinks - abstandLinks/8 +   abstandLinks/10  &&
+			e.getY() >=  abstandUnten/8  &&
+			e.getY() <=   abstandUnten/8  +  (this.getHeight()-abstandUnten -abstandUnten/8)
+		) {
+			
+			
+		
+			
+			
+			seurat.NegColor = JColorChooser.showDialog(
+                    this,
+                    "Choose color for negative values",
+                     seurat.NegColor);
+			
+			seurat.repaintWindows();
+			repaint();
+		}
+		
+		
+		
+		
+		
+		if (e.getX() >=WIDTH + abstandLinks - abstandLinks/8 &&
+				e.getX() <=	WIDTH+ abstandLinks - abstandLinks/8 +   abstandLinks/10  &&
+				e.getY() >=  abstandUnten/8  &&
+				e.getY() <=   abstandUnten/8  +  (this.getHeight()-abstandUnten -abstandUnten/8)
+			) {
+			
+				seurat.PosColor = JColorChooser.showDialog(
+	                     this,
+	                     "Choose color for positive values",
+	                      seurat.PosColor);
+;
+				seurat.repaintWindows();
+				repaint();
+			}
+			
 		
 	
 		
