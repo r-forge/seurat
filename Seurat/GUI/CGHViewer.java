@@ -57,7 +57,7 @@ public class CGHViewer {
 				}
 				
 				
-				GlobalView v = new GlobalView(seurat,"Heatmap CGH Data", vars,
+				GlobalView v = new GlobalView(seurat,"Heatmap Genomic Variations", vars,
 						CLONES);
 				v.applyNewPixelSize(seurat.settings.PixelW,seurat.settings.PixelH);
 			
