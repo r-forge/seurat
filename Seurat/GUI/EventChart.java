@@ -26,6 +26,9 @@ import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.ToolTipManager;
 
+import Data.AnnGene;
+import Data.CGHVariable;
+import Data.Clone;
 import Data.DescriptionVariable;
 import Data.ISelectable;
 import Data.Variable;
@@ -40,7 +43,7 @@ public class EventChart extends JFrame implements IPlot{
     
 	
 	public EventChart(Seurat seurat, DescriptionVariable time, DescriptionVariable status) {
-		super("EventChart");
+		super("EventChart (" +time.name + " , " + status.name +")");
 		seurat.windows.add(this);
 
 		item = new JMenuItem("EventChart");
@@ -606,6 +609,7 @@ class EventPanel extends JPanel implements KeyListener,MouseListener, MouseMotio
 	
 	
 	public void applySelection(int x1,int y1, int x2, int y2) {
+		boolean selected = false;
 		for (int i = 0; i < patients.size(); i++) {
 			if (Tools.containsRectInRect(x1,y1,x2,y2, 
 					abstandLinks,
@@ -616,9 +620,17 @@ class EventPanel extends JPanel implements KeyListener,MouseListener, MouseMotio
 			)) {
 				
 				patients.elementAt(i).patient.select(true);
-				
+				selected = true;
 			}
 		}
+		
+		
+		if (selected) { 
+				seurat.dataManager.selectGenesClones(); 
+		    }
+			
+			
+			
 		
 		seurat.repaintWindows();
 	}

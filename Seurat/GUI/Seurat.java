@@ -92,7 +92,7 @@ public class Seurat extends JFrame implements ColorListener{
 
 	JMenu helpMenu;
 
-	Color PosColor = Color.getHSBColor(0, 1 , 1);;
+	Color PosColor = Color.getHSBColor(0, 1 , 1);
 	Color NegColor = Color.getHSBColor((float)0.33, 1 , 1);;
 	
 	JMenu plotsMenu;

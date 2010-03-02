@@ -38,7 +38,7 @@ class GlobalView extends JFrame implements MatrixWindow, IPlot {
 
 	boolean resize = true;
 
-	int abstandUnten = 20;
+	int abstandUnten = 2;
 
 	long timeResized;
 
@@ -460,6 +460,7 @@ class GlobalViewAbstractPanel extends JPanel implements MouseListener, IPlot,
 
 		cellColor = new Color[this.Columns.size()][this.data[0].length];
 
+		/*
 		exclusiveSelection = true;
 		
 		boolean cols = true;
@@ -476,9 +477,9 @@ class GlobalViewAbstractPanel extends JPanel implements MouseListener, IPlot,
 		}
 		
 		exclusiveSelection = cols || rows;
-
+        */
 		
-		
+		exclusiveSelection = false;
 	
 			for (int i = 0; i < data.length; i++) {
 				for (int j = 0; j < PixelCount; j++) {
@@ -520,10 +521,35 @@ class GlobalViewAbstractPanel extends JPanel implements MouseListener, IPlot,
 						if (selected) {
 							if (Model == 1) c = c.darker();
 							if (Model ==2) {
+								/*
+                                    c	 = Color.getHSBColor(h, (float) Tools
+											.fPos(koeff)*s, v);
+                                    
+                                    
+                                    c = Color.getHSBColor(h, s/2,(float) (Tools
+    										.fPos(koeff)*v)/2);
+	
+                                    c.darker();
+                                 
+                                    c.darker();
+                                    c.darker();
+                                    c.darker();
+                                  
+                                    
+                                    h = Color.RGBtoHSB(c.getRed(), c.getGreen(), c.getBlue(), null) [0];
+            						s = Color.RGBtoHSB(c.getRed(), c.getGreen(), c.getBlue(), null) [1];
+            						v = Color.RGBtoHSB(c.getRed(), c.getGreen(), c.getBlue(), null) [2];
+
+								*/
+								c = Color.getHSBColor(h, s,(float) Math.min(1,(Tools
+										.fPos(koeff)*v+0.02)));	
+								
 							c = c.brighter();
 							c = c.brighter();
 							c = c.brighter();
 							c = c.brighter();
+							
+							
 							}
 							
 						}
@@ -562,10 +588,47 @@ class GlobalViewAbstractPanel extends JPanel implements MouseListener, IPlot,
 						if (selected) {
 							if (Model == 1) c = c.darker();
 							if (Model ==2) {
+								/*c = (Color.getHSBColor(h,
+										(float) Tools.fNeg(koeff)*s, v));
+								
+								  c.darker();
+								  
+								  
+								  
+									
+											c = Color.getHSBColor(h,
+													s/2,(float) Tools.fNeg(koeff)*v/2);
+								  
+								  
+                              /*
+								  c.darker();
+                                  c.darker();
+                                  c.darker();
+                                
+                                  
+                                  h = Color.RGBtoHSB(c.getRed(), c.getGreen(), c.getBlue(), null) [0];
+          						s = Color.RGBtoHSB(c.getRed(), c.getGreen(), c.getBlue(), null) [1];
+          						v = Color.RGBtoHSB(c.getRed(), c.getGreen(), c.getBlue(), null) [2];
+          						
+          						
+          						
+          						
+								
+						//		c = Color.getHSBColor(h,
+							//			s,(float) Tools.fNeg(koeff)*v/2);	
+								
+								
+								*/
+								 c = Color.getHSBColor(h,
+											s,(float) Math.min(1,(Tools.fNeg(koeff)*v+0.02)));
+								
 							c = c.brighter();
 							c = c.brighter();
 							c = c.brighter();
 							c = c.brighter();
+							
+							
+								
 							}
 							
 						}
