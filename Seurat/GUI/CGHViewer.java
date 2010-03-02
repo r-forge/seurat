@@ -45,7 +45,7 @@ public class CGHViewer {
 
 		
 
-		JMenuItem openItem = new JMenuItem("Heatmap CGH Data");
+		JMenuItem openItem = new JMenuItem("Heatmap Genomic Variations");
 		openItem.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				

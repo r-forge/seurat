@@ -74,6 +74,7 @@ Vector<String> TimeVarsS = new Vector();
 		    		   int i = time.getSelectedIndex();
 		    		   int j = status.getSelectedIndex();
 		    		   new EventChart(dialog.seurat, TimeVars.elementAt(i), StatusVars.elementAt(j));
+		    		   setVisible(false);
 		    	   }
 		       }		
 		);

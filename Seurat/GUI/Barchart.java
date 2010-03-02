@@ -8,8 +8,11 @@ import Tools.Tools;
 import java.awt.event.*;
 import java.awt.*;
 
+import Data.AnnGene;
 import Data.CGHVariable;
+import Data.Clone;
 import Data.DescriptionVariable;
+import Data.Gene;
 import Data.GeneVariable;
 import Data.ISelectable;
 import Data.Variable;
@@ -380,20 +383,20 @@ class BarchartPanel extends JPanel implements KeyListener, MouseListener,
 		}
 		
 		
-		/*
+		
 		
 		if (selected) { 
-		if (variables.elementAt(0).isGene() || variables.elementAt(0).isClone()) {
+		if (variables.elementAt(0) instanceof Gene || variables.elementAt(0) instanceof AnnGene || variables.elementAt(0) instanceof Clone) {
 			seurat.dataManager.selectExperiments(); 
 		}
-		else {
+		if (variables.elementAt(0) instanceof Variable || variables.elementAt(0) instanceof CGHVariable) {
 			seurat.dataManager.selectGenesClones(); 
 	    }
 		
 		
 		
 		
-		}*/
+		}
 
 	}
 

@@ -76,7 +76,7 @@ public class BiclusteringDialog extends JFrame{
 		
 		this.seurat = seurat;
 		this.dataManager = seurat.dataManager;
-		this.setBounds(100, 320, 450, 225);
+		this.setBounds(100, 320, 450, 245);
         this.pixelW = pixelW;
         this.pixelH = pixelH;
         this.Rows = Rows;
