@@ -333,7 +333,7 @@ public class BiclusteringDialog extends JFrame{
 		JOptionPane.showMessageDialog(this, "Calculation failed.");
 	}
 	
-	System.out.println("PlaidModel calculated...");
+	//System.out.println("PlaidModel calculated...");
 	Biclustering biclustering = new Biclustering("Biclustering"+dataManager.BiclusteringNumber+"(PlaidModel)",bicresult);
 	//bicresult.remove(0);
 	return biclustering;

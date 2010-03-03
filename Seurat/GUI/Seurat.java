@@ -617,7 +617,7 @@ public class Seurat extends JFrame implements ColorListener{
 						
 						if (((DataTreeNode) obj).cObject instanceof Bicluster){
 							Bicluster bic = (Bicluster)((DataTreeNode) obj).cObject;
-							new GlobalView(seurat,bic.name,bic.colums,bic.rows).applyNewPixelSize(20, 20);
+							new GlobalView(seurat,bic.name,bic.colums,bic.rows).applyNewPixelSize(15, 5);
 							//System.out.println("is Bicluster");
 						}
 						
