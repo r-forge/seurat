@@ -38,7 +38,7 @@ class KMeansView extends JFrame implements MatrixWindow, IPlot {
 	int oldPixelCount;
 
 
-int abstandUnten = 2;
+    int abstandUnten = 2;
 	
 	long timeResized;
 	
@@ -1328,19 +1328,45 @@ this.repaint();
 					if (values [i][j] > 0) {
 
 						koeff = values [i][j] / max;
-
+/*
 						if (Model == 1)  c = Color.getHSBColor(0, (float) Tools.fPos(koeff), 1);
 						if (Model == 2)  c = new Color((float) Tools.fPos(koeff), 0, 0);
+	*/
+						
+						float h = Color.RGBtoHSB(seurat.PosColor.getRed(), seurat.PosColor.getGreen(), seurat.PosColor.getBlue(), null) [0];
+						float s = Color.RGBtoHSB(seurat.PosColor.getRed(), seurat.PosColor.getGreen(), seurat.PosColor.getBlue(), null) [1];
+						float v = Color.RGBtoHSB(seurat.PosColor.getRed(), seurat.PosColor.getGreen(), seurat.PosColor.getBlue(), null) [2];
+
+						
+						c = Color.getHSBColor(h, (float) Tools
+								.fPos(koeff)*s, v);
+						
+						if (Model == 2) c = Color.getHSBColor(h, s,(float) Tools
+								.fPos(koeff)*v);
+						
+						
 						
 					} else {
 						koeff = values [i][j] / min;
 						if (min == 0) koeff = 0;
 
+						/*
 						if (Model == 1) c = (Color.getHSBColor((float) 0.33,
 								(float) Tools.fNeg(koeff), 1));
 						
 						if (Model == 2)  c = new Color(0, (float) Tools.fNeg(koeff), 0);
+						*/
+						
+						float h = Color.RGBtoHSB(seurat.NegColor.getRed(), seurat.NegColor.getGreen(), seurat.NegColor.getBlue(), null) [0];
+						float s = Color.RGBtoHSB(seurat.NegColor.getRed(), seurat.NegColor.getGreen(), seurat.NegColor.getBlue(), null) [1];
+						float v = Color.RGBtoHSB(seurat.NegColor.getRed(), seurat.NegColor.getGreen(), seurat.NegColor.getBlue(), null) [2];
+
+						c = (Color.getHSBColor(h,
+								(float) Tools.fNeg(koeff)*s, v));
+                        if (Model == 2) c = Color.getHSBColor(h,
+								s,(float) Tools.fNeg(koeff)*v);
 					}
+					
 					
 					
 					
@@ -1353,7 +1379,23 @@ this.repaint();
 					
 					if (isSelected [i][j]) {
 						
-						if (Model == 1) {
+						if (Model == 1) c = c.darker();
+						if (Model ==2) {
+							
+						
+						c = c.brighter();
+						c = c.brighter();
+						c = c.brighter();
+						c = c.brighter();
+						
+						
+						}
+						
+						
+						/*
+						 * 
+						 * if (Model == 1) {
+						 
 						c = c.darker();
 						
 						}
@@ -1363,7 +1405,7 @@ this.repaint();
 							c = c.brighter();
 							c = c.brighter();
 							c = c.brighter();
-						}
+						}*/
 					} 
 					
 
