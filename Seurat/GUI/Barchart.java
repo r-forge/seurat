@@ -58,6 +58,8 @@ public class Barchart extends JFrame implements IPlot {
 			@Override
 			public void windowClosing(WindowEvent e) {
 				panel.seurat.windowMenu.remove(item);
+				panel.removeColoring();
+			
 			}
 		});
 		
@@ -97,6 +99,7 @@ public class Barchart extends JFrame implements IPlot {
 			@Override
 			public void windowClosing(WindowEvent e) {
 				panel.seurat.windowMenu.remove(item);
+				panel.removeColoring();
 			}
 		});
 		
@@ -320,6 +323,7 @@ class BarchartPanel extends JPanel implements KeyListener, MouseListener,
 
 	public void removeColoring() {
 
+		boolean removed = false;
 		for (int i = 0; i < this.variables.size(); i++) {
 			int index = ((Variable) this.getVariable(i)).getBarchartToColors()
 					.indexOf(barchart);
@@ -328,6 +332,7 @@ class BarchartPanel extends JPanel implements KeyListener, MouseListener,
 				((Variable) this.getVariable(i)).getColorNames().remove(index);
 				((Variable) this.getVariable(i)).getBarchartToColors()
 						.remove(index);
+				removed =  true;
 			}
 		}
 
@@ -336,6 +341,7 @@ class BarchartPanel extends JPanel implements KeyListener, MouseListener,
 			this.colorShift = 0;
 
 		}
+		seurat.repaintWindows();
 
 	}
 
