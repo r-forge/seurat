@@ -292,8 +292,7 @@ public class BiclusteringDialog extends JFrame{
 		
 	    nbiclusters = rConnection.eval("res@Number").asInteger();      
 	    
-	    
-//Biclustering bicresult = new Biclustering();
+	   //Biclustering bicresult = new Biclustering();
 	    if(nbiclusters==0) JOptionPane.showMessageDialog(this, "No biclusters found");
 	    
 	    
@@ -317,6 +316,8 @@ public class BiclusteringDialog extends JFrame{
 	    	 	
 	    	int[] cols = rConnection.eval("which(res@NumberxCol[" + i + ",])").asIntegers();
 	    	
+	    	
+	    	
 	    	for (int j = 0; j < cols.length; j++){
 	    		//System.out.print("Sample:");
 	    		//System.out.println(cols[j]);
@@ -327,7 +328,9 @@ public class BiclusteringDialog extends JFrame{
 	    			rowresult.elementAt(i-1),colresult.elementAt(i-1)));
 	    	new GlobalView(seurat,bicresult.elementAt(i-1).name,bicresult.elementAt(i-1).colums,bicresult.elementAt(i-1).rows).applyNewPixelSize(15, 5);
 	    	}    
-
+	    rConnection.voidEval("rm(list=ls())");
+ 	    rConnection.voidEval("gc()");
+	    
 	} catch (Exception e) {
 		e.printStackTrace();
 		JOptionPane.showMessageDialog(this, "Calculation failed.");
@@ -372,8 +375,7 @@ public class BiclusteringDialog extends JFrame{
 			    rConnection.voidEval("res <- biclust(tempData,method=BCBimax(),minr="+ minr+ ",minc=" + minc + ",number=" + number+ ")"); 
 			
 		    nbiclusters = rConnection.eval("res@Number").asInteger();      
-		    
-		    
+		   
 	//Biclustering bicresult = new Biclustering();
 		    if(nbiclusters==0) JOptionPane.showMessageDialog(this, "No biclusters found");
 		    
@@ -397,7 +399,7 @@ public class BiclusteringDialog extends JFrame{
 		    	} 
 		    	 	
 		    	int[] cols = rConnection.eval("which(res@NumberxCol[" + i + ",])").asIntegers();
-		    	
+		    	   	 			    		    	
 		    	for (int j = 0; j < cols.length; j++){
 		    		//System.out.print("Sample:");
 		    		//System.out.println(cols[j]);
@@ -409,6 +411,9 @@ public class BiclusteringDialog extends JFrame{
 		    	new GlobalView(seurat,bicresult.elementAt(i-1).name,bicresult.elementAt(i-1).colums,bicresult.elementAt(i-1).rows).applyNewPixelSize(15, 5);
 		    	}    
 
+		    rConnection.voidEval("rm(list=ls())");
+		    rConnection.voidEval("gc()");    
+		    
 		} catch (Exception e) {
 			e.printStackTrace();
 			JOptionPane.showMessageDialog(this, "Calculation failed.");
