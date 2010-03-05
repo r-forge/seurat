@@ -205,6 +205,10 @@ Vector<ISelectable> Experiments;
 			globalView.setLocation(333, 0);
 			globalView.setVisible(true);
 
+			
+			rConnection.voidEval("rm(list=ls())");
+			rConnection.voidEval("gc()");
+			
 		} catch (RserveException e) {
 			e.printStackTrace();
 			

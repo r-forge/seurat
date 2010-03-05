@@ -368,6 +368,8 @@ public class ClusteringDialog extends JFrame {
 				if (max < clusterArray [j]) max = clusterArray [j];
 				
 
+				rConnection.voidEval("rm(list=ls())");
+				rConnection.voidEval("gc()"); 
 	
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -394,6 +396,12 @@ public class ClusteringDialog extends JFrame {
 		
 
 	}
+	
+	
+	
+	
+	
+	
 
 	public Vector<Vector<ISelectable>> calculateClustersSpalten(int n, String method, String distance) {
 
@@ -484,6 +492,10 @@ public class ClusteringDialog extends JFrame {
 				
 				
 				result.remove(0);
+				
+				rConnection.voidEval("rm(list=ls())");
+				rConnection.voidEval("gc()");
+				
 				return result;
 				
 				
@@ -704,6 +716,10 @@ public class ClusteringDialog extends JFrame {
 			*/
 			
 			
+             
+             
+         	rConnection.voidEval("rm(list=ls())");
+			rConnection.voidEval("gc()");
 
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -838,6 +854,12 @@ public class ClusteringDialog extends JFrame {
         
         nodeSpalten = Nodes.firstElement();	
 		nodeSpalten.calculateHeight(height [height.length-1]);
+		
+		
+		rConnection.voidEval("rm(list=ls())");
+		rConnection.voidEval("gc()");
+		
+		
 
 	} catch (Exception e) {
 		e.printStackTrace();
