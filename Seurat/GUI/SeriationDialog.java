@@ -57,16 +57,18 @@ Vector<ISelectable> Experiments;
 	
 	Vector<ISelectable> Genes;
 	
-	int pixelW,pixelH;
+	int pixelW,pixelH, aggregation;
 	
 
-	public SeriationDialog(Seurat seurat,Vector Genes, Vector Exps, int pixelW, int pixelH) {
+	public SeriationDialog(Seurat seurat,Vector Genes, Vector Exps, int pixelW, int pixelH, int aggr) {
 		super("Seriation");
 		this.seurat = seurat;
 		this.dialog = this;
 		
 		this.pixelW = pixelW;
 		this.pixelH = pixelH;
+		this.aggregation = aggr;
+		
 		
         this.Genes = Genes;
         
@@ -114,6 +116,9 @@ Vector<ISelectable> Experiments;
 
 		this.setVisible(true);
 	}
+	
+	
+	
 
 	public void seriation(String method, String Distance) {
 		
@@ -202,6 +207,8 @@ Vector<ISelectable> Experiments;
 			GlobalView globalView = new GlobalView(seurat, "Heatmap "+method, E,G);
             globalView.applyNewPixelSize(dialog.pixelW,dialog.pixelH);
 		
+            if (aggregation > 0) globalView.gPanel.setAggregation(aggregation);
+            
 			globalView.setLocation(333, 0);
 			globalView.setVisible(true);
 

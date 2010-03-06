@@ -302,6 +302,10 @@ public class BiclusteringDialog extends JFrame{
 		}
 	    //System.out.println("Colresultsize"+colresult.size()+"gleich"+nbiclusters);
 	    
+	   	
+	   	
+	   	
+	   	
 	    for (int i = 1 ; i < (nbiclusters+1); i++){
 	    	//System.out.println("next bicluster"+i);
 	    	int[] rows = rConnection.eval("which(res@RowxNumber[," + i + "])").asIntegers();
@@ -326,8 +330,16 @@ public class BiclusteringDialog extends JFrame{
 	    	
 	    	bicresult.add(new Bicluster("Bicluster"+i+"(PlaidModel,Rows:"+rowresult.elementAt(i-1).size()+",Columns:"+colresult.elementAt(i-1).size()+")",
 	    			rowresult.elementAt(i-1),colresult.elementAt(i-1)));
-	    	new GlobalView(seurat,bicresult.elementAt(i-1).name,bicresult.elementAt(i-1).colums,bicresult.elementAt(i-1).rows).applyNewPixelSize(15, 5);
-	    	}    
+	    	GlobalView globalView = new GlobalView(seurat,bicresult.elementAt(i-1).name,bicresult.elementAt(i-1).colums,bicresult.elementAt(i-1).rows);
+	        
+	        
+	        int aggr = 1;
+			while (rowresult.elementAt(i-1).size()*5/aggr > 700) aggr++;
+            globalView.gPanel.setAggregation(aggr);
+            globalView.applyNewPixelSize(15, 5);
+	        globalView.setLocation(320 + (1000 * (i-1))/nbiclusters,0);	
+	    
+	    }    
 	    rConnection.voidEval("rm(list=ls())");
  	    rConnection.voidEval("gc()");
 	    
@@ -408,8 +420,17 @@ public class BiclusteringDialog extends JFrame{
 		    	
 		    	bicresult.add(new Bicluster("Bicluster"+i+"(Bimax,Rows:"+rowresult.elementAt(i-1).size()+",Columns:"+colresult.elementAt(i-1).size()+")",
 		    			rowresult.elementAt(i-1),colresult.elementAt(i-1)));
-		    	new GlobalView(seurat,bicresult.elementAt(i-1).name,bicresult.elementAt(i-1).colums,bicresult.elementAt(i-1).rows).applyNewPixelSize(15, 5);
-		    	}    
+		    	GlobalView globalView = new GlobalView(seurat,bicresult.elementAt(i-1).name,bicresult.elementAt(i-1).colums,bicresult.elementAt(i-1).rows);
+		    	
+		    	
+		    	int aggr = 1;
+				while (rowresult.elementAt(i-1).size()*5/aggr > 700) aggr++;
+	            globalView.gPanel.setAggregation(aggr);
+	            globalView.applyNewPixelSize(15, 5);
+			    globalView.setLocation(320 + (1000 * (i-1))/nbiclusters,0);		
+		    
+		    
+		    }    
 
 		    rConnection.voidEval("rm(list=ls())");
 		    rConnection.voidEval("gc()");    

@@ -1269,7 +1269,7 @@ fileMenu.addSeparator();
 					
 					
 				new SeriationDialog(seurat, dataManager.Genes,
-						dataManager.Experiments, pixelW,pixelH);
+						dataManager.Experiments, pixelW,pixelH,-1);
 
 			}
 		});
@@ -1299,7 +1299,7 @@ fileMenu.addSeparator();
 				}
 				
 				new ClusteringDialog(seurat, seurat.dataManager.Genes,
-						seurat.dataManager.Experiments, pixelW,pixelH);
+						seurat.dataManager.Experiments, pixelW,pixelH,-1);
 			}
 		});
 		plotsMenu.add(item);
