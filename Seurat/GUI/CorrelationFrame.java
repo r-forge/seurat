@@ -321,6 +321,7 @@ class CorrelationPanel extends JPanel implements MouseListener,
 					}
 					m1 /= data[i].length;
 					m2 /= data[j].length;
+					
 
 					for (int k = 0; k < data[i].length; k++) {
 						if (data[i][k] != dataManager.NA)
@@ -349,7 +350,11 @@ class CorrelationPanel extends JPanel implements MouseListener,
 					}
 
 				
-					corr[i][j] = p / s1 / s2;
+					corr[i][j] = Math.min(p / s1 / s2,1);
+					if (i==j) corr[i][j] = 1;
+					
+					
+				//	if (corr [i][j]>1) System.out.println("!!!!!! " +corr [i][j] + "  " + i + " " + j);
 
 				}
 			}
@@ -389,6 +394,7 @@ class CorrelationPanel extends JPanel implements MouseListener,
 				}
 				correlations[i][j] /= count;
 
+				//if (correlations [i][j]>1) System.out.println("!!!!!! " +correlations [i][j]);
 			}
 
 		}

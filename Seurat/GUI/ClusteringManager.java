@@ -59,9 +59,11 @@ public class ClusteringManager{
         this.tree = tree;
 	//	this.getContentPane().setLayout(new BorderLayout());
 		
+        
+        root.add(Bics);
 		root.add(Rows);
 		root.add(Columns);
-		root.add(Bics);
+		
 		
 		//tree = new JTree(root);
 	/*
@@ -211,7 +213,7 @@ public class ClusteringManager{
 	
 public void addBiclustering(Biclustering bic) {
 		
-		root.add(Bics);
+		
 		DataTreeNode node = new DataTreeNode(bic.name);
 		node.cObject = bic;
 		

@@ -35,7 +35,7 @@ public class ConfusionsPlot extends JFrame implements IPlot {
 
 		this.setBounds(400, 0, (int) Math.min(800, Experiments1.Names.size()
 				* 80 + panel.abstandLinks + panel.abstandRechts), (int) Math
-				.min(800, Experiments2.Names.size() * 80 + 30));
+				.min(800, Experiments2.Names.size() * 80 + 30)+30);
 
 		this.setVisible(true);
 
@@ -1275,10 +1275,13 @@ class ConfusionsPanel extends JPanel implements KeyListener, MouseListener,
 		int height = this.getHeight() - 25;
 
 		int[][] counts = new int[matrix.length][matrix[0].length];
+		int[][] countsS = new int[matrix.length][matrix[0].length];
+		
 		for (int i = 0; i < matrix.length; i++) {
 			for (int j = 0; j < matrix[0].length; j++) {
 
 				counts[i][j] = matrix[Columns.elementAt(i)][Rows.elementAt(j)];
+				countsS[i][j] = isSelected[Columns.elementAt(i)][Rows.elementAt(j)];
 
 			}
 		}
@@ -1289,10 +1292,14 @@ class ConfusionsPanel extends JPanel implements KeyListener, MouseListener,
 		if (i < 0 || j < 0 || i >= counts.length || j >= counts[0].length)
 			return null;
 
-		if (e.isControlDown())
-			return counts[i][j] + "";
+		if (e.isControlDown() && counts[i][j]!=0) return "selected: "+ countsS[i][j] + "/"+ counts[i][j] + " (" + countsS[i][j]*100/counts[i][j] +"%)";
+		
+		
 		return null;
 	}
+	
+	
+	
 
 	public void mouseMoved(MouseEvent arg0) {
 		// TODO Auto-generated method stub

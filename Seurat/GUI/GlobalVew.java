@@ -1163,7 +1163,7 @@ class GlobalViewAbstractPanel extends JPanel implements MouseListener, IPlot,
 				public void actionPerformed(ActionEvent e) {
 					// createCorrelationGenes();
 
-					new ClusteringDialog(seurat, Rows, Columns, pixelW, pixelH);
+					new ClusteringDialog(seurat, Rows, Columns, pixelW, pixelH, Aggregation);
 
 				}
 			});
@@ -1174,7 +1174,7 @@ class GlobalViewAbstractPanel extends JPanel implements MouseListener, IPlot,
 				public void actionPerformed(ActionEvent e) {
 					// createCorrelationGenes();
 
-					new SeriationDialog(seurat, Rows, Columns, pixelW, pixelH);
+					new SeriationDialog(seurat, Rows, Columns, pixelW, pixelH,Aggregation);
 
 				}
 			});

@@ -77,12 +77,12 @@ public class ClusteringDialog extends JFrame {
 	
 	Vector<ISelectable> Rows;
 	
-	int pixelW = 1, pixelH = 1;
+	int pixelW = 1, pixelH = 1, aggregation;
 	
 	
 	DataManager dataManager;
 
-	public ClusteringDialog(Seurat seurat,Vector Rows, Vector Columns, int pixelW, int pixelH) {
+	public ClusteringDialog(Seurat seurat,Vector Rows, Vector Columns, int pixelW, int pixelH, int aggr) {
 		super("Clustering");
 		
 		System.out.println(">Clsutering Dialog  Rows: " + Rows.size() + " Columns: "+Columns.size());
@@ -91,6 +91,8 @@ public class ClusteringDialog extends JFrame {
 		this.setBounds(100, 270, 350, 190);
         this.pixelW = pixelW;
         this.pixelH = pixelH;
+        this.aggregation = aggr;
+        
 			
 		this.Rows = Rows;
 		
@@ -197,6 +199,8 @@ public class ClusteringDialog extends JFrame {
 					dataManager.ClusteringNumber++;
 					
 					globalView.applyNewPixelSize(dialog.pixelW,dialog.pixelH);
+		            if (aggregation > 0) globalView.gPanel.setAggregation(aggregation);
+
 
 					globalView.setLocation(350, 0);
 	                
@@ -274,10 +278,10 @@ public class ClusteringDialog extends JFrame {
 				}
 				
 				int aggr = 1;
-				while (count/dialog.seurat.settings.PixelH/aggr > 700) aggr++;
+				while (count*dialog.seurat.settings.PixelH/aggr > 700) aggr++;
 				 	
 				globalView.panel.Aggregation = aggr;
-				System.out.println("Aggregation: " + aggr);
+			
 				globalView.setLocation(350, 0);
 				globalView.panel.Model = dialog.seurat.settings.Model;
 				count = 0;
@@ -290,6 +294,8 @@ public class ClusteringDialog extends JFrame {
 				
 				
 				globalView.applyNewPixelSize(dialog.pixelW,dialog.pixelH);
+	            if (aggregation > 0) globalView.panel.setAggregation(aggregation);
+
 						//dialog.seurat.settings.PixelW,dialog.seurat.settings.PixelH);
                 
 				dialog.setVisible(false);
