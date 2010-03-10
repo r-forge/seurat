@@ -36,16 +36,15 @@ By launching SEURAT the data manager window will appear: <br>
 <p align="justify"> The data manager displays the different datasets
 and the corresponding variables loaded into SEURAT.
 Detailed information about each file and the variables stored can be
-accessed
-with a click on the name of the respective dataset.
-In addition the manager window shows the objects described by the
+accessed with a click on the name of the respective dataset.
+SERUAT provides a "Loadings Settings" menu where the user can specify the names of the 
+required columns. In addition the manager window shows the objects described by the
 datasets.
-These objects are genes, samples, CGH clones and chromosomes. Summary
-information about each single gene, sample and CGH clone can be
-accessed with
-a double click on the corresponding object ID. The lower margin of the
+These objects are genes, samples, CGH clones, SNPs and chromosomes. Summary
+information about each single gene, sample, CGH clone and SNP can be
+accessed with a double click on the corresponding objects. The lower margin of the
 data manager window displays the number of genes,
-samples and clones loaded and the proportion of objects currently
+samples, clones and SNPs loaded and the proportion of objects currently
 selected.
 At the top of the data manager window is the main panel from
 which most of the functions can be accessed: </p>
@@ -61,7 +60,9 @@ foreground and close all currently opened windows. This feuture is
 very important, since in practice while exploring the data many  
 windows can be opened. -->
     <li>&nbsp;&nbsp;&nbsp; -open/close different data files</li>
+    <li>&nbsp;&nbsp;&nbsp; -loadings settings</li>
     <li>&nbsp;&nbsp;&nbsp; -save data files</li>
+    <li>&nbsp;&nbsp;&nbsp; -close all data files</li>
     <li>&nbsp;&nbsp;&nbsp; -exit SEURAT</li>
   </ul>
   <li><b>Plots</b></li>
@@ -72,8 +73,9 @@ foreground and close all currently opened windows. This feuture is
 very important, since in practice while exploring the data many  
 windows can be opened. -->
     <li>&nbsp;&nbsp;&nbsp; -open heatmap plots for gene expression and
-array CGH data</li>
+genomic gain and loss information</li>
     <li>&nbsp;&nbsp;&nbsp; -open the chromosome map</li>
+    <li>&nbsp;&nbsp;&nbsp; -open an eventchart to display time to event data</li>
     <li>&nbsp;&nbsp;&nbsp; -perform clustering and seriation algorithms</li>
     <li>&nbsp;&nbsp;&nbsp; -open the confusion matrix to compare
 clustering results together with clinical variables</li>
@@ -136,7 +138,7 @@ case nearby expression values are automatically aggregated and
 visualized by one pixel.
 The lower margin of the heatmap plot shows the number of rows and
 columns and the aggregation ratio.
-The aggregation ratio can be changed with the arrow keys. </p>
+The aggregation ratio can be changed with the arrow keys. The </p>
 Pixel and color preferences of all heatmap plots can be changed under:<br>
 <br>
 <em><i>Plots &#8594; Pixel Settings </i></em> <br>
@@ -148,6 +150,9 @@ Pixel and color preferences of all heatmap plots can be changed under:<br>
 <div align="left"> <img src="images/settings2.png"
  style="margin: 20px 40px;"> </div>
 <div align="left"> <img src="images/settings3.png"
+ style="margin: 20px 40px;"> </div>
+By clicking the color bars a menu that allows to change the colors will appear.
+<div align="left"> <img src="images/colors2.png"
  style="margin: 20px 40px;"> </div>
 &nbsp; Additional options can be accessed with a right click on the
 heatmap. <br>
@@ -175,8 +180,11 @@ perform hierarchical clustering several linkage functions are
 available, including single, complete, and Ward. The distance measures
 and linkage functions for clustering genes and samples can be chosen
 independently. The results of hierarchical clustering are visualized by
-a reordered heatmap together with the resulting dendrograms. If the
-user specifies the number of gene and sample clusters and chooses a
+a reordered heatmap together with the resulting dendrograms.
+Within the "Count:" field the user can give the number of clusters in which the data set will be clustered.
+For k-means clustering the user has to specify the number of clusters and otherwise SEURAT will
+prompt a warning. In this context "Columns:" and "Rows:" represent sample and gene clusters.
+If the user specifies the number of gene and sample clusters and chooses a
 hierarchical clustering method, the dendrogram will be cut according to
 the number of clusters and will not be drawn.&nbsp; Instead, cluster
 boundaries will be drawn on the reordered heatmap, as for the results
@@ -186,9 +194,8 @@ data.</p>
 <div align="left"> <img src="images/dendro.png"
  style="margin: 20px 40px;"> </div>
 <p align="justify"> The results of two clusterings can be compared by a
-confusion matrix.
-This graphical tool displays objects falling into the same clusters by
-squares with size proportional to the number of objects. A function to
+confusion matrix. This graphical tool displays objects falling into the same clusters by
+rectangles with size proportional to the number of objects. A function to
 permutate the columns and the rows of the matrix to match the
 clusterings is available with a right click on the confusion matrix.
 In addition the confusion matrix can be used to compare the clustering
@@ -199,10 +206,113 @@ SEURAT provides several seriation algorithms available under: <br>
 <br>
 <em><i>Plots &#8594; Seriation</i> </em> <br>
 <br>
+Seriation algorithms aim to find an optimal linear ordering of objects according to some loss or merit function.
+This is a combinatorial problem that is hard to solve for all but small data sets.
+The number of possible solutions (permutations) grows with the problem size.
+Within SEURAT we provide the following seriation methods:
+<br>
+<br>
+<table border="1">
+  <tr>
+    <td>PCA</td>
+    <td>Principle Component Analysis</td>
+    <td><p>Uses the projection of the data on its first principal
+     component to determine the order.</p></td>
+  </tr>
+  <tr>
+    <td>MDS</td>
+    <td>Multidimensional Scaling</td>
+    <td><p>Use multidimensional scaling techniques to find an linear
+          order.</p></td>
+  </tr>
+  <tr>
+    <td>BEA</td>
+    <td>Bond energy algorithm</td>
+    <td><p>Heuristic procedure to rearrange the columns and rows of a matrix such that each entry is as closely
+     numerically related to its four neighbors as possible. The algorithm tries to maximize the measure of effectiveness
+     of a non-negative matrix.</p></td>
+  </tr>
+  <tr>
+    <td>ARSA</td>
+    <td>Anti-Robinson seriation by simulated annealing </td>
+    <td><p>A simulated annnealing approach that finds a linear order by bringing the dissimilarity matrix
+     into perfect anti-Robinson form</p></td>
+  </tr>
+  <tr>
+    <td>BBURCG</td>
+    <td>Anti-Robinson seriation (unweighted)</td>
+    <td><p>A unweighted branch and bound approach that finds a linear order by bringing the dissimilarity matrix
+     into perfect anti-Robinson form</p></td>
+  </tr>
+  <tr>
+    <td>BBWRCG</td>
+    <td>Anti-Robinson seriation (weighted)  </td>
+    <td><p>A weighted branch and bound approach that finds a linear order by bringing the dissimilarity matrix
+     into perfect anti-Robinson form</p></td>
+  </tr>
+  <tr>
+    <td>TSP</td>
+    <td>Traveling salesperson problem solver</td>
+    <td><p>Seriation by minimizing the length of a Hamiltonian path through a graph is equal to solving
+		a traveling salesperson problem. The goal is to find the shortest tour that, starting from a given city (object), visits
+		each city in a given list exactly once and then returns to the starting city.</p></td>
+  </tr
+  <tr>
+    <td>Chen</td>
+    <td>Rank-two ellipse seriation</td>
+    <td><p>Finds a rank two correlation matrix of the original distance matrix. Projecting all points in this matrix on the first two
+          eigenvectors, all points fall on an ellipse. The order of the points on this ellipse is the resulting order.
+</p></td>
+  </tr>
+</table>
+<br>
+<br>
+In case of large data set, e.g. >500 gene, we strongly recommend to use onyl PCA, MDS and the BEA.
+All other methods aim to find exact solutions to the seriation problem and are thus extremly time consuming.   
 More information about the implemented seriation algorithms can be
-found <a
- href="http://cran.r-project.org/web/packages/seriation/vignettes/seriation.pdf"
- target="_blank">here</a>.
+found <a href="http://cran.r-project.org/web/packages/seriation/vignettes/seriation.pdf"
+target="_blank">here</a>.
+<div align="left"> <img src="images/seriation.png"
+ style="margin: 20px 40px;"> </div>
+Besides classical one-way clustering approaches we provide some biclustering algorithms that are available under: <br>
+<br>
+<em><i>Plots &#8594; Biclustering</i> </em> <br>
+<br>
+Biclustering is the simultaneous clustering of rows and
+columns of a data matrix. Ordinary one-way clustering algorithms cluster objects using the complete
+feature space, e.g. a clustering of the genes with respect to the gene expression values of all patients.
+Biclustering algorithms take into account that correlations between genes may only be present for a
+subset of patients and vice versa. In addition, biclustering algorithms do not assign all objects to a
+cluster and depending on the biclustering algorithm
+resulting biclusters are allowed to overlap. Genes
+that are members of more than one bicluster may
+be regarded as being involved in more than one biological process. Until know SEURAT offers two biclustering algorithms:
+<br>
+<br>
+<table border="1">
+  <tr>
+    <td>Bimax</td>
+    <td><p>A fast divide and conquer approach that needs a binary input data matrix.
+    Thus the gene expression matrix has to be binarized beforehand. 
+    For binarization the user can choose the proportion of ones and the type of regulation, e.g. 
+    up- or down regulation.    
+    </p></p></td>
+  </tr>
+  <tr>
+    <td>Plaid Model</td>
+    <td><p> The Plaid Model algorithm fits an additive model of possible overlapping layers to the gene expression matrix.
+    Each layer/bicluster corresponds to a two-way ANOVA model with additive gene and sample effects.
+    The user can specify the row- and column release thresholds that are used for pruning ill fitting genes and samples.
+    We recommend to use parameters in the range of 0.5 to 0.7. Smaller thresholds will result in larger biclusters.
+    The importance of each layer is tested against layers returned after random permutations. 
+    With the parameter shuffle iterations the user can specify the number of random permutations.
+    Increasing this parameter will result in less but more important (e.g. strong gene and sample effects) biclusters.      
+    </p></td>
+  </tr>
+  
+</table>
+
+ 
 <br>
 <br>
 <h2>Exploring gene annotations and clinical data</h2>
@@ -231,19 +341,36 @@ colors of the samples falling into the different classes.</p>
 <object width="425" height="344"><param name="movie" value="http://www.youtube.com/v/iOfBEtn1TvU"></param><param name="allowFullScreen" value="true"></param><param name="allowscriptaccess" value="always"></param><embed src="http://www.youtube.com/v/iOfBEtn1TvU" type="application/x-shockwave-flash" allowscriptaccess="always" allowfullscreen="true" width="425" height="344"></embed></object>
 </div>
 <br></br>
+<p align="justify">
+For many clinicians some of the most interesting clinical data collected are survival times and other time to event data. 
+Often, interest lies in how time to event data is related to certain gene expression patterns or genomic variations.
+In SEURAT time to event data can be visualized by so called eventcharts.
+Eventcharts display each individual observation by horizontal lines and this representation.
+When dealing with time to event data,
+possible censoring has to be considered. 
+To display observed events within the eventcharts a small vertical bar is drawn at the end of the horizontal line.
+A missing bar indicates that the event of interest has not been observed and thus the observation time is censored.  
+With right click on the eventchart it is possible to reorder and 
+group the horizontal time lines according to other clinical variables.<p>
+<br>
+<em><i> Plots &#8594; EventChart</i> </em> <br>
+<br>
+<div align="left"> <img src="images/eventchart.png"
+ style="margin: 20px 40px;"> </div> 
+<br></br>
 <p></p>
+
 <br>
 <br>
 <h2>Chromosome map</h2>
 <hr>
 <br>
 <p align="justify">
-If array CGH data is available, SEURAT offers a chromosome map.
+If array CGH or SNP array data is available, SEURAT offers a chromosome map.
 This plot displays all chromosomes together with the relative number of
 samples showing a genetical change.
-For each array CGH clone along the chromosome a red bar corresponds
-to the relative number of samples
-showing a genetic gain and the green bar displays the relative number of
+For each array CGH clone or SNP along the chromosome a red bar corresponds
+to the relative number of samples showing a genetic gain and the green bar displays the relative number of
 losses of the respective DNA segment.</p>
 The chromosome map is available under:<br>
 <br>
@@ -252,10 +379,9 @@ The chromosome map is available under:<br>
 <div align="left"> <img src="images/karyotype.png"
  style="margin: 20px 40px;"> </div>
 <p align="justify"> The single chromosome plot can be opened via the
-data manager with a double click
-on the name of the chromosome of interest. In addtition to the red and
+data manager with a double click on the name of the chromosome of interest. In addtition to the red and
 green bars showing the relative number of different genetical states,
-this plot also displays the single cytobands where the array CGH clones
+this plot also displays the single cytobands where the array CGH clones or SNPs
 are located.</p>
 <br></br><br></br>
 <div align="left">
