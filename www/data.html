@@ -22,8 +22,15 @@ microarray data</title>
 <p align="justify">
 All data files have to be in tab delimited ascii format and missing
 values should be labeled "NA". Example files are available in the <a
- href="down.html" target="PageRechts">Download and Installation</a>
-section.</p>
+href="down.html" target="PageRechts">Download and Installation</a>
+section. In the following we will describe the required data formats for the different data types.
+The names of the required columns can deviate from that in the description.
+In this case the user has to change the naming of the required columns in the "Loading Settings" menu.</p>
+<br>
+<em><i>File &#8594; Loading Settings</i></em>
+<br>   
+<div align="left"> <img src="images/loading.png"
+ style="margin: 20px 40px;"> </div>
 <br>
 <br>
 <h2>Gene expression data</h2>
@@ -112,6 +119,25 @@ clones on the same chromosome). See the example for details:</p>
 <br>
 <pre>CloneID ChromosomeNumber ChrStart ChrEnd Mapping ChromosomeCen sample.1.States ... sample.n.States<br>clone.1        1            145     605       1q41     124300000         1                    0<br>clone.2       22            11233   12034     22q13    11800000          -1                   1 <br>...<br>clone.w        X            NA      NA        Xq22     59500000          0                    -1 <br><pre>  <br><br>
 </pre></pre>
+<br>
+<h2>SNP array data</h2>
+<hr>
+<p align="justify">
+Like the array CGH data also the SNP array data need to be preprocessed. 
+To normalize Affymetrix SNP chips (Genome-Wide Human SNP Arrays 6.0), we used the R package <a href="http://cran.r-project.org/web/packages/aroma.affymetrix/index.html" target="_blank"> aroma.affymetrix</a>. 
+A detailed R script descriping the preprocessing of Affymerix exon arrays (GeneChip Human Exon 1.0 ST Arrays) and SNP chips is available in the download section.
+The first column of the snp file contains the SNPIDs. To link the states of the SNPs with the samples, a column with the name
+"samplename.States" is needed for each sample. These columns contain
+the result of the segmentation algorithm and the entries are "-1","0"
+or "1", which correspond to a cytogenetic loss, no change or gain.<br>
+To link the SNP data with the gene expression data, the following 
+columns are needed: "ChromosomeNumber", "Physical.position",
+"ChromosomeCen" and "Mapping".</p>
+<br>
+<br>
+<pre>SNPID ChromosomeNumber Physical.position Mapping ChromosomeCen sample.1.States ... sample.n.States<br>SNP.1        1                    555	    1q41     124300000         1                    0<br>SNP.2       22                    33030     22q13    11800000          -1                   1 <br>...<br>SNP.w        X                    NA        Xq22     59500000          0                    -1 <br><pre>  <br><br>
+</pre></pre>
+</p>
 </div>
 </body>
 </html>
