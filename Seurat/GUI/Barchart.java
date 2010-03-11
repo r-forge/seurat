@@ -323,8 +323,11 @@ class BarchartPanel extends JPanel implements KeyListener, MouseListener,
 
 	public void removeColoring() {
 
+		
 		boolean removed = false;
 		for (int i = 0; i < this.variables.size(); i++) {
+			if (this.getVariable(i) instanceof Variable) {
+			
 			int index = ((Variable) this.getVariable(i)).getBarchartToColors()
 					.indexOf(barchart);
 			if (index != -1) {
@@ -334,6 +337,7 @@ class BarchartPanel extends JPanel implements KeyListener, MouseListener,
 						.remove(index);
 				removed =  true;
 			}
+			}
 		}
 
 		for (int i = 0; i < balken.size(); i++) {
@@ -342,6 +346,8 @@ class BarchartPanel extends JPanel implements KeyListener, MouseListener,
 
 		}
 		seurat.repaintWindows();
+		
+	
 
 	}
 
