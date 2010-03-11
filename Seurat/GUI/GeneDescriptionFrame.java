@@ -348,7 +348,7 @@ public class GeneDescriptionFrame extends JFrame {
 		{
 			boolean found = false;
 			for (int j = i; j < seurat.dataManager.Genes.size(); j++) {
-				if (indexVar.stringData [i].equals(seurat.dataManager.Genes.elementAt(j).getName())) {
+				if (indexVar.stringData [i].contains(seurat.dataManager.Genes.elementAt(j).getName().replace("\"",""))) {
 					AnnGenes.elementAt(i).gene = (seurat.dataManager.Genes.elementAt(j));
 					seurat.dataManager.Genes.elementAt(j).annGene = AnnGenes.elementAt(i);
 					found = true;
@@ -357,7 +357,7 @@ public class GeneDescriptionFrame extends JFrame {
 			}
 			if (!found) {
 			for (int j = 0; j < Math.min(i,seurat.dataManager.Genes.size()); j++) {
-				if (indexVar.stringData [i].equals(seurat.dataManager.Genes.elementAt(j).getName())) {
+				if (indexVar.stringData [i].contains(seurat.dataManager.Genes.elementAt(j).getName().replace("\"",""))) {
 					AnnGenes.elementAt(i).gene = (seurat.dataManager.Genes.elementAt(j));
 					seurat.dataManager.Genes.elementAt(j).annGene = AnnGenes.elementAt(i);
 					found = true;
