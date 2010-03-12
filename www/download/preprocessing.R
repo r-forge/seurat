@@ -9,8 +9,7 @@ library(aroma.affymetrix)
 verbose <- Arguments$getVerbose(-1, timestamp=TRUE)
 
 #gettingAnnotation
-#Note folder structure has to be /project/annotationData/<chipType>
-#custom cdfs have a tag
+#Note that the folder structure has to be /project/annotationData/<chipType>
 #Affymetrix provides clusterings of the exon probesets that are meant 
 #to roughly correspond to genes (see Affymetrix documentation).
 #An advantage of these groupings of the exons is that each exon and
@@ -25,7 +24,7 @@ cdf <- AffymetrixCdfFile$byChipType(chipType, tags="coreR3,A20071112,EP")
 print(cdf)
 
 #Defining CEL set 
-cs <- AffymetrixCelSet$byName("ExonLars", cdf=cdf)
+cs <- AffymetrixCelSet$byName("myExonChips", cdf=cdf)
 print(cs)
 # RMA backgroundCorrection
 bc <- RmaBackgroundCorrection(cs, tag="coreR3")
