@@ -125,7 +125,7 @@ class GlobalView extends JFrame implements MatrixWindow, IPlot {
 	
 	public GlobalView(Seurat seurat, String name, ClusterNode columns,ClusterNode rows) {
 		super(name);
-		create(seurat, name, columns.getOrder(), rows.getOrder());
+		create(seurat, name, columns.getFirstOrder(), rows.getFirstOrder());
 		
 		
 			gPanel.clustering = true;
@@ -1158,6 +1158,69 @@ class GlobalViewAbstractPanel extends JPanel implements MouseListener, IPlot,
 
 			}
 
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			if (Rows.elementAt(0) instanceof Clone) {
+
+				JMenu m = new JMenu("Sort Rows by");
+
+				item = new JMenuItem("Original Order");
+				item.addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent e) {
+						// createCorrelationGenes();
+
+						Rows = originalRows;
+						paintDendrRows = true;
+						if (nodeZeilen != null) {
+							abstandLinks = 150;
+							globalView.setSize(globalView.getWidth() + 149,
+									globalView.getHeight());
+						}
+						calculateMatrixValues();
+						updateSelection();
+					}
+				});
+				m.add(item);
+
+				item = new JMenuItem("Chromosome Position");
+				item.addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent e) {
+						// createCorrelationGenes();
+
+						sortClonesByChrPosition();
+					}
+				});
+				m.add(item);
+
+				menu.add(m);
+
+			}
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
 			item = new JMenuItem("Clustering");
 			item.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
@@ -1490,6 +1553,71 @@ class GlobalViewAbstractPanel extends JPanel implements MouseListener, IPlot,
 		updateSelection();
 
 	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	public void sortClonesByChrPosition() {
+
+		Vector<Vector<Clone>> Chromosomes = new Vector();
+
+		for (int i = 0; i < Rows.size(); i++) {
+			Clone clone = (Clone) Rows.elementAt(i);
+			String chr = "NA";
+			if (clone.chromosome != null)
+				chr = clone.chromosome.name;
+
+			double pos = clone.chrStart;
+
+			Vector<Clone> genes = findCloneChrInList(Chromosomes, chr);
+
+			if (genes == null) {
+				genes = new Vector();
+				genes.add(clone);
+				Chromosomes.add(genes);
+			} else {
+
+				insertClone(clone, genes);
+			}
+
+		}
+
+		Chromosomes = sortCloneChromosomes(Chromosomes);
+
+		Rows = new Vector();
+		for (int i = 0; i < Chromosomes.size(); i++) {
+			for (int j = 0; j < Chromosomes.elementAt(i).size(); j++) {
+				Rows.add(Chromosomes.elementAt(i).elementAt(j));
+				// System.out.println(Chromosomes.elementAt(i).elementAt(j).getName());
+			}
+		}
+
+		// System.out.println("New Row Size " + Rows.size());
+
+		paintDendrRows = false;
+		if (nodeZeilen != null) {
+			abstandLinks = 1;
+			globalView.setSize(globalView.getWidth() - 149, globalView
+					.getHeight());
+		}
+
+		calculateMatrixValues();
+		updateSelection();
+
+	}
+	
+	
+	
+	
+	
+	
+	
+	
 
 	public static Vector<Vector<Gene>> sortChromosomes(
 			Vector<Vector<Gene>> stringBuffer) {
@@ -1524,6 +1652,55 @@ class GlobalViewAbstractPanel extends JPanel implements MouseListener, IPlot,
 		return newBuffer;
 
 	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	public static Vector<Vector<Clone>> sortCloneChromosomes(
+			Vector<Vector<Clone>> stringBuffer) {
+
+		Vector<Vector<Clone>> newBuffer = new Vector();
+		for (int i = 0; i < stringBuffer.size(); i++)
+			newBuffer.add(stringBuffer.elementAt(i));
+
+		for (int i = 0; i < stringBuffer.size(); i++) {
+			for (int j = 0; j < stringBuffer.size(); j++) {
+
+				String s1 = "NA";
+				if (newBuffer.elementAt(i).elementAt(0).chromosome != null)
+					s1 = newBuffer.elementAt(i).elementAt(0).chromosome.name;
+
+				String s2 = "NA";
+				if (newBuffer.elementAt(j).elementAt(0).chromosome != null)
+					s2 = newBuffer.elementAt(j).elementAt(0).chromosome.name;
+
+				if (Tools.compareLexicoChr(s1, s2)) {
+					if (i < j) {
+
+						Vector<Clone> o = (Vector<Clone>) newBuffer.elementAt(j);
+
+						newBuffer.set(j, newBuffer.elementAt(i));
+						newBuffer.set(i, o);
+
+					}
+				}
+			}
+		}
+		return newBuffer;
+
+	}
+
+	
+	
+	
+	
+	
 
 	/*
 	 * setzt Gene in eine Liste, so dass die Gene der Liste nach
@@ -1533,6 +1710,22 @@ class GlobalViewAbstractPanel extends JPanel implements MouseListener, IPlot,
 		boolean insert = true;
 		for (int i = 0; i < genes.size(); i++) {
 			if (gene.nucleotideStart <= genes.elementAt(i).nucleotideStart) {
+				genes.insertElementAt(gene, i);
+				insert = false;
+				break;
+			}
+		}
+		if (insert)
+			genes.add(gene);
+	}
+	
+	
+	
+	
+	public void insertClone(Clone gene, Vector<Clone> genes) {
+		boolean insert = true;
+		for (int i = 0; i < genes.size(); i++) {
+			if (gene.chrStart <= genes.elementAt(i).chrStart) {
 				genes.insertElementAt(gene, i);
 				insert = false;
 				break;
@@ -1553,6 +1746,22 @@ class GlobalViewAbstractPanel extends JPanel implements MouseListener, IPlot,
 		}
 		return null;
 	}
+	
+	
+	
+	public Vector<Clone> findCloneChrInList(Vector<Vector<Clone>> Chromosomes, String s) {
+		for (int i = 0; i < Chromosomes.size(); i++) {
+			String name = "NA";
+
+			if (Chromosomes.elementAt(i).elementAt(0).chromosome != null)
+				name = Chromosomes.elementAt(i).elementAt(0).chromosome.name;
+			if (name.equals(s))
+				return Chromosomes.elementAt(i);
+		}
+		return null;
+	}
+	
+	
 
 	public Vector<ClusterNode> union(Vector<ClusterNode> Nodes, int c1, int c2,
 			double height) {
