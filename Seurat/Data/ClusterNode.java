@@ -22,6 +22,7 @@ public class ClusterNode {
 	
 	public boolean isRows;
 	
+	public boolean firstOrder = true;
 	
 	public ClusterNode(Vector<ISelectable> cases) {
 		this.Cases = cases;
@@ -80,6 +81,28 @@ public class ClusterNode {
 		return orderL;
 	}
 
+	
+	
+	public Vector<ISelectable> getFirstOrder() {
+
+		if (firstOrder) {
+		
+		
+			Vector<ISelectable> order = getOrder();
+			
+			
+		firstOrder = false;
+		return order;
+		}
+		return Cases;
+	}
+	
+	
+	
+	
+	
+	
+	
 	
 	public ClusterNode(int ClusterNumber, ISelectable item) {
 		this.ClusterNumber = ClusterNumber;

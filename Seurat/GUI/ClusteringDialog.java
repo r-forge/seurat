@@ -34,7 +34,8 @@ public class ClusteringDialog extends JFrame {
 	
 	
 	
-	JButton okBtn = new JButton("Ok");
+	JButton okBtn1 = new JButton("Ok");
+	JButton okBtn2 = new JButton("Ok");
 	
 	
 	/*"euclidean", "maximum", "manhattan", "canberra" "binary" "pearson", "correlation", "spearman" or "kendall"
@@ -43,22 +44,34 @@ public class ClusteringDialog extends JFrame {
 	
 
 	String[] ClusteringMethods = { "ward", "single", "complete", "average",
-			"mcquitty", "kmeans"};
+			"mcquitty", "kmeans","none"};
 
 	String[] Distance = { "euclidean", "maximum", "manhattan", "canberra",
 			"binary", "pearson",  "spearman" , "kendall"};
 
-	JComboBox boxColumns = new JComboBox(ClusteringMethods);
+	JComboBox boxColumns1 = new JComboBox(ClusteringMethods);
 
-	JComboBox boxDColumns = new JComboBox(Distance);
+	JComboBox boxDColumns1 = new JComboBox(Distance);
 
-	JComboBox boxRows = new JComboBox(ClusteringMethods);
+	JComboBox boxRows1 = new JComboBox(ClusteringMethods);
 
-	JComboBox boxDRows = new JComboBox(Distance);
+	JComboBox boxDRows1 = new JComboBox(Distance);
+	
+	
+	
+	JComboBox boxColumns2 = new JComboBox(ClusteringMethods);
 
-	String[] SeriationControl = {};
+	JComboBox boxDColumns2 = new JComboBox(Distance);
 
-	String[] SeriationDistance = {};
+	JComboBox boxRows2 = new JComboBox(ClusteringMethods);
+
+	JComboBox boxDRows2 = new JComboBox(Distance);
+	
+	
+
+//	String[] SeriationControl = {};
+
+	//String[] SeriationDistance = {};
 
 	Seurat seurat;
 
@@ -81,7 +94,378 @@ public class ClusteringDialog extends JFrame {
 	
 	
 	DataManager dataManager;
+	
+	
+	
+	public ClusteringDialog(Seurat seurat,Vector Rows, Vector Columns, int pixelW, int pixelH, int aggr) {
+		super("Clustering");
+		
+		System.out.println(">Clsutering Dialog  Rows: " + Rows.size() + " Columns: "+Columns.size());
+		this.seurat = seurat;
+		this.dataManager = seurat.dataManager;
+		this.setBounds(100, 270, 380, 240);
+        this.pixelW = pixelW;
+        this.pixelH = pixelH;
+        this.aggregation = aggr;
+        
+			
+		this.Rows = Rows;
+		
+		this.Columns = Columns;
+		
+		JTabbedPane tPanel = new JTabbedPane();
+		
+		
+		this.getContentPane().setLayout(new BorderLayout());
+		
+		
+		
+		
+		
+		
+		JPanel panel = new JPanel();
+		panel.setLayout(new GridLayout(3,3));
 
+		panel.add(new JLabel("   "));
+        panel.add(new JLabel("Columns:"));
+        panel.add(new JLabel("Rows:"));
+
+				
+		panel.add(new JLabel("Method:       "));
+	
+		JPanel panel2 = new JPanel();
+		panel2.add(boxColumns1);
+		panel.add(panel2);
+		
+		panel2 = new JPanel();
+		panel2.add(boxRows1);
+		panel.add(panel2);
+
+		
+		
+		panel.add(new JLabel("Distance:    "));
+		
+		panel2 = new JPanel();
+		panel2.add(boxDColumns1);
+		panel.add(panel2);
+		
+		
+		panel2 = new JPanel();
+		panel2.add(boxDRows1);
+		panel.add(panel2);
+
+	
+
+	//	panel.setBorder(BorderFactory.createEtchedBorder());
+		
+		JPanel p = new JPanel();
+		p.setLayout(new BorderLayout());
+		p.add(panel,BorderLayout.CENTER);
+		
+		panel = new JPanel();
+		panel.setLayout(new BorderLayout());
+	    panel.add(okBtn1, BorderLayout.EAST);
+	    
+	    p.add(panel,BorderLayout.SOUTH);
+	    
+	    this.setResizable(false);
+		
+		okBtn1.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				String methodColumns = boxColumns1.getSelectedItem().toString();
+				String DistanceColumns = boxDColumns1.getSelectedItem()
+						.toString();
+
+				String methodRows = boxRows1.getSelectedItem().toString();
+				String DistanceRows = boxDRows1.getSelectedItem().toString();
+				
+				ClusteringManager cManager = dialog.seurat.getClusteringManager();
+				
+					
+					
+					if (!methodRows.equals("none")) {
+						calculateClustersZeilen(methodRows, DistanceRows);
+						
+						nodeZeilen.name = " Clustering" +  "(\""+methodRows+","+DistanceRows+"\")";
+						nodeZeilen.isRows = true;
+						cManager.addRowsClustering(nodeZeilen);
+					}
+					else {
+                        nodeZeilen = new ClusterNode(dialog.Rows);
+                        nodeZeilen.getFirstOrder();
+                        nodeZeilen.Cases = dialog.Rows;
+						nodeZeilen.name = " Clustering: none";
+						nodeZeilen.isRows = true;
+
+					}
+					
+					
+					if (!methodColumns.equals("none")) {
+						calculateClustersSpalten(methodColumns, DistanceColumns);
+						nodeSpalten.name = " Clustering"  + "(\""+methodColumns+","+DistanceColumns+"\")";
+						nodeSpalten.isRows = false;
+						cManager.addColumnsClustering(nodeSpalten);
+						
+					}
+					else {
+                        nodeSpalten = new ClusterNode(dialog.Columns);
+                        nodeSpalten.getFirstOrder();
+                        nodeSpalten.Cases = dialog.Columns;
+						nodeSpalten.name = " Clustering: none";
+						nodeSpalten.isRows = false;
+
+					}
+					
+					
+					
+					
+					
+					GlobalView globalView = new GlobalView(dialog.seurat,
+							"Clustering" + dataManager.ClusteringNumber, nodeSpalten,nodeZeilen);
+
+					if (methodColumns.equals("none")) globalView.gPanel.abstandOben = 2;
+					if (methodRows.equals("none")) globalView.gPanel.abstandLinks = 2;
+					
+					
+					dataManager.ClusteringNumber++;
+					
+					globalView.applyNewPixelSize(dialog.pixelW,dialog.pixelH);
+		            if (aggregation > 0) globalView.gPanel.setAggregation(aggregation);
+
+
+					globalView.setLocation(350, 0);
+	                
+					dialog.setVisible(false);
+					return;
+				
+				
+			}
+		});
+
+		
+		tPanel.addTab("Hierarchical clustering", p);
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+
+		panel = new JPanel();
+		panel.setLayout(new GridLayout(4,3));
+
+		panel.add(new JLabel("   "));
+
+		panel.add(new JLabel("Columns:"));
+
+		panel.add(new JLabel("Rows:"));
+
+		
+		
+		
+		
+		panel.add(new JLabel("Count:"));
+
+		panel.add(fieldC);
+
+		panel.add(fieldR);
+		
+		
+		panel.add(new JLabel("Method:       "));
+		
+		
+		
+		panel2 = new JPanel();
+		panel2.add(boxColumns2);
+		panel.add(panel2);
+		
+		
+		panel2 = new JPanel();
+		panel2.add(boxRows2);
+		panel.add(panel2);
+
+		panel.add(new JLabel("Distance:    "));
+		
+		panel2 = new JPanel();
+		panel2.add(boxDColumns2);
+		panel.add(panel2);
+		
+		
+		panel2 = new JPanel();
+		panel2.add(boxDRows2);
+		panel.add(panel2);
+
+	
+
+	//	panel.setBorder(BorderFactory.createEtchedBorder());
+		
+		p = new JPanel();
+		p.setLayout(new BorderLayout());
+		p.add(panel,BorderLayout.CENTER);
+		
+		
+		
+		panel = new JPanel();
+		panel.setLayout(new BorderLayout());
+	    panel.add(okBtn2, BorderLayout.EAST);
+	    
+	    p.add(panel,BorderLayout.SOUTH);
+	    
+	    this.setResizable(false);
+		
+		
+		
+		okBtn2.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				String methodColumns = boxColumns2.getSelectedItem().toString();
+				String DistanceColumns = boxDColumns2.getSelectedItem()
+						.toString();
+
+				String methodRows = boxRows2.getSelectedItem().toString();
+				String DistanceRows = boxDRows2.getSelectedItem().toString();
+				
+				
+				int nR = 0;
+				int nC = 0;
+				
+				
+				if (!fieldR.getText().equals("")) nR= Integer.parseInt(fieldR.getText());
+				
+				if (!fieldC.getText().equals("")) nC= Integer.parseInt(fieldC.getText());
+					
+				if (methodRows.equals("none")) {
+					nR = 1; 
+					
+				}
+				if (methodColumns.equals("none")) {
+					nC = 1; 
+					
+				}
+				
+				
+				
+				
+			 long time = System.currentTimeMillis();
+				
+				Vector<Vector<ISelectable>> Gens = new Vector();
+				if (nR != 0) {
+					if (!methodRows.equals("none")) Gens = calculateClustersZeilen(nR, methodRows, DistanceRows);
+					else Gens = calculateClustersZeilen(nR, "ward", DistanceRows);
+				}
+				else {
+					
+					Gens.add(dialog.Rows);
+				}
+				
+				
+				Vector<Vector<ISelectable>> Exps = new Vector();
+				if (nC != 0) {
+					if (!methodColumns.equals("none")) Exps = calculateClustersSpalten(nC, methodColumns, DistanceColumns);
+					else Exps = calculateClustersSpalten(nC, "ward", DistanceColumns);
+				}
+				else {
+					
+					Exps.add(dialog.Columns);
+				}
+				
+				System.out.println((System.currentTimeMillis() - time)/1000);
+				
+					
+				Vector<String> GeneNames = new Vector();
+				for (int i = 0; i < Gens.size(); i++) {
+					GeneNames.add(""+i);
+				}
+				
+				
+				
+				Vector<String> ExpsNames = new Vector();
+				for (int i = 0; i < Gens.size(); i++) {
+					ExpsNames.add(""+i);
+				}
+				
+				Clustering cR = new Clustering(" Clustering"+dataManager.ClusteringNumber+"(\""+methodRows + " , " + DistanceRows + " , "+nR + "\")", Gens,GeneNames, true);
+				Clustering cC = new Clustering(" Clustering"+dataManager.ClusteringNumber+"(\""+methodColumns + " , " + DistanceColumns + " , "+nC+ "\")", Exps,ExpsNames, false);
+								dialog.seurat.dataManager.GeneClusters.insertElementAt(cR,0);
+				dialog.seurat.dataManager.ExpClusters.insertElementAt(cC,0);
+				
+				
+				ClusteringManager cManager = dialog.seurat.getClusteringManager();
+				cManager.addRowsClustering(cR);
+				cManager.addColumnsClustering(cC);
+				
+				dialog.seurat.repaint();
+				
+				
+
+				KMeansView globalView = new KMeansView(dialog.seurat,
+						"Clustering"+ dataManager.ClusteringNumber, cC,cR);
+				
+				
+				dataManager.ClusteringNumber++;
+				
+
+				
+				int count = 0;
+				for (int i = 0; i < Gens.size(); i++) {
+					count+=Gens.elementAt(i).size();
+				}
+				
+				int aggr = 1;
+				while (count*dialog.seurat.settings.PixelH/aggr > 700) aggr++;
+				 	
+				globalView.panel.Aggregation = aggr;
+			
+				globalView.setLocation(350, 0);
+				globalView.panel.Model = dialog.seurat.settings.Model;
+				count = 0;
+				for (int i = 0; i < Exps.size(); i++) {
+					count+=Exps.elementAt(i).size();
+				}
+				
+				
+ 
+				
+				
+				globalView.applyNewPixelSize(dialog.pixelW,dialog.pixelH);
+	            if (aggregation > 0) globalView.panel.setAggregation(aggregation);
+
+						//dialog.seurat.settings.PixelW,dialog.seurat.settings.PixelH);
+                
+				dialog.setVisible(false);
+			}
+		});
+		
+		
+		tPanel.addTab("k-Means clustering", p);
+		
+		
+		
+		this.getContentPane().add(tPanel,BorderLayout.CENTER);
+		
+
+		
+
+		this.setVisible(true);
+	}
+	
+	
+	
+	
+	
+	
+	
+/*
 	public ClusteringDialog(Seurat seurat,Vector Rows, Vector Columns, int pixelW, int pixelH, int aggr) {
 		super("Clustering");
 		
@@ -305,7 +689,7 @@ public class ClusteringDialog extends JFrame {
 		this.setVisible(true);
 	}
 	
-	
+	*/
 	
 	
 
