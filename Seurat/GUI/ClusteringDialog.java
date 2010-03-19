@@ -43,27 +43,30 @@ public class ClusteringDialog extends JFrame {
 	
 	
 
-	String[] ClusteringMethods = { "ward", "single", "complete", "average",
+	String[] ClusteringMethods1 = { "ward", "single", "complete", "average",
+			"mcquitty","none"};
+	
+	String[] ClusteringMethods2 = { "ward", "single", "complete", "average",
 			"mcquitty", "kmeans","none"};
 
 	String[] Distance = { "euclidean", "maximum", "manhattan", "canberra",
 			"binary", "pearson",  "spearman" , "kendall"};
 
-	JComboBox boxColumns1 = new JComboBox(ClusteringMethods);
+	JComboBox boxColumns1 = new JComboBox(ClusteringMethods1);
 
 	JComboBox boxDColumns1 = new JComboBox(Distance);
 
-	JComboBox boxRows1 = new JComboBox(ClusteringMethods);
+	JComboBox boxRows1 = new JComboBox(ClusteringMethods1);
 
 	JComboBox boxDRows1 = new JComboBox(Distance);
 	
 	
 	
-	JComboBox boxColumns2 = new JComboBox(ClusteringMethods);
+	JComboBox boxColumns2 = new JComboBox(ClusteringMethods2);
 
 	JComboBox boxDColumns2 = new JComboBox(Distance);
 
-	JComboBox boxRows2 = new JComboBox(ClusteringMethods);
+	JComboBox boxRows2 = new JComboBox(ClusteringMethods2);
 
 	JComboBox boxDRows2 = new JComboBox(Distance);
 	
@@ -447,7 +450,7 @@ public class ClusteringDialog extends JFrame {
 		});
 		
 		
-		tPanel.addTab("k-Means clustering", p);
+		tPanel.addTab("Partitioning", p);
 		
 		
 		
