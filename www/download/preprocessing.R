@@ -18,7 +18,7 @@ verbose <- Arguments$getVerbose(-1, timestamp=TRUE)
 #Affymetrix does not provide a cdf for these mappings, but Ken Simpson created such 
 #cdfs based on the design-time annotation.
 #The cdfs are avaialble at:
-#http://groups.google.com/group/aroma-affymetrix/web/affymetrix-defined-transcript-clusters
+#http://www.aroma-project.org/node/122
 chipType <- "HuEx-1_0-st-v2"
 cdf <- AffymetrixCdfFile$byChipType(chipType, tags="coreR3,A20071112,EP")
 print(cdf)
@@ -100,7 +100,7 @@ write.table(anno,file="transannoFull.txt",sep="\t",row.names=F,col.names=T)
 
 
 #2. Copy Number Analysis of Whole Genome 6.0 SNP-Chips using aroma.affymetrix
-#http://groups.google.com/group/aroma-affymetrix/web/total-copy-number-analysis-6-0
+#http://www.aroma-project.org/node/15
 #####################################################################################
 #setup
 rm(list=ls())
@@ -112,7 +112,7 @@ verbose <- Arguments$getVerbose(-8, timestamp=TRUE)
 #and place it in the folder /annotationData/chipTypes/GenomeWideSNP_6/
 #Within this folder you will also need the according UGP (Unit Genome 
 #Position) and UFL (Unit Fragment-Length) files. Both available at:
-#http://groups.google.com/group/aroma-affymetrix/web/genomewidesnp-6
+#http://www.aroma-project.org/chipTypes/GenomeWideSNP_6
 #Note aroma.affymetrix assumes a certain folder structure 
 
 #Locate the CDF:
