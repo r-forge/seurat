@@ -12,6 +12,7 @@ import Settings.*;
 
 import Data.DataManager;
 import Data.ISelectable;
+import Data.MyColor;
 
 public class Tools {
 	
@@ -195,6 +196,191 @@ public static boolean isLineInRect(int x1, int y1, int x2, int y2, int Rx1,
 		return value;
 
 	}
+	
+	
+	
+	
+	public static MyColor convertXYZtoRGB(MyColor color) {
+		
+		double x = color.x;
+		double y = color.y;
+		double z = color.z;
+		
+		//double r = 3.240479*x -1.537150*y -0.498535*z; 
+		//double g = -0.969256*x+ 1.875992*y+ 0.041556*z;
+	    //double b = 0.055648*x -0.204043*y+ 1.057311*z; 
+		
+		
+		double r = 3.24071 * x + (-1.53726) * y + (-0.498571) * z;
+		double g =(-0.969258) * x + 1.87599 * y + 0.0415557 * z;
+	double 	b = 0.0556352 * x + (-0.203996) * y + 1.05707 * z ;
+		
+		
+		return new MyColor(r/100,g/100,b/100);
+	}
+	
+	
+	
+	
+	
+	public static MyColor convertLUVtoXYZ(MyColor color) {
+		/*double Yn = 100;
+		
+		double un = 0.2009;
+		double vn = 0.4610;
+	
+		*/
+		double L = color.x;
+		double u = color.y;
+		double v = color.z;
+		
+			/*
+		double us = (u / 13) / L + un;
+		double vs = (v / 13) / L + vn;
+		
+		double Y = Yn * L * 3*3*3/29/29/29;
+		if (L>8)
+			Y = Yn*(L+16)*(L+16)*(L+16)/116/116/116;
+		
+		double X = (-9)*Y*us/ (us*(us-4)- us*vs);
+		double Z = (9*Y - 15*Y*vs -X*vs)/3/vs;
+		*/
+		
+		
+	
+		double Xr = 95.047, Yr = 100.000, Zr = 108.883 ;
+		
+		double v0 = 9*Yr / (Xr + 15*Yr + 3*Zr);
+		
+		double u0 = 4*Xr /(Xr + 15*Yr + 3*Zr);
+		
+		double k = 903.3;
+		
+		double e = 0.008856;
+		
+		double Y = L/k;
+		if (L > k*e) Y = (L+16)*(L+16)*(L+16)/116/116/116;
+		
+		double a = (52*L/(u + 13*L*u0) - 1)/3;
+		
+		double b = - 5 * Y;
+		
+		double c = - (double)1/3;
+		
+		double d = Y* (39*L/(v + 13*L*v0) - 5);
+		
+		double X = (d-b)/(a-c); 
+		
+		double Z = X*a + b;
+		
+		return new MyColor(X*100,Y*100,Z*100);
+	}
+	
+	
+	public static MyColor convertHLCtoLUV(MyColor c) {
+	      return new MyColor(c.x, c.y*Math.cos(c.z*Math.PI/180), c.y*Math.sin(c.z*Math.PI/180));	
+	}
+	
+	
+	
+	public static MyColor convertHLCtoRGB(MyColor c) {
+          return convertXYZtoRGB(convertLUVtoXYZ(convertHLCtoLUV(c)));
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	public static MyColor rgb2luv(int R, int G, int B) {
+		//http://www.brucelindbloom.com
+		
+		float rf, gf, bf;
+		float r, g, b, X_, Y_, Z_, X, Y, Z, fx, fy, fz, xr, yr, zr;
+		float L;
+		float eps = 216.f/24389.f;
+		float k = 24389.f/27.f;
+		 
+	//	float Xr = 0.964221f;  // reference white D50
+		//float Yr = 1.0f;
+		//float Zr = 0.825211f;
+		 
+		
+		float Xr = 95.047f;  // reference white D50
+		float Yr = 100.000f;
+		float Zr = 108.8831f;
+		
+		// RGB to XYZ
+		 
+		r = R/255.f; //R 0..1
+		g = G/255.f; //G 0..1
+		b = B/255.f; //B 0..1
+		   
+		// assuming sRGB (D65)
+		if (r <= 0.04045)
+			r = r/12;
+		else
+			r = (float) Math.pow((r+0.055)/1.055,2.4);
+		
+		if (g <= 0.04045)
+			g = g/12;
+		else
+			g = (float) Math.pow((g+0.055)/1.055,2.4);
+		 
+		if (b <= 0.04045)
+			b = b/12;
+		else
+			b = (float) Math.pow((b+0.055)/1.055,2.4);
+		
+		
+		X =  0.436052025f*r     + 0.385081593f*g + 0.143087414f *b;
+		Y =  0.222491598f*r     + 0.71688606f *g + 0.060621486f *b;
+		Z =  0.013929122f*r     + 0.097097002f*g + 0.71418547f  *b;
+		
+		// XYZ to Luv
+		
+		float u, v, u_, v_, ur_, vr_;
+						
+		u_ = 4*X / (X + 15*Y + 3*Z);
+		v_ = 9*Y / (X + 15*Y + 3*Z);
+				 
+		ur_ = 4*Xr / (Xr + 15*Yr + 3*Zr);
+		vr_ = 9*Yr / (Xr + 15*Yr + 3*Zr);
+		  
+		yr = Y/Yr;
+		
+		if ( yr > eps )
+			L =  (float) (116*Math.pow(yr, 1/3.) - 16);
+		else
+			L = k * yr;
+		 
+		u = 13*L*(u_ -ur_);
+		v = 13*L*(v_ -vr_);
+		
+		return new MyColor((2.55*L + .5),(u + .5),(v + .5));        
+	} 
+	
+	
+	
+	
+	public static void main(String [] args) {
+	    MyColor c = convertHLCtoRGB(new MyColor(80,63,220));
+	    System.out.println(c.x + "  " + c.y + "   "+ c.z);
+		
+		//	System.out.println(convertHLCtoXYZ(new MyColor(120,20,60)).x + "  "+convertHLCtoXYZ(new MyColor(120,20,60)).y+ "   "+convertHLCtoXYZ(new MyColor(120,20,60)).z);
+	}
+	
+	
+	
+	
+	//public static MyColor convertHLCtoRGB(MyColor color) {
+		//return convertHLCtoXYZ(convertXYZtoRGB(color));
+	//}
+	
+	
+	
 	
 	
 	

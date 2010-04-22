@@ -8,6 +8,7 @@ import Tools.Tools;
 
 import java.awt.event.*;
 import java.awt.*;
+import Settings.*;
 
 import Data.*;
 
@@ -459,51 +460,26 @@ class GlobalViewAbstractPanel extends JPanel implements MouseListener, IPlot,
 	public void updateSelection() {
 
 		cellColor = new Color[this.Columns.size()][this.data[0].length];
-
-		/*
-		exclusiveSelection = true;
-		
-		boolean cols = true;
-
-		for (int i = 0; i < this.Columns.size(); i++) {
-			if (this.Columns.elementAt(i).isSelected()) cols = false;
-		}
-		
-		boolean rows = true;
-		
-		for (int i = 0; i < this.Rows.size(); i++) {
-			if (this.Rows.elementAt(i).isSelected())
-				rows = false;
-		}
-		
-		exclusiveSelection = cols || rows;
-        */
-		
-		exclusiveSelection = false;
+    	exclusiveSelection = false;
 	
 			for (int i = 0; i < data.length; i++) {
 				for (int j = 0; j < PixelCount; j++) {
 
+					
+					Color c = null;
+					
 					if (data[i][j] > 0) {
 
 						double koeff = data[i][j] / Max[i];
-
-						float h = Color.RGBtoHSB(seurat.PosColor.getRed(), seurat.PosColor.getGreen(), seurat.PosColor.getBlue(), null) [0];
-						float s = Color.RGBtoHSB(seurat.PosColor.getRed(), seurat.PosColor.getGreen(), seurat.PosColor.getBlue(), null) [1];
-						float v = Color.RGBtoHSB(seurat.PosColor.getRed(), seurat.PosColor.getGreen(), seurat.PosColor.getBlue(), null) [2];
-
 						
-						Color c = Color.getHSBColor(h, (float) Tools
-								.fPos(koeff)*s, v);
-						
-						if (Model == 2) c = Color.getHSBColor(h, s,(float) Tools
-								.fPos(koeff)*v);
-
+						if (Model == 1) c = Tools.convertHLCtoRGB(new MyColor(Settings.Lmax -  Tools.fPos(koeff)*(Settings.Lmax-Settings.Lmin),Tools.fPos(koeff)*Settings.Cmax, seurat.PosColor )).getRGBColor();
+						if (Model == 2) c = Tools.convertHLCtoRGB(new MyColor(Settings.LSmin   +   Tools.fPos(koeff)*(Settings.Lmax-Settings.LSmin), Settings.Cmin + (Tools.fPos(koeff))*(Settings.Cmax-Settings.Cmin), seurat.PosColor )).getRGBColor();
+	
 
 						if (PixelCount == Rows.size()
 								&& Columns.elementAt(i).getRealValue(
 										Rows.elementAt(j).getID()) == dataManager.NA)
-							c = Color.WHITE;
+							c = seurat.NAColor;
 
 
 						boolean selected = false;
@@ -519,64 +495,26 @@ class GlobalViewAbstractPanel extends JPanel implements MouseListener, IPlot,
 						}
 
 						if (selected) {
-							if (Model == 1) c = c.darker();
-							if (Model ==2) {
-								/*
-                                    c	 = Color.getHSBColor(h, (float) Tools
-											.fPos(koeff)*s, v);
-                                    
-                                    
-                                    c = Color.getHSBColor(h, s/2,(float) (Tools
-    										.fPos(koeff)*v)/2);
-	
-                                    c.darker();
-                                 
-                                    c.darker();
-                                    c.darker();
-                                    c.darker();
-                                  
-                                    
-                                    h = Color.RGBtoHSB(c.getRed(), c.getGreen(), c.getBlue(), null) [0];
-            						s = Color.RGBtoHSB(c.getRed(), c.getGreen(), c.getBlue(), null) [1];
-            						v = Color.RGBtoHSB(c.getRed(), c.getGreen(), c.getBlue(), null) [2];
-
-								*/
-								c = Color.getHSBColor(h, s,(float) Math.min(1,(Tools
-										.fPos(koeff)*v+0.02)));	
-								
-							c = c.brighter();
-							c = c.brighter();
-							c = c.brighter();
-							c = c.brighter();
-							
-							
-							}
+							if (Model == 1) 	c = Tools.convertHLCtoRGB(new MyColor((Settings.Lmax -  Tools.fPos(koeff)*(Settings.Lmax-Settings.Lmin))*(1-Settings.Selection),Tools.fPos(koeff)*Settings.Cmax*Settings.Selection, seurat.PosColor )).getRGBColor();	
+							if (Model ==2) c = Tools.convertHLCtoRGB(new MyColor(Settings.LSmin   + Tools.fPos(koeff)*(Settings.Lmax-Settings.LSmin) + Settings.Selection*(Settings.Lmax-Settings.LSmin-Tools.fPos(koeff)*(Settings.Lmax-Settings.LSmin)), (100 - Tools.fPos(koeff)*Settings.Cmax)*Settings.Selection + Tools.fPos(koeff)*Settings.Cmax, seurat.PosColor )).getRGBColor();
+						
 							
 						}
 
-						cellColor[i][j] = c;
+						
 
 					} else {
 						double koeff = data[i][j] / Min[i];
-
-						if (Min[i] == 0)
-							koeff = 0;
+						if (Min[i] == 0) koeff = 0;
 						
+					
+					
+						if (Model ==1) c = Tools.convertHLCtoRGB(new MyColor(Settings.Lmax- Tools.fNeg(koeff)*(Settings.Lmax-Settings.Lmin), Tools.fNeg(koeff)*Settings.Cmax, seurat.NegColor)).getRGBColor();
+						if (Model == 2) c = Tools.convertHLCtoRGB(new MyColor(Settings.LSmin+ Tools.fNeg(koeff)*(Settings.Lmax-Settings.LSmin), Settings.Cmin+ (Tools.fNeg(koeff))*(Settings.Cmax-Settings.Cmin), seurat.NegColor)).getRGBColor();
 						
-
-						float h = Color.RGBtoHSB(seurat.NegColor.getRed(), seurat.NegColor.getGreen(), seurat.NegColor.getBlue(), null) [0];
-						float s = Color.RGBtoHSB(seurat.NegColor.getRed(), seurat.NegColor.getGreen(), seurat.NegColor.getBlue(), null) [1];
-						float v = Color.RGBtoHSB(seurat.NegColor.getRed(), seurat.NegColor.getGreen(), seurat.NegColor.getBlue(), null) [2];
-
-						Color c = (Color.getHSBColor(h,
-								(float) Tools.fNeg(koeff)*s, v));
-                        if (Model == 2) c = Color.getHSBColor(h,
-								s,(float) Tools.fNeg(koeff)*v);
-						
-
+					
 						boolean selected = false;
-
-						for (int k = j * Aggregation; k < (j + 1) * Aggregation; k++) {
+                        for (int k = j * Aggregation; k < (j + 1) * Aggregation; k++) {
 							if (k < Rows.size()) {
 								if (selected(Columns.elementAt(i).isSelected()
 										,Rows.elementAt(k).isSelected())) {
@@ -586,149 +524,22 @@ class GlobalViewAbstractPanel extends JPanel implements MouseListener, IPlot,
 						}
 
 						if (selected) {
-							if (Model == 1) c = c.darker();
-							if (Model ==2) {
-								/*c = (Color.getHSBColor(h,
-										(float) Tools.fNeg(koeff)*s, v));
-								
-								  c.darker();
-								  
-								  
-								  
-									
-											c = Color.getHSBColor(h,
-													s/2,(float) Tools.fNeg(koeff)*v/2);
-								  
-								  
-                              /*
-								  c.darker();
-                                  c.darker();
-                                  c.darker();
-                                
-                                  
-                                  h = Color.RGBtoHSB(c.getRed(), c.getGreen(), c.getBlue(), null) [0];
-          						s = Color.RGBtoHSB(c.getRed(), c.getGreen(), c.getBlue(), null) [1];
-          						v = Color.RGBtoHSB(c.getRed(), c.getGreen(), c.getBlue(), null) [2];
-          						
-          						
-          						
-          						
-								
-						//		c = Color.getHSBColor(h,
-							//			s,(float) Tools.fNeg(koeff)*v/2);	
-								
-								
-								*/
-								 c = Color.getHSBColor(h,
-											s,(float) Math.min(1,(Tools.fNeg(koeff)*v+0.02)));
-								
-							c = c.brighter();
-							c = c.brighter();
-							c = c.brighter();
-							c = c.brighter();
-							
-							
-								
-							}
-							
+							if (Model == 1) 	c = Tools.convertHLCtoRGB(new MyColor((Settings.Lmax- Tools.fNeg(koeff)*(Settings.Lmax-Settings.Lmin))*(1-Settings.Selection), Tools.fNeg(koeff)*Settings.Cmax*Settings.Selection, seurat.NegColor)).getRGBColor();
+							if (Model ==2)      c = Tools.convertHLCtoRGB(new MyColor(Settings.LSmin+Tools.fNeg(koeff)*(Settings.Lmax-Settings.Lmin)+Settings.Selection*(Settings.Lmax-Settings.LSmin-Tools.fNeg(koeff)*(Settings.Lmax-Settings.LSmin)), (100 - Tools.fNeg(koeff))*Settings.Cmax*Settings.Selection + Tools.fNeg(koeff)*Settings.Cmax, seurat.NegColor)).getRGBColor();
 						}
 
-						// c = Color.WHITE;
-						cellColor[i][j] = c;
+					
+						
 					}
+					cellColor[i][j] = c;
 
 				}
 
 			}
 
 		
-		
-		
-/*
-		if (Model == 2) {
+					
 
-			for (int i = 0; i < data.length; i++) {
-				for (int j = 0; j < PixelCount; j++) {
-
-					if (data[i][j] > 0) {
-
-						double koeff = data[i][j] / Max[i];
-
-						Color c = new Color((float) Tools.fPos(koeff), 0, 0);
-
-						if (PixelCount == Rows.size()
-								&& Columns.elementAt(i).getRealValue(
-										Rows.elementAt(j).getID()) == dataManager.NA)
-							c = Color.WHITE;
-
-						
-
-						boolean selected = false;
-
-						for (int k = j * Aggregation; k < (j + 1) * Aggregation; k++) {
-							if (k < Rows.size()) {
-								if (selected(Columns.elementAt(i).isSelected()
-										,Rows.elementAt(k).isSelected())) {
-									selected = true;
-								}
-
-							}
-						}
-
-						if (selected) {
-							c = c.brighter();
-							c = c.brighter();
-							c = c.brighter();
-							c = c.brighter();
-
-							
-
-							if (PixelCount == Rows.size()
-									&& Columns.elementAt(i).getRealValue(
-											Rows.elementAt(j).getID()) == dataManager.NA)
-								c = Color.WHITE;
-
-						}
-
-						cellColor[i][j] = c;
-					} else {
-						
-						double koeff = data[i][j] / Min[i];
-
-						Color c = new Color(0, (float) Tools.fNeg(koeff), 0);
-
-						
-
-						boolean selected = false;
-
-						for (int k = j * Aggregation; k < (j + 1) * Aggregation; k++) {
-							if (k < Rows.size()) {
-								if (selected(Columns.elementAt(i).isSelected()
-									, Rows.elementAt(k).isSelected())) {
-									selected = true;
-								}
-
-							}
-						}
-
-						if (selected) {
-							c = c.brighter();
-							c = c.brighter();
-							c = c.brighter();
-							c = c.brighter();
-							// c = new Color(0,(float)
-							// Math.sqrt(Math.sqrt((float)fNeg(koeff))), 0);
-
-						}
-						cellColor[i][j] = c;
-					}
-
-				}
-			}
-		}
-
-		
-		*/
 		
 		if (clustering) {
 			if (nodeZeilen != null)
@@ -1062,6 +873,8 @@ class GlobalViewAbstractPanel extends JPanel implements MouseListener, IPlot,
 			}
 		}
 
+		
+		if (!seurat.globalScaling) {
 		Max = new double[this.data.length];
 		for (int i = 0; i < this.data.length; i++) {
 			for (int j = 0; j < this.PixelCount; j++) {
@@ -1078,6 +891,38 @@ class GlobalViewAbstractPanel extends JPanel implements MouseListener, IPlot,
 					Min[i] = data[i][j];
 			}
 		}
+		} else {
+			
+			double max = 0;
+			for (int i = 0; i < this.data.length; i++) {
+				for (int j = 0; j < this.PixelCount; j++) {
+					if (dataManager.NA != data[i][j] && max < data[i][j])
+						max = data[i][j];
+				}
+
+			}
+			
+			
+			double min  = 0;
+			for (int i = 0; i < this.data.length; i++) {
+				for (int j = 0; j < this.PixelCount; j++) {
+					if (min > data[i][j])
+						min = data[i][j];
+				}
+			}
+			
+			System.out.println("MinMax  " + min + "    "+max);
+			
+			Max = new double[this.data.length];
+			Min = new double[this.data.length];
+			for (int i = 0; i < this.data.length; i++) {
+				Max [i] = max;
+			    Min [i] = min;	
+			}
+			
+		}
+		
+		
 
 	}
 
@@ -1864,8 +1709,15 @@ class GlobalViewAbstractPanel extends JPanel implements MouseListener, IPlot,
 		paintClustering(g);
 
 		if (point1 != null && point2 != null) {
-			g.setColor(SelectionColor);
-			if (SelectionColor == Color.BLACK) {
+			if (Model == 1) g.setColor(Color.BLACK);
+			else g.setColor(Color.WHITE);
+			
+			
+			g.drawRect(Math.min(point1.x, point2.x), Math.min(point1.y,
+					point2.y), Math.abs(point2.x - point1.x), Math
+					.abs(point2.y - point1.y));
+			
+			/*			if (SelectionColor == Color.BLACK) {
 
 				g.drawRect(Math.min(point1.x, point2.x), Math.min(point1.y,
 						point2.y), Math.abs(point2.x - point1.x), Math
@@ -1877,9 +1729,9 @@ class GlobalViewAbstractPanel extends JPanel implements MouseListener, IPlot,
 								- point1.y));
 				g.drawRect(this.abstandLinks - 1, 1 + Math.min(point1.y,
 						point2.y), this.getWidth() - abstandLinks - 2, Math
-						.abs(point2.y - point1.y));
+						.abs(point2.y - point1.y));*/
 
-			}
+			//}
 		}
 
 	}

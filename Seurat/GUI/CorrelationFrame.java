@@ -2,24 +2,20 @@ package GUI;
 
 import java.util.*;
 import Data.*;
+
 import javax.swing.*;
 
 import java.awt.event.*;
 import java.awt.*;
 
-import Data.Variable; //import org.rosuda.JRclient.*;
 
-
-
-import Data.*;
-import javax.swing.*;
-
+import Settings.Settings;
 import Tools.Tools;
 
-import java.awt.event.*;
-import java.awt.*;
 
-import Data.Variable; //import org.rosuda.JRclient.*;
+
+
+
 
 class CorrelationFrame extends JFrame implements MatrixWindow, IPlot {
 	int pixelSize = 1;
@@ -422,14 +418,14 @@ class CorrelationPanel extends JPanel implements MouseListener,
 				ISelectable var = Experiments.elementAt(i);
 				// if (var.isSelected()) selection [order [i-2]] = true;
 				if (Experiments.elementAt(i).isSelected())
-					selection[i/Aggregation] = true;
+					selection[Math.min(i / Aggregation,PixelCount-1)] = true;
 				
 			}
 		} else {
 			for (int i = 0; i < Genes.size(); i++) {
 				// if (amlTool.isRowSelected(i)) selection [order [i]] = true;
 				if (Genes.elementAt(i).isSelected())
-					selection[i / Aggregation] = true;
+					selection[Math.min(i / Aggregation,PixelCount-1)] = true;
 
 			}
 		}
@@ -437,13 +433,15 @@ class CorrelationPanel extends JPanel implements MouseListener,
 		this.repaint();
 	}
 
+	
+	
+	
 	public void addSelection(int start, int end) {
 		this.selection = new boolean[data.length];
-		this.dataManager.deleteSelection();
-
+		this.dataManager.deleteSelection();	
+        boolean selected = false;
 		
 		
-
 		if (this.isVariables) {
 			
 			
@@ -455,9 +453,12 @@ class CorrelationPanel extends JPanel implements MouseListener,
 				ISelectable var = Experiments.elementAt(i);
 				if (i < end* Aggregation && start* Aggregation <= i) {
 					var.select(true);
+					selected = true;
 				} else
 					var.unselect(true);
 			}
+			
+			
 		} else {
 			
 			
@@ -469,11 +470,25 @@ class CorrelationPanel extends JPanel implements MouseListener,
 				int row = Genes.elementAt(i).getID();
 				if (i < Genes.size()) {
 					Genes.elementAt(i).select(true);
-
+                     selected = true;
 					
 				}
 			}
 		}
+		
+		
+		
+		if (selected) { 
+			if (!this.isVariables) {
+				seurat.dataManager.selectExperiments(); 
+			}
+			if (this.isVariables) {
+				seurat.dataManager.selectGenesClones(); 
+		    }
+		}		
+			
+			
+			
 	}
 
 	public void mouseEntered(MouseEvent e) {
@@ -652,49 +667,30 @@ class CorrelationPanel extends JPanel implements MouseListener,
 				double koeff = 0;
 
 				if (data[i][j] > 0) {
-					koeff = Math.pow(data[i][j],
-							seurat.settings.colorParam);
+					koeff = data[i][j];
+		
+					Color c = null;
+					if (Settings.Model == 1) c = Tools.convertHLCtoRGB(new MyColor(Settings.Lmax -  Tools.fPos(koeff)*(Settings.Lmax-Settings.Lmin),Tools.fPos(koeff)*Settings.Cmax, seurat.PosColor )).getRGBColor();
+					if (Settings.Model == 2) c = Tools.convertHLCtoRGB(new MyColor(Settings.LSmin   +   Tools.fPos(koeff)*(Settings.Lmax-Settings.LSmin), Settings.Cmin + (Tools.fPos(koeff))*(Settings.Cmax-Settings.Cmin), seurat.PosColor )).getRGBColor();
 
-					//Color c = (Color.getHSBColor(0, (float) koeff, 1));
-					float h = Color.RGBtoHSB(seurat.PosColor.getRed(), seurat.PosColor.getGreen(), seurat.PosColor.getBlue(), null) [0];
-					float s = Color.RGBtoHSB(seurat.PosColor.getRed(), seurat.PosColor.getGreen(), seurat.PosColor.getBlue(), null) [1];
-					float v = Color.RGBtoHSB(seurat.PosColor.getRed(), seurat.PosColor.getGreen(), seurat.PosColor.getBlue(), null) [2];
-
-					
-					Color c = Color.getHSBColor(h, (float) (koeff)*s, v);
-					if (seurat.settings.Model == 2) c = Color.getHSBColor(h, s,(float) koeff*v);
-					
-					
-					
 					if (this.selection[i] || this.selection[j]) {
-						c = c.darker();
-						c = c.darker();
-						
+						if (Settings.Model == 1) 	c = Tools.convertHLCtoRGB(new MyColor((Settings.Lmax -  Tools.fPos(koeff)*(Settings.Lmax-Settings.Lmin))*(1-Settings.Selection),Tools.fPos(koeff)*Settings.Cmax*Settings.Selection, seurat.PosColor )).getRGBColor();	
+						if (Settings.Model ==2) c = Tools.convertHLCtoRGB(new MyColor(Settings.LSmin   + Tools.fPos(koeff)*(Settings.Lmax-Settings.LSmin) + Settings.Selection*(Settings.Lmax-Settings.LSmin-Tools.fPos(koeff)*(Settings.Lmax-Settings.LSmin)), (100 - Tools.fPos(koeff)*Settings.Cmax)*Settings.Selection + Tools.fPos(koeff)*Settings.Cmax, seurat.PosColor )).getRGBColor();
 					}
 					
 
 					g.setColor(c);
 
 				} else {
-					koeff = Math.pow(-data[i][j],
-							seurat.settings.colorParam);
-					//Color c = Color.getHSBColor((float) 0.66, (float) koeff, 1);
+					koeff = -data[i][j];
+						
+					Color c = null;
+					if (Settings.Model ==1) c = Tools.convertHLCtoRGB(new MyColor(Settings.Lmax- Tools.fNeg(koeff)*(Settings.Lmax-Settings.Lmin), Tools.fNeg(koeff)*Settings.Cmax, seurat.NegColor)).getRGBColor();
+					if (Settings.Model == 2) c = Tools.convertHLCtoRGB(new MyColor(Settings.LSmin+ Tools.fNeg(koeff)*(Settings.Lmax-Settings.LSmin), Settings.Cmin+ (Tools.fNeg(koeff))*(Settings.Cmax-Settings.Cmin), seurat.NegColor)).getRGBColor();
 					
-					
-					float h = Color.RGBtoHSB(seurat.NegColor.getRed(), seurat.NegColor.getGreen(), seurat.NegColor.getBlue(), null) [0];
-					float s = Color.RGBtoHSB(seurat.NegColor.getRed(), seurat.NegColor.getGreen(), seurat.NegColor.getBlue(), null) [1];
-					float v = Color.RGBtoHSB(seurat.NegColor.getRed(), seurat.NegColor.getGreen(), seurat.NegColor.getBlue(), null) [2];
-
-					Color c = (Color.getHSBColor(h,
-							(float)koeff*s, v));
-					if (seurat.settings.Model == 2) c = Color.getHSBColor(h,
-							s,(float) koeff*v);
-
-					
-
-if (this.selection[i] || this.selection[j]) {
-	c = c.darker();
-	c = c.darker();
+					if (this.selection[i] || this.selection[j]) {
+						if (Settings.Model == 1) 	c = Tools.convertHLCtoRGB(new MyColor((Settings.Lmax- Tools.fNeg(koeff)*(Settings.Lmax-Settings.Lmin))*(1-Settings.Selection), Tools.fNeg(koeff)*Settings.Cmax*Settings.Selection, seurat.NegColor)).getRGBColor();
+						if (Settings.Model ==2)      c = Tools.convertHLCtoRGB(new MyColor(Settings.LSmin+Tools.fNeg(koeff)*(Settings.Lmax-Settings.Lmin)+Settings.Selection*(Settings.Lmax-Settings.LSmin-Tools.fNeg(koeff)*(Settings.Lmax-Settings.LSmin)), (100 - Tools.fNeg(koeff))*Settings.Cmax*Settings.Selection + Tools.fNeg(koeff)*Settings.Cmax, seurat.NegColor)).getRGBColor();
 					}
 					
 					g.setColor(c);

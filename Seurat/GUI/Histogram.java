@@ -750,11 +750,12 @@ int sWidth = 	getStringWidth(g,round(anchor)+"");
 		
 		
 		
+			boolean selected = false;		 
+			boolean isNASelected = false;
 		 
 		if (this.NABalken == 0) {
 
-		boolean selected = false;	
-			
+				
 			for (int i = 0; i < balken.length; i++) {
 				if (this.containsRectInRect(abstandLinks + i
 						* (this.getWidth() - 2 * abstandLinks) / balken.length,
@@ -775,7 +776,7 @@ int sWidth = 	getStringWidth(g,round(anchor)+"");
 			}
 
 			
-			
+			/*
 
 			if (selected) {
 			if (variables.elementAt(0) instanceof AnnGene || variables.elementAt(0) instanceof Clone) {
@@ -785,7 +786,7 @@ int sWidth = 	getStringWidth(g,round(anchor)+"");
 				seurat.dataManager.selectGenesClones(); 
 		   }
 			}
-			
+*/			
 			
 			
 			for (int i = 0; i < selectedBalken.length; i++) {
@@ -803,7 +804,6 @@ int sWidth = 	getStringWidth(g,round(anchor)+"");
 
 		if (this.NABalken != 0) {
 
-			boolean selected = false;
 			
 			for (int i = 0; i < balken.length; i++) {
 				if (this.containsRectInRect(abstandLinks + i
@@ -826,7 +826,7 @@ int sWidth = 	getStringWidth(g,round(anchor)+"");
 
 			}
 
-			boolean isNASelected = false;
+		
 
 			if (this.containsRectInRect(
 
@@ -848,7 +848,7 @@ int sWidth = 	getStringWidth(g,round(anchor)+"");
 			point1.x, point1.y, point2.x, point2.y))
 				isNASelected = true;
 
-			
+			/*
 			if (selected || isNASelected) {
 				if (variables.elementAt(0) instanceof AnnGene || variables.elementAt(0) instanceof Clone) {
 					seurat.dataManager.selectExperiments(); 
@@ -856,7 +856,7 @@ int sWidth = 	getStringWidth(g,round(anchor)+"");
 				if (variables.elementAt(0) instanceof Variable || variables.elementAt(0) instanceof CGHVariable) {
 					seurat.dataManager.selectGenesClones(); 
 			   }
-				}
+				}*/
 			
 		
 			for (int j = 0; j < data.length; j++) {
@@ -872,7 +872,16 @@ int sWidth = 	getStringWidth(g,round(anchor)+"");
 			}
 
 		}
-
+		
+		
+		if (selected) { 
+			if (variables.elementAt(0) instanceof Gene || variables.elementAt(0) instanceof AnnGene || variables.elementAt(0) instanceof Clone) {
+				seurat.dataManager.selectExperiments(); 
+			}
+			if (variables.elementAt(0) instanceof Variable || variables.elementAt(0) instanceof CGHVariable) {
+				seurat.dataManager.selectGenesClones(); 
+		    }
+		}
 	}
 
 	public void mouseExited(MouseEvent e) {

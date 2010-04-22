@@ -92,8 +92,17 @@ public class Seurat extends JFrame implements ColorListener{
 
 	JMenu helpMenu;
 
+	/*
 	Color PosColor = Color.getHSBColor(0, 1 , 1);
 	Color NegColor = Color.getHSBColor((float)0.33, 1 , 1);;
+	*/
+	
+	public int PosColor = 360;
+	public int NegColor = 120;
+	public Color NAColor = Color.YELLOW;
+	
+	public boolean globalScaling = true;
+	
 	
 	JMenu plotsMenu;
 
@@ -1147,6 +1156,14 @@ fileMenu.addSeparator();
 		item.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				new ColorSettings(seurat);
+			}
+		});
+		optionsMenu.add(item);
+		
+		item = new JMenuItem("Scaling");
+		item.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				new ScaleFrame(seurat);
 			}
 		});
 		optionsMenu.add(item);
