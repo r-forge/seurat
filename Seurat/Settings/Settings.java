@@ -3,10 +3,16 @@ package Settings;
 public class Settings {
 	public int PixelW = 8;
 	public int PixelH = 1;
+	
+	public static double Lmax = 97, Lmin = 30, Cmax = 90, Cmin = 0,  LSmin = 30;
+	public static double Selection = 0.15;
+	public static double shift = 30; 
+	
+	
 
-	public int Model = 1;
+	public static int Model = 1;
 
-	public double colorParam = 0.5;
+	//public double colorParam = 0.5;
 	
 	public static double aPos = 0.5,bPos = 1;
 	public static double aNeg = 0.5,bNeg = 1;
@@ -35,13 +41,6 @@ public class Settings {
 		Model = model;
 	}
 
-	public double getColorParam() {
-		return colorParam;
-	}
-
-	public void setColorParam(double colorParam) {
-		this.colorParam = colorParam;
-	}
 
 	public double getAPos() {
 		return aPos;

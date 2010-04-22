@@ -354,7 +354,7 @@ class KmeansPanel extends JPanel implements MouseListener, IPlot,
 
 	double[][] data;
 
-	double[] Min, Max;
+	//double[] Min, Max;
 
 	KMeansView plot;
 
@@ -468,14 +468,19 @@ class KmeansPanel extends JPanel implements MouseListener, IPlot,
 		boolean isSelection = seurat.dataManager.isSomethingSelected();
 		
 		
+		double min =0, max = 0;
 		
 		for (int i = 0; i < this.Experiments.size(); i++) {
 			Vector<ISelectable> exps = this.Experiments.elementAt(i);
 			
 			
 			boolean isMinMaxSet = false;
-			double min =0, max = 0;
-
+			//double min =0, max = 0;
+            if (!seurat.globalScaling) {
+            	min = 0;
+            	max = 0;
+            }
+			
 			int shiftY = abstandOben+1;
 			
 			 shiftY = shiftY
@@ -544,15 +549,19 @@ class KmeansPanel extends JPanel implements MouseListener, IPlot,
 					for (int jj = 0; jj < blocks[i][j].values [ii].length; jj++) {
 						if (counts [ii][jj]!=0) {
 							blocks[i][j].values [ii] [jj] /= counts [ii][jj];
-							if (isMinMaxSet) {
-								if (min > blocks[i][j].values [ii] [jj]) min = blocks[i][j].values [ii] [jj];
-								if (max < blocks[i][j].values [ii] [jj]) max = blocks[i][j].values [ii] [jj];
-							}
-							else {
-								min = blocks[i][j].values [ii] [jj];
-								max = blocks[i][j].values [ii] [jj];
-								isMinMaxSet = true;
-							}
+							
+							//if (isMinMaxSet) {
+								
+							if (min > blocks[i][j].values [ii] [jj]) min = blocks[i][j].values [ii] [jj];
+							if (max < blocks[i][j].values [ii] [jj]) max = blocks[i][j].values [ii] [jj];
+							//}
+							//else {
+								//min = blocks[i][j].values [ii] [jj];
+								//max = blocks[i][j].values [ii] [jj];
+								//isMinMaxSet = true;
+							//}
+							
+							
 						}
 						else blocks[i][j].values [ii] [jj] = seurat.dataManager.NA;
 					}
@@ -577,18 +586,29 @@ class KmeansPanel extends JPanel implements MouseListener, IPlot,
 			
 			
 			
-			
+			if (!seurat.globalScaling) { 
 			for (int j = 0; j < Genes.size(); j++) {
 				blocks[i][j].min = min;
 				blocks[i][j].max = max;
 			
 			}
-			
+			}
 			
 
 			shiftX = shiftX
 					+ exps.size() * pixelW + 1;
 
+		}
+		
+		
+		if (seurat.globalScaling) {
+			for (int i = 0; i < Experiments.size(); i++) {
+			for (int j = 0; j < Genes.size(); j++) {
+				blocks[i][j].min = min;
+				blocks[i][j].max = max;
+			
+			}
+			}
 		}
 		
 		
@@ -994,8 +1014,16 @@ this.repaint();
 		
 
 		if (point1 != null && point2 != null) {
-			g.setColor(SelectionColor);
-			if (SelectionColor == Color.BLACK) {
+	        if (Model == 1) g.setColor(Color.BLACK);
+	        else g.setColor(Color.WHITE);
+			
+			g.drawRect(Math.min(point1.x, point2.x), Math.min(point1.y,
+					point2.y), Math.abs(point2.x - point1.x), Math
+					.abs(point2.y - point1.y));
+	
+			
+			//g.setColor(SelectionColor);
+/*			if (SelectionColor == Color.BLACK) {
 
 				g.drawRect(Math.min(point1.x, point2.x), Math.min(point1.y,
 						point2.y), Math.abs(point2.x - point1.x), Math
@@ -1009,7 +1037,7 @@ this.repaint();
 						point2.y), this.getWidth() - abstandLinks - 2, Math
 						.abs(point2.y - point1.y));
 
-			}
+			}*/
 		}
 
 	}
@@ -1328,50 +1356,27 @@ this.repaint();
 					if (values [i][j] > 0) {
 
 						koeff = values [i][j] / max;
-/*
-						if (Model == 1)  c = Color.getHSBColor(0, (float) Tools.fPos(koeff), 1);
-						if (Model == 2)  c = new Color((float) Tools.fPos(koeff), 0, 0);
-	*/
-						
-						float h = Color.RGBtoHSB(seurat.PosColor.getRed(), seurat.PosColor.getGreen(), seurat.PosColor.getBlue(), null) [0];
-						float s = Color.RGBtoHSB(seurat.PosColor.getRed(), seurat.PosColor.getGreen(), seurat.PosColor.getBlue(), null) [1];
-						float v = Color.RGBtoHSB(seurat.PosColor.getRed(), seurat.PosColor.getGreen(), seurat.PosColor.getBlue(), null) [2];
 
-						
-						c = Color.getHSBColor(h, (float) Tools
-								.fPos(koeff)*s, v);
-						
-						if (Model == 2) c = Color.getHSBColor(h, s,(float) Tools
-								.fPos(koeff)*v);
-						
+						if (Model == 1) c = Tools.convertHLCtoRGB(new MyColor(Settings.Lmax -  Tools.fPos(koeff)*(Settings.Lmax-Settings.Lmin),Tools.fPos(koeff)*Settings.Cmax, seurat.PosColor )).getRGBColor();
+						if (Model == 2) c = Tools.convertHLCtoRGB(new MyColor(Settings.LSmin   +   Tools.fPos(koeff)*(Settings.Lmax-Settings.LSmin), Settings.Cmin + (Tools.fPos(koeff))*(Settings.Cmax-Settings.Cmin), seurat.PosColor )).getRGBColor();
+	
 						
 						
 					} else {
 						koeff = values [i][j] / min;
 						if (min == 0) koeff = 0;
 
-						/*
-						if (Model == 1) c = (Color.getHSBColor((float) 0.33,
-								(float) Tools.fNeg(koeff), 1));
+						if (Model ==1) c = Tools.convertHLCtoRGB(new MyColor(Settings.Lmax- Tools.fNeg(koeff)*(Settings.Lmax-Settings.Lmin), Tools.fNeg(koeff)*Settings.Cmax, seurat.NegColor)).getRGBColor();
+						if (Model == 2) c = Tools.convertHLCtoRGB(new MyColor(Settings.LSmin+ Tools.fNeg(koeff)*(Settings.Lmax-Settings.LSmin), Settings.Cmin+ (Tools.fNeg(koeff))*(Settings.Cmax-Settings.Cmin), seurat.NegColor)).getRGBColor();
 						
-						if (Model == 2)  c = new Color(0, (float) Tools.fNeg(koeff), 0);
-						*/
-						
-						float h = Color.RGBtoHSB(seurat.NegColor.getRed(), seurat.NegColor.getGreen(), seurat.NegColor.getBlue(), null) [0];
-						float s = Color.RGBtoHSB(seurat.NegColor.getRed(), seurat.NegColor.getGreen(), seurat.NegColor.getBlue(), null) [1];
-						float v = Color.RGBtoHSB(seurat.NegColor.getRed(), seurat.NegColor.getGreen(), seurat.NegColor.getBlue(), null) [2];
-
-						c = (Color.getHSBColor(h,
-								(float) Tools.fNeg(koeff)*s, v));
-                        if (Model == 2) c = Color.getHSBColor(h,
-								s,(float) Tools.fNeg(koeff)*v);
+														
+								
 					}
 					
 					
 					
 					
-					if (values [i][j] == dataManager.NA)
-						   c = Color.WHITE;
+					if (values [i][j] == dataManager.NA) c = seurat.NAColor;
 					
 					
 					
@@ -1379,33 +1384,19 @@ this.repaint();
 					
 					if (isSelected [i][j]) {
 						
-						if (Model == 1) c = c.darker();
-						if (Model ==2) {
-							
 						
-						c = c.brighter();
-						c = c.brighter();
-						c = c.brighter();
-						c = c.brighter();
-						
-						
+						if (values [i][j] > 0) {
+							if (Model == 1) 	c = Tools.convertHLCtoRGB(new MyColor((Settings.Lmax -  Tools.fPos(koeff)*(Settings.Lmax-Settings.Lmin))*(1-Settings.Selection),Tools.fPos(koeff)*Settings.Cmax*Settings.Selection, seurat.PosColor )).getRGBColor();	
+							if (Model ==2) c = Tools.convertHLCtoRGB(new MyColor(Settings.LSmin   + Tools.fPos(koeff)*(Settings.Lmax-Settings.LSmin) + Settings.Selection*(Settings.Lmax-Settings.LSmin-Tools.fPos(koeff)*(Settings.Lmax-Settings.LSmin)), (100 - Tools.fPos(koeff)*Settings.Cmax)*Settings.Selection + Tools.fPos(koeff)*Settings.Cmax, seurat.PosColor )).getRGBColor();
+						}
+						else {
+							if (Model == 1) 	c = Tools.convertHLCtoRGB(new MyColor((Settings.Lmax- Tools.fNeg(koeff)*(Settings.Lmax-Settings.Lmin))*(1-Settings.Selection), Tools.fNeg(koeff)*Settings.Cmax*Settings.Selection, seurat.NegColor)).getRGBColor();
+							if (Model ==2)      c = Tools.convertHLCtoRGB(new MyColor(Settings.LSmin+Tools.fNeg(koeff)*(Settings.Lmax-Settings.Lmin)+Settings.Selection*(Settings.Lmax-Settings.LSmin-Tools.fNeg(koeff)*(Settings.Lmax-Settings.LSmin)), (100 - Tools.fNeg(koeff))*Settings.Cmax*Settings.Selection + Tools.fNeg(koeff)*Settings.Cmax, seurat.NegColor)).getRGBColor();
+					
 						}
 						
 						
-						/*
-						 * 
-						 * if (Model == 1) {
-						 
-						c = c.darker();
 						
-						}
-						
-						if (Model == 2) {
-							c = c.brighter();
-							c = c.brighter();
-							c = c.brighter();
-							c = c.brighter();
-						}*/
 					} 
 					
 

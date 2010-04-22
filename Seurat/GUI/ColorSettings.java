@@ -10,6 +10,7 @@ import java.awt.*;
 import javax.swing.colorchooser.AbstractColorChooserPanel;
 import javax.swing.event.*;
 
+import Data.MyColor;
 import Data.Variable;
 
 public class ColorSettings extends JFrame{
@@ -44,6 +45,8 @@ public class ColorSettings extends JFrame{
 
 	Settings settings;
 	
+	JLabel sLabel;
+	
 	
 	public ColorSettings(Seurat seurat) {
 		super("Color Settings");
@@ -51,11 +54,33 @@ public class ColorSettings extends JFrame{
 		this.seurat = seurat;
 		settings = seurat.settings;
 		
-		this.setBounds(0, 450, 530, 350);
+		this.setBounds(0, 450, 530, 430);
+		
+		
+		aSliderPos.setMajorTickSpacing(20);
+		aSliderPos.setMinorTickSpacing(5);
+		aSliderPos.setPaintTicks(true);
+	
+		
+		aSliderNeg.setMajorTickSpacing(20);
+		aSliderNeg.setMinorTickSpacing(5);
+		aSliderNeg.setPaintTicks(true);
+		
+		
+		bSliderPos.setMajorTickSpacing(20);
+		bSliderPos.setMinorTickSpacing(5);
+		bSliderPos.setPaintTicks(true);
+	
+		
+		bSliderNeg.setMajorTickSpacing(20);
+		bSliderNeg.setMinorTickSpacing(5);
+		bSliderNeg.setPaintTicks(true);
+	
 
 		
 		
-		
+		JPanel cPanel = new JPanel();
+		cPanel.setLayout(new BorderLayout());
 		
 		
 		
@@ -66,8 +91,9 @@ public class ColorSettings extends JFrame{
 		
 		this.getContentPane().setLayout(new BorderLayout());
 
-		this.getContentPane().add(gridPanel, BorderLayout.CENTER);
-
+		this.getContentPane().add(cPanel, BorderLayout.CENTER);
+		cPanel.add(gridPanel, BorderLayout.CENTER);
+	    
 		
 		JPanel panel = new JPanel();
 		gridPanel.add(panel);
@@ -266,7 +292,7 @@ panel.add(bSliderPos);
 		
 		
 		
-int dimX = 150, dimY = 20;
+int dimX = 150, dimY = 25;
 		
 		aSliderPos.setPreferredSize(new Dimension(dimX,dimY));
 		bSliderPos.setPreferredSize(new Dimension(dimX,dimY));
@@ -282,10 +308,10 @@ int dimX = 150, dimY = 20;
 		
 		
 		JPanel panel2 = new JPanel();
-		panel2.setPreferredSize(new Dimension(200,220));
+		panel2.setPreferredSize(new Dimension(200,240));
 		panel2.setBorder(BorderFactory.createEtchedBorder());
 		panel2.setLayout(new BorderLayout());
-		fPanel = new FunctionPanel(seurat,settings.aPos, settings.bPos,settings.aNeg, settings.bNeg);
+		fPanel = new FunctionPanel(this,seurat,settings.aPos, settings.bPos,settings.aNeg, settings.bNeg);
 		panel2.add(fPanel,BorderLayout.CENTER);
 		this.getContentPane().add(panel2, BorderLayout.NORTH);
 		
@@ -302,6 +328,47 @@ int dimX = 150, dimY = 20;
 				repaint();
 			}
 		});
+		
+		
+		
+		
+		JPanel sPanel = new JPanel();
+		sPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
+		JSlider slider = new JSlider(JSlider.HORIZONTAL,
+	            0, 100, 50);
+		slider.setValue((int)Math.round(Settings.Selection*100));
+		
+		sLabel = new JLabel("Selection quatioent: " + Math.round(Settings.Selection*100) + "%");
+		
+		slider.setMajorTickSpacing(20);
+		slider.setMinorTickSpacing(1);
+		slider.setPaintTicks(true);
+		slider.setPaintLabels(true);
+		
+		
+		
+		
+		slider.addChangeListener(new ChangeListener() {
+			public void stateChanged(ChangeEvent e ) {
+				JSlider s = (JSlider)e.getSource();
+				int i = s.getValue();
+				sLabel.setText("Selection quotient: " + i + "%");
+				Settings.Selection = (double)i/100;
+				cSettings.seurat.repaintWindows();
+				repaint();
+			}
+		});
+		
+		sPanel.add(sLabel);
+		sPanel.add(slider);
+		sPanel.setBorder(BorderFactory.createEtchedBorder());
+		
+		cPanel.add(sPanel,BorderLayout.SOUTH);
+		this.getContentPane().add(cPanel,BorderLayout.CENTER);
+		
+		
+		
+		
 		
 		JPanel invertColorPanel = new JPanel();
 		invertColorPanel.setLayout(new BorderLayout());
@@ -327,44 +394,7 @@ int dimX = 150, dimY = 20;
 			
 		
 		
-		/*
-		
-		JPanel pixelSizePanel = new JPanel();
-		pixelSizePanel.setBorder(BorderFactory.createEtchedBorder());
-		
-		pixelWField.setText("   " + settings.PixelW);
-		JButton btn = new JButton("Change");
-		
-		pixelSizePanel.add(new JLabel("Pixel Width: "));
-		pixelSizePanel.add(pixelWField);
-		pixelSizePanel.add(btn);
-		
-		
-		
-		
-		pixelHField.setText("   " + settings.PixelH);
-		btn = new JButton("Change");
-		btn.addActionListener(new ActionListener(){
-			public void actionPerformed(ActionEvent e) {
-				int PixelH = Integer.parseInt(pixelHField.getText().replaceAll(" ", ""));
-				int PixelW = Integer.parseInt(pixelWField.getText().replaceAll(" ", ""));
-				cSettings.seurat.applyNewPixelSize(PixelW,PixelH);
-				repaint();
-			}
-			
-		});
-		
-		pixelSizePanel.add(new JLabel("Pixel Height: "));
-		pixelSizePanel.add(pixelHField);
-		pixelSizePanel.add(btn);
-		
-		
-		
-		invertColorPanel.add(pixelSizePanel,BorderLayout.SOUTH);
-		
-		*/
-		
-		
+	
 		
 		
 		
@@ -434,8 +464,10 @@ implements MouseListener, MouseMotionListener{
 	int [] negBinsColor;
 	int negMaxColor;
 	boolean dragPosMin=false,dragPosMax=false,dragNegMin= false,dragNegMax= false;
+	ColorSettings colorSettings;
 	
-	public FunctionPanel(Seurat seurat, double aPos, double bPos, double aNeg, double bNeg) {
+	public FunctionPanel(ColorSettings colorSettings,Seurat seurat, double aPos, double bPos, double aNeg, double bNeg) {
+		this.colorSettings = colorSettings;
 		this.aPos = aPos;
 		this.bPos = bPos;
 		this.aNeg = aNeg;
@@ -520,6 +552,8 @@ implements MouseListener, MouseMotionListener{
 		
 		for (int i = 0; i < segments; i++) {
 			
+			
+			/*
 			float h = Color.RGBtoHSB(seurat.PosColor.getRed(), seurat.PosColor.getGreen(), seurat.PosColor.getBlue(), null) [0];
 			float s = Color.RGBtoHSB(seurat.PosColor.getRed(), seurat.PosColor.getGreen(), seurat.PosColor.getBlue(), null) [1];
 			float v = Color.RGBtoHSB(seurat.PosColor.getRed(), seurat.PosColor.getGreen(), seurat.PosColor.getBlue(), null) [2];
@@ -530,6 +564,12 @@ implements MouseListener, MouseMotionListener{
 					koeff*s, v));
             if (settings.Model == 2) c = Color.getHSBColor(h,
 					s,(float) koeff*v);
+					
+		*/
+		Color c = null;	
+			if (settings.Model == 1) c = Tools.convertHLCtoRGB(new MyColor(Settings.Lmax -  (segments - i)*(Settings.Lmax-Settings.Lmin)/segments, (segments - i)*Settings.Cmax/segments, seurat.PosColor )).getRGBColor();
+			if (settings.Model == 2) c = Tools.convertHLCtoRGB(new MyColor(Settings.LSmin  + (segments - i)*(Settings.Lmax-Settings.LSmin )/segments, (segments - i)*Settings.Cmax/segments, seurat.PosColor )).getRGBColor();
+		
             
             g.setColor(c);
         		
@@ -618,7 +658,7 @@ implements MouseListener, MouseMotionListener{
 		
 		for (int i = 0; i < segments; i++) {
 				
-			
+			/*
 			float h = Color.RGBtoHSB(seurat.NegColor.getRed(), seurat.NegColor.getGreen(), seurat.NegColor.getBlue(), null) [0];
 			float s = Color.RGBtoHSB(seurat.NegColor.getRed(), seurat.NegColor.getGreen(), seurat.NegColor.getBlue(), null) [1];
 			float v = Color.RGBtoHSB(seurat.NegColor.getRed(), seurat.NegColor.getGreen(), seurat.NegColor.getBlue(), null) [2];
@@ -629,7 +669,15 @@ implements MouseListener, MouseMotionListener{
 					(float) koeff*s, v));
             if (settings.Model == 2) c = Color.getHSBColor(h,
 					s,(float) koeff*v);
-            
+            */
+			
+			
+			Color c = null;	
+			if (settings.Model == 1) c = Tools.convertHLCtoRGB(new MyColor(Settings.Lmax -  (segments - i)*(Settings.Lmax-Settings.Lmin)/segments,(segments - i)*Settings.Cmax/segments, seurat.NegColor )).getRGBColor();
+			if (settings.Model == 2) c = Tools.convertHLCtoRGB(new MyColor(Settings.LSmin   + (segments - i)*(Settings.Lmax- Settings.LSmin )/segments,(segments - i)*Settings.Cmax/segments, seurat.NegColor )).getRGBColor();
+		
+			
+			
             g.setColor(c);
         		
 			
@@ -839,11 +887,15 @@ implements MouseListener, MouseMotionListener{
 			
 		
 			
-			
+			/*
 			seurat.NegColor = JColorChooser.showDialog(
                     this,
                     "Choose color for negative values",
                      seurat.NegColor);
+			*/
+			MyColorChooser m = new MyColorChooser(colorSettings, seurat.NegColor, "Choose color for negative values", false);
+		//	seurat.NegColor = m.color;
+			
 			
 			seurat.repaintWindows();
 			repaint();
@@ -859,10 +911,15 @@ implements MouseListener, MouseMotionListener{
 				e.getY() <=   abstandUnten/8  +  (this.getHeight()-abstandUnten -abstandUnten/8)
 			) {
 			
+			/*
 				seurat.PosColor = JColorChooser.showDialog(
 	                     this,
 	                     "Choose color for positive values",
-	                      seurat.PosColor);
+	                      seurat.PosColor);*/
+			
+			MyColorChooser m = new MyColorChooser(colorSettings, seurat.PosColor, "Choose color for positive values", true);
+		//	seurat.PosColor = m.color;
+		
 ;
 				seurat.repaintWindows();
 				repaint();
