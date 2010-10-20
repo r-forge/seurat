@@ -743,15 +743,11 @@ int sWidth = 	getStringWidth(g,round(anchor)+"");
 	
 	public void addSelection(Point point1, Point point2) {
 		boolean[] selectedBalken = new boolean[balken.length];
-		seurat.dataManager.deleteSelection();
-		 for (int i = 0; i < variables.size(); i++) {
-		    	variables.elementAt(i).unselect(true);
-		    }
 		
 		
 		
-			boolean selected = false;		 
-			boolean isNASelected = false;
+		boolean selected = false;		 
+		boolean isNASelected = false;
 		 
 		if (this.NABalken == 0) {
 
@@ -893,7 +889,7 @@ int sWidth = 	getStringWidth(g,round(anchor)+"");
 	public void mouseReleased(MouseEvent e) {
 		point2 = e.getPoint();
 		if (point1 != null && point2 != null) {
-
+			if (!e.isShiftDown()) seurat.dataManager.deleteSelection();
 			addSelection(point1, point2);
 
 		}

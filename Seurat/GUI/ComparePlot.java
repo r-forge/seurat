@@ -12,7 +12,7 @@ import java.awt.*;
 
 import Data.GeneVariable;
 import Data.ISelectable;
-import GUI.BarchartPanel.Balken;
+import GUI.BarchartPanel.Bar;
 
 public class ComparePlot extends JFrame implements IPlot {
 

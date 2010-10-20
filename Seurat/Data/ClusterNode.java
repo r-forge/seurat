@@ -1,6 +1,8 @@
 package Data;
 import java.util.*;
 
+import Tools.Tools;
+
 public class ClusterNode {
 
 	public ClusterNode nodeR;
@@ -14,7 +16,7 @@ public class ClusterNode {
 
 	public double currentHeight;
 	
-	public Vector<ISelectable> Cases;
+	public Cluster cluster;
 	
 	public CoordinateNode cNode;
 	
@@ -24,8 +26,10 @@ public class ClusterNode {
 	
 	public boolean firstOrder = true;
 	
+	
+	
 	public ClusterNode(Vector<ISelectable> cases) {
-		this.Cases = cases;
+		this.cluster = new Cluster(cases,null);
 	}
 
 
@@ -67,7 +71,7 @@ public class ClusterNode {
 			Vector<ISelectable> order = new Vector();
 			
 			
-			order.add(Cases.firstElement());
+			order.add(cluster.items.firstElement());
 			return order;
 		}
 
@@ -83,6 +87,23 @@ public class ClusterNode {
 
 	
 	
+	public ClusterNode cut(double H) {
+		if (currentHeight >= H) {
+		   ClusterNode node = copy();
+		   node.nodeR = node.nodeR.cut(H);
+		   node.nodeL = node.nodeL.cut(H);
+		   return node;
+		}
+		else {
+			return null;
+		}
+		
+		
+		
+		
+	}
+	
+	
 	public Vector<ISelectable> getFirstOrder() {
 
 		if (firstOrder) {
@@ -94,7 +115,7 @@ public class ClusterNode {
 		firstOrder = false;
 		return order;
 		}
-		return Cases;
+		return cluster.items;
 	}
 	
 	
@@ -106,8 +127,8 @@ public class ClusterNode {
 	
 	public ClusterNode(int ClusterNumber, ISelectable item) {
 		this.ClusterNumber = ClusterNumber;
-		Cases = new Vector();
-		Cases.add(item);
+		cluster = new Cluster(new Vector(),null);
+		cluster.items.add(item);
 	}
 
 	public ClusterNode(int ClusterNumber, ClusterNode nodeR, ClusterNode nodeL) {
@@ -118,17 +139,52 @@ public class ClusterNode {
 	}
 
 	public void loadCases() {
-		Cases = new Vector();
-		for (int i = 0; i < nodeR.Cases.size(); i++) {
-			Cases.add(nodeR.Cases.elementAt(i));
+		cluster = new Cluster(new Vector(),null);
+		for (int i = 0; i < nodeR.cluster.items.size(); i++) {
+			cluster.items.add(nodeR.cluster.items.elementAt(i));
 		}
 	
-		for (int i = 0; i < nodeL.Cases.size(); i++) {
-			Cases.add(nodeL.Cases.elementAt(i));
+		for (int i = 0; i < nodeL.cluster.items.size(); i++) {
+			cluster.items.add(nodeL.cluster.items.elementAt(i));
 		}
 		
 	}
 
+	
+	public void permute() {
+		ClusterNode c = nodeR;
+		nodeR = nodeL;
+		nodeL = c;
+	}
+	
+	
+	public ClusterNode copy() {
+		ClusterNode node = new ClusterNode(cluster.items);
+		
+		if (nodeR != null) node.nodeR = nodeR.copy(); 
+		if (nodeL != null) node.nodeL = nodeL.copy(); 
+		
+		
+		
+		node.ClusterNumber = ClusterNumber;
+
+
+		node.currentHeight = currentHeight;
+		
+		node.cluster = cluster;
+		
+		node.cNode = cNode;
+		
+		node.name = name;
+		
+		node.isRows = isRows;
+		
+		node.firstOrder = firstOrder;
+		
+		return node;
+		
+	}
+	
 	
 
 	public int getTiefe() {
@@ -139,13 +195,27 @@ public class ClusterNode {
 	}
 	
 	
+	// returns all nodes in the tree not children
+	public Vector<ClusterNode> getParents() {
+		if (nodeL != null && nodeR != null) {
+			Vector v = Tools.mergeVectors(nodeL.getParents(),nodeR.getParents());
+			v.add(this);
+			return v;
+		}	
+		
+		return new Vector();
+	}
+	
+	
+	
+	
 	
 	
 	
 	public boolean isSelected() {
-		for (int i = 0; i < Cases.size(); i++) {
+		for (int i = 0; i < cluster.items.size(); i++) {
 			
-			if (Cases.elementAt(i).isSelected()) return true;
+			if (cluster.items.elementAt(i).isSelected()) return true;
 		}
 		return false;
 	}
@@ -157,8 +227,8 @@ public class ClusterNode {
 		
 		
 		
-		for (int i = 0; i < this.Cases.size(); i++) {
-			Cases.elementAt(i).select(true);
+		for (int i = 0; i < this.cluster.items.size(); i++) {
+			cluster.items.elementAt(i).select(true);
 			
 		}
 			

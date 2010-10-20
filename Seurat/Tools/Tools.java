@@ -174,6 +174,23 @@ public static boolean isLineInRect(int x1, int y1, int x2, int y2, int Rx1,
 
 	}
 
+	// Merges two verctors
+	public static Vector mergeVectors(Vector v1, Vector v2) {
+		Vector v = new Vector();
+		
+		for (int i = 0; i < v1.size(); i++) {
+			v.add(v1.elementAt(i));
+		}
+		
+		for (int i = 0; i < v2.size(); i++) {
+			v.add(v2.elementAt(i));
+		}
+		return v;
+	}
+	
+	
+	
+	
 	public static double fNeg(double xx) {
 		double a = Settings.aNeg;
 		double b = Settings.bNeg;
@@ -375,6 +392,8 @@ public static boolean isLineInRect(int x1, int y1, int x2, int y2, int Rx1,
 	
 	
 	
+	
+	
 	//public static MyColor convertHLCtoRGB(MyColor color) {
 		//return convertHLCtoXYZ(convertXYZtoRGB(color));
 	//}
@@ -548,6 +567,78 @@ public static boolean isLineInRect(int x1, int y1, int x2, int y2, int Rx1,
 	
 	
 	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+
+	
+
+	public static String round100(double zahl) {
+		if (zahl == Math.round(zahl))
+			return "" + zahl;
+		return "" + (double) Math.round(zahl * 100) / 100;
+	}
+
+	
+
+	public static String cutLabels(String s, int availablePlace, Graphics g) {
+		s = s.replaceAll("\"", "");
+		String ss = cutLabelsHelp(s, availablePlace, g);
+		if (ss.length() < 5)
+			return ss;
+
+		int Width = getStringSpace(ss,g);
+		if (Width < availablePlace)
+			return ss;
+
+		while (Width > availablePlace) {
+			Width = 0;
+			ss = ss.substring(0, ss.length() - 1);
+			for (int i = 0; i < ss.length(); i++)
+				Width += g.getFontMetrics().charWidth(ss.charAt(i));
+
+		}
+
+		return ss;
+
+	};
+	
+	
+	public static int getStringSpace(String s,Graphics g) {
+		int Width = 0;
+		for (int i = 0; i < s.length(); i++)
+			Width += g.getFontMetrics().charWidth(s.charAt(i));
+		return Width;
+	}
+	
+	
+
+	public static String cutLabelsHelp(String s, int availablePlace, Graphics g) {
+		int Width = getStringSpace(s,g);
+		if (Width < availablePlace)
+			return s;
+
+		Width = 0;
+
+		s = s.replaceAll("ck", "c");
+		String cutS = "";
+		for (int i = 0; i < s.length(); i++) {
+			char c = s.charAt(i);
+			// if (c != 'e' && c != 'u' && c != 'i' && c != 'o' && c != 'ü'
+			// && c != 'a' && c != 'ö' && c != 'ä' && c != 'y')
+			cutS += c;
+		}
+
+		return cutS;
+
+	}
 	
 	
 	

@@ -37,8 +37,8 @@ public class Barchart extends JFrame implements IPlot {
 
 		this.getContentPane().setLayout(new BorderLayout());
 		this.getContentPane().add(new JScrollPane(panel), BorderLayout.CENTER);
-		this.setBounds(350, 0, 250, Math.min(panel.balken.size()
-				* panel.BinHeigth * 2 + panel.abstandOben + 40, 600));
+		this.setBounds(350, 0, 250, Math.min(panel.bars.size() * (panel.BarHeigth + panel.BarSpace) 
+				+ 2*panel.abstandOben-panel.BarSpace+30, 600));
 
 		this.setVisible(true);
 		this.addKeyListener(panel);
@@ -78,8 +78,8 @@ public class Barchart extends JFrame implements IPlot {
 
 		this.getContentPane().setLayout(new BorderLayout());
 		this.getContentPane().add(new JScrollPane(panel), BorderLayout.CENTER);
-		this.setBounds(350, 0, 250, Math.min(panel.balken.size()
-				* panel.BinHeigth * 2 + panel.abstandOben + 40, 600));
+		this.setBounds(350, 0, 250, Math.min(panel.bars.size() * (panel.BarHeigth + panel.BarSpace) 
+				+ 2*panel.abstandOben-panel.BarSpace+30, 600));
 
 		this.setVisible(true);
 		this.addKeyListener(panel);
@@ -185,14 +185,28 @@ class BarchartPanel extends JPanel implements KeyListener, MouseListener,
 	Image image;
 
 	int abstandLinks = 80;
+	
+	int abstandRechts = 20;
 
 	int abstandOben = 20;
 
-	int BinHeigth = 20;
+	int BarHeigth = 25;
+	
+	int BarSpace = 20;
 
 	int abstandString = 5;
 
 	boolean firstPaint = true;
+	
+	boolean labelResizing = false;
+	
+	boolean barResizing = false;
+	
+    boolean heightResizing = false;
+	
+	boolean spaceResizing = false;
+	
+	Bar resizingBar;
 	
 	// int[] balkenAbs;
 
@@ -214,7 +228,8 @@ class BarchartPanel extends JPanel implements KeyListener, MouseListener,
 
 	JPopupMenu menu;
 
-	Vector<Balken> balken;
+	/*Bars to the categories of given data*/
+	Vector<Bar> bars;
 	
 	
 
@@ -231,8 +246,8 @@ class BarchartPanel extends JPanel implements KeyListener, MouseListener,
 
 		this.calculateBalken();
 
-		this.setPreferredSize(new Dimension(200, balken.size() * BinHeigth * 2
-				+ abstandOben));
+		this.setPreferredSize(new Dimension(200, bars.size() * (BarHeigth+BarSpace) 
+				+ abstandOben- BarSpace));
 		this.setVisible(true);
 		this.addKeyListener(this);
 		this.addMouseListener(this);
@@ -273,8 +288,8 @@ class BarchartPanel extends JPanel implements KeyListener, MouseListener,
 	}
 
 	public int indexOf(String s) {
-		for (int i = 0; i < balken.size(); i++) {
-			if (balken.elementAt(i).name.equals(s))
+		for (int i = 0; i < bars.size(); i++) {
+			if (bars.elementAt(i).name.equals(s))
 				return i;
 		}
 		return -1;
@@ -284,13 +299,13 @@ class BarchartPanel extends JPanel implements KeyListener, MouseListener,
 
 	public void brush() {
 
-		for (int i = 0; i < balken.size(); i++) {
+		for (int i = 0; i < bars.size(); i++) {
 
-			float value = ((float) i / balken.size() + colorShift);
+			float value = ((float) i / bars.size() + colorShift);
 			if (value > 1)
 				value -= 1;
 
-			balken.elementAt(i).color = Color
+			bars.elementAt(i).color = Color
 					.getHSBColor(value, 1, (float) 0.7);
 
 			for (int j = 0; j < data.length; j++) {
@@ -299,9 +314,9 @@ class BarchartPanel extends JPanel implements KeyListener, MouseListener,
 					if (((Variable) this.getVariable(j)).getBarchartToColors()
 							.indexOf(barchart) == -1) {
 
-						((Variable) this.getVariable(j)).getColors().add(balken
+						((Variable) this.getVariable(j)).getColors().add(bars
 								.elementAt(i).color);
-						((Variable) this.getVariable(j)).getColorNames().add(balken
+						((Variable) this.getVariable(j)).getColorNames().add(bars
 								.elementAt(i).name);
 						((Variable) this.getVariable(j)).getBarchartToColors()
 								.add(barchart);
@@ -310,7 +325,7 @@ class BarchartPanel extends JPanel implements KeyListener, MouseListener,
 						int index = ((Variable) this.getVariable(j)).getBarchartToColors()
 								.indexOf(barchart);
 						((Variable) this.getVariable(j)).getColors().set(index,
-								balken.elementAt(i).color);
+								bars.elementAt(i).color);
 
 					}
 
@@ -340,8 +355,8 @@ class BarchartPanel extends JPanel implements KeyListener, MouseListener,
 			}
 		}
 
-		for (int i = 0; i < balken.size(); i++) {
-			balken.elementAt(i).color = GRAY;
+		for (int i = 0; i < bars.size(); i++) {
+			bars.elementAt(i).color = GRAY;
 			this.colorShift = 0;
 
 		}
@@ -352,48 +367,33 @@ class BarchartPanel extends JPanel implements KeyListener, MouseListener,
 	}
 
 	public void addSelection(Point point1, Point point2) {
-		boolean[] selectedBalken = new boolean[balken.size()];
 
-		for (int i = 0; i < balken.size(); i++) {
+		
+		
+		boolean selected = false;	
+
+		for (int i = 0; i < bars.size(); i++) {
+		
+			
 			if (Tools.containsRectInRect(
 
 			abstandLinks,
 
-			abstandOben + i * 2 * BinHeigth,
+			abstandOben + i * (BarHeigth+BarSpace),
 
-			abstandLinks
-					+ (int) Math.round((this.getWidth() - abstandLinks - 20)
-							* balken.elementAt(i).balkenRel),
+			abstandLinks+ (int) Math.round((this.getWidth() - abstandLinks - abstandRechts)
+							* bars.elementAt(i).barRel),
 
-			abstandOben + i * 2 * BinHeigth + BinHeigth,
+			abstandOben + i * (BarSpace+ BarHeigth) + BarHeigth,
 
 			point1.x, point1.y, point2.x, point2.y))
-				selectedBalken[i] = true;
-
-		}
-
-		seurat.dataManager.deleteSelection();
-	    /*for (int i = 0; i < variables.size(); i++) {
-	    	variables.elementAt(i).unselect(true);
-	    }*/
-	
-			
 		
-		boolean selected = false;	
-			
-		for (int i = 0; i < selectedBalken.length; i++) {
-
-			if (selectedBalken[i]) {
-				for (int j = 0; j < data.length; j++) {
-					int num = indexOf(data[j]);
-					if (i == num) {
-						this.getVariable(j).select(true);
-						selected = true;
-					}
-				}
+			{
+				selected = bars.elementAt(i).select() || selected;
 			}
-		}
-		
+
+	
+		}		
 		
 		
 		
@@ -419,16 +419,37 @@ class BarchartPanel extends JPanel implements KeyListener, MouseListener,
 	}
 
 	public void mouseReleased(MouseEvent e) {
-		point2 = e.getPoint();
+		
+		if (labelResizing) {
+			labelResizing = false;
+			resizingBar = null;
+			return;
+		}
+		if (barResizing) {
+			barResizing = false;
+			resizingBar = null;
+			return;
+		}
+		if (heightResizing) {
+			heightResizing = false;
+			resizingBar = null;
+			return;
+		}
 
+		if (spaceResizing) {
+			spaceResizing = false;
+			resizingBar = null;
+			return;
+		}
+
+
+		point2 = e.getPoint();
+		
 		if (!(e.getButton() == MouseEvent.BUTTON3 || e.isControlDown())) {
 
-			
-			//seurat.dataManager.deleteSelection();
 			if (point1 != null && point2 != null) {
-
+				if (!e.isShiftDown()) seurat.dataManager.deleteSelection();
 				addSelection(point1, point2);
-
 			}
 
 			point1 = null;
@@ -438,8 +459,10 @@ class BarchartPanel extends JPanel implements KeyListener, MouseListener,
 	}
 
 	public void mouseClicked(MouseEvent e) {
+		
 		point1 = e.getPoint();
-
+		
+		
 		if (e.getButton() == MouseEvent.BUTTON3 || e.isControlDown()) {
 
 			menu = new JPopupMenu();
@@ -557,13 +580,116 @@ class BarchartPanel extends JPanel implements KeyListener, MouseListener,
 	}
 
 	public void mouseDragged(MouseEvent e) {
+		
+		
+		if (labelResizing) {
+			this.abstandLinks = e.getX();
+			updateSelection();
+			return;
+		}
+		
+		if (barResizing) {
+			
+				if (resizingBar != null) {
+				Bar bar = getMaxBar();	
+				this.abstandRechts = this.getWidth() - abstandLinks - (e.getX()- abstandLinks)*bar.variables.size()/resizingBar.variables.size();
+			    updateSelection();
+			}
+			return;
+		}
+		if (heightResizing) {
+			
+				if (resizingBar != null && e.getY()>=abstandOben && bars.indexOf(resizingBar)==0 ) {
+				this.BarHeigth = (e.getY() - abstandOben);
+				this.setPreferredSize(new Dimension(
+						this.getWidth(), bars.size() * (BarHeigth+BarSpace) + abstandOben- BarSpace));
+			    updateSelection();
+			}
+			return;
+		}
+		if (spaceResizing) {
+			
+				if (resizingBar != null && bars.indexOf(resizingBar)!= 0) {
+				this.BarSpace =  (e.getY() - abstandOben)/(bars.indexOf(resizingBar))-BarHeigth;
+				this.setPreferredSize(new Dimension(this.getWidth(), bars.size() * (BarHeigth+BarSpace) 
+						+ abstandOben- BarSpace));
+				updateSelection();
+			}
+				
+				
+				if (resizingBar != null && bars.indexOf(resizingBar)== 0) {
+					abstandOben =  e.getY();
+					this.setPreferredSize(new Dimension(this.getWidth(), bars.size() * (BarHeigth+BarSpace) 
+							+ abstandOben- BarSpace));
+					updateSelection();
+				}
+				
+				
+			return;
+		}
+		
+		
 		point2 = e.getPoint();
+		
+		
 		this.repaint();
 
 	}
+	
+    public int getMaxBarWidth() {
+    	int max = 0;
+    	for (int i = 0; i < bars.size(); i++) {
+    		Bar bar = bars.elementAt(i);
+    		if (bar.barWidth>max) max = bar.barWidth;
+    		
+    	}
+    	
+    	return max;
+    }	
+    
+    
+    public Bar getMaxBar() {
+    	int max = 0;
+    	int j = 0;
+    	for (int i = 0; i < bars.size(); i++) {
+    		Bar bar = bars.elementAt(i);
+    		if (bar.barWidth>max){
+    			max = bar.barWidth;
+    			j = i;
+    		}
+    		
+    	}
+    	
+    	return bars.elementAt(j);
+    }	
+	
+	
+	
 
 	public void mousePressed(MouseEvent e) {
 		point1 = e.getPoint();
+		System.out.println("Pressed");
+		if (isLabelResizing(e)) {
+			labelResizing = true;
+			resizingBar = getBar(e);
+			return;
+		}
+		if (isBarWidthResizing(e)) {
+			barResizing = true;
+			resizingBar = getBar(e);
+			return;
+		}
+		if (isHeightResizing(e)) {
+			heightResizing = true;
+			resizingBar = getBar(e);
+			return;
+		}
+		if (isSpaceResizing(e)) {
+			spaceResizing = true;
+			resizingBar = getBar(e);
+			return;
+		}
+		
 	}
 
 	public void keyPressed(KeyEvent e) {
@@ -597,7 +723,8 @@ class BarchartPanel extends JPanel implements KeyListener, MouseListener,
 
 	public void calculateBalken() {
 
-		balken = new Vector();
+		System.out.println("Calc");
+		bars = new Vector();
 
 		Vector<String> barStrings = new Vector();
 
@@ -606,44 +733,42 @@ class BarchartPanel extends JPanel implements KeyListener, MouseListener,
 			for (int j = 0; j < barStrings.size(); j++) {
 				if (barStrings.elementAt(j).equals(data[i])) {
 					add = false;
+					bars.elementAt(j).variables.add(getVariable(i));
 				}
 			}
-			if (add)
+			if (add) {
 				barStrings.add(data[i]);
+				bars.add(new Bar(this, data [i],getVariable(i)));
+			}
 		}
 
-		Collections.sort(barStrings);
 
-		for (int i = 0; i < barStrings.size(); i++) {
-			balken.add(new Balken(this, barStrings.elementAt(i)));
-		}
 
-		for (int i = 0; i < data.length; i++) {
-			int num = barStrings.indexOf(data[i]);
-			balken.elementAt(num).balkenRel++;
-			balken.elementAt(num).balkenAbs++;
+		for (int i = 0; i < bars.size(); i++) {
+			Bar bar = bars.elementAt(i);
+			bar.barRel = bar.variables.size();
+			bar.barAbs = bar.variables.size();
+			bars.elementAt(i).color = GRAY;
 		}
+		
 
 		double max = 0;
-		for (int i = 0; i < balken.size(); i++) {
-			if (max < balken.elementAt(i).balkenRel)
-				max = balken.elementAt(i).balkenRel;
+		for (int i = 0; i < bars.size(); i++) {
+			if (max < bars.elementAt(i).barRel) max = bars.elementAt(i).barRel;
 		}
 
-		for (int i = 0; i < balken.size(); i++) {
-			balken.elementAt(i).balkenRel /= max;
+		for (int i = 0; i < bars.size(); i++) {
+			bars.elementAt(i).barRel /= max;
 		}
-
-		for (int i = 0; i < balken.size(); i++) {
-			balken.elementAt(i).color = GRAY;
-		}
-
+		
+		//Collections.sort(barStrings);
+        sortByLexico();
 	}
 
 	public void calculateAbstandLinks() {
 		int length = 0;
-		for (int i = 0; i < this.balken.size(); i++) {
-			String s = this.balken.elementAt(i).name;
+		for (int i = 0; i < this.bars.size(); i++) {
+			String s = this.bars.elementAt(i).name;
 			int Width = 0;
 			for (int j = 0; j < s.length(); j++)
 				Width += this.getGraphics().getFontMetrics().charWidth(
@@ -654,120 +779,108 @@ class BarchartPanel extends JPanel implements KeyListener, MouseListener,
 
 		}
 
-		this.abstandLinks = Math.min(length + 10, 80);
+		this.abstandLinks = Math.min(length + 12, 80);
 	}
 
+	
+	
+	
 	public void updateSelection() {
 
-		// if (binStrings == null) this.binStrings = new String [balken.length];
+		for (int i = 0; i < bars.size(); i++) {
 
-		for (int i = 0; i < balken.size(); i++) {
+			Bar bar = bars.elementAt(i);
+            bar.nameShort = Tools.cutLabels(bar.name, abstandLinks- abstandString - 3, this.getGraphics());
+			int selectedCount = 0;
 
-			String s = balken.elementAt(i).name;
-
-			if (balken.elementAt(i).nameKurz == null)
-				balken.elementAt(i).nameKurz = this.cutLabels(s, abstandLinks
-						- abstandString - 3, this.getGraphics());
-
-			int selectedCount = 0, gesamtExperInBalken = 0;
-
-			for (int j = 0; j < this.data.length; j++) {
-				if (this.data[j].equals(s)) {
-					if (getVariable(j).isSelected())
-						selectedCount++;
-					gesamtExperInBalken++;
-				}
+			
+			for (int j = 0; j < bar.variables.size(); j++) {
+				if (bar.variables.elementAt(j).isSelected()) selectedCount++;
 			}
 
-			balken.elementAt(i).koeff = (double) selectedCount
-					/ gesamtExperInBalken;
-			balken.elementAt(i).selectedCount = selectedCount;
+			bar.koeff = (double) selectedCount / bar.variables.size();
+			bar.selectedCount = selectedCount;
+			bar.barWidth = (int) Math.round((this.getWidth() - abstandLinks - abstandRechts)* bar.barRel);
+			bar.barSelectedWidth = (int) Math.round((this.getWidth() - abstandLinks - abstandRechts)* bar.barRel * bar.koeff);
 
-			balken.elementAt(i).balkenWidth = (int) Math.round((this.getWidth()
-					- abstandLinks - 20)
-					* balken.elementAt(i).balkenRel);
-
-			balken.elementAt(i).balkenSelectedWidth = (int) Math
-					.round((this.getWidth() - abstandLinks - 20)
-							* balken.elementAt(i).balkenRel
-							* balken.elementAt(i).koeff);
-
-			if ((this.getWidth() - abstandLinks - 20)
-					* balken.elementAt(i).balkenRel * balken.elementAt(i).koeff > 0
-					&& (this.getWidth() - abstandLinks - 20)
-							* balken.elementAt(i).balkenRel
-							* balken.elementAt(i).koeff < 1) {
-				balken.elementAt(i).balkenSelectedWidth = 1;
-			}
+			if (   (this.getWidth() - abstandLinks - abstandRechts) * bar.barRel * bar.koeff > 0
+				&& (this.getWidth() - abstandLinks - abstandRechts) * bar.barRel * bar.koeff < 1) 
+				bar.barSelectedWidth = 1;
 
 		}
 
 		this.repaint();
 
 	}
+	
+	
+	
+	
+	
+	
+	
 
 	public void sortByCount() {
-		Vector<Balken> balkenTemp = new Vector();
-		for (int i = 0; i < balken.size(); i++) {
-			Balken balk = balken.elementAt(i);
+		Vector<Bar> balkenTemp = new Vector();
+		for (int i = 0; i < bars.size(); i++) {
+			Bar bar = bars.elementAt(i);
 			int j = 0;
 			while (j < balkenTemp.size()
-					&& balk.balkenAbs < balkenTemp.elementAt(j).balkenAbs) {
+					&& bar.barAbs < balkenTemp.elementAt(j).barAbs) {
 				j++;
 			}
-			balkenTemp.insertElementAt(balk, j);
+			balkenTemp.insertElementAt(bar, j);
 
 		}
 
-		this.balken = balkenTemp;
+		this.bars = balkenTemp;
 		repaint();
 	}
 
 	public void sortByAbsolutSelected() {
-		Vector<Balken> balkenTemp = new Vector();
-		for (int i = 0; i < balken.size(); i++) {
-			Balken balk = balken.elementAt(i);
+		Vector<Bar> balkenTemp = new Vector();
+		for (int i = 0; i < bars.size(); i++) {
+			Bar bar = bars.elementAt(i);
 			int j = 0;
 			while (j < balkenTemp.size()
-					&& balk.selectedCount < balkenTemp.elementAt(j).selectedCount) {
+					&& bar.selectedCount < balkenTemp.elementAt(j).selectedCount) {
 				j++;
 			}
-			balkenTemp.insertElementAt(balk, j);
+			balkenTemp.insertElementAt(bar, j);
 
 		}
 
-		this.balken = balkenTemp;
+		this.bars = balkenTemp;
 		repaint();
 	}
 
 	public void sortByRelativeSelected() {
-		Vector<Balken> balkenTemp = new Vector();
-		for (int i = 0; i < balken.size(); i++) {
-			Balken balk = balken.elementAt(i);
+		Vector<Bar> balkenTemp = new Vector();
+		for (int i = 0; i < bars.size(); i++) {
+			Bar bar = bars.elementAt(i);
 			int j = 0;
-			while (j < balkenTemp.size()
-					&& (double) balk.selectedCount / balk.balkenAbs < (double) balkenTemp
-							.elementAt(j).selectedCount
-							/ balkenTemp.elementAt(j).balkenAbs) {
+			while (j < balkenTemp.size() && 
+					(double) bar.selectedCount / bar.barAbs < (double) balkenTemp.elementAt(j).selectedCount
+					/ balkenTemp.elementAt(j).barAbs) {
 				j++;
 			}
-			balkenTemp.insertElementAt(balk, j);
+			balkenTemp.insertElementAt(bar, j);
 
 		}
 
-		this.balken = balkenTemp;
+		this.bars = balkenTemp;
 		repaint();
 	}
 
 	public void sortByReverse() {
-		Vector<Balken> balkenTemp = new Vector();
-		for (int i = 0; i < balken.size(); i++) {
-			Balken balk = balken.elementAt(i);
-			balkenTemp.insertElementAt(balk, 0);
+		Vector<Bar> balkenTemp = new Vector();
+		for (int i = 0; i < bars.size(); i++) {
+			Bar bar = bars.elementAt(i);
+			balkenTemp.insertElementAt(bar, 0);
 
 		}
 
-		this.balken = balkenTemp;
+		this.bars = balkenTemp;
 		repaint();
 	}
 
@@ -778,19 +891,19 @@ class BarchartPanel extends JPanel implements KeyListener, MouseListener,
 			return;
 		}
 
-		Vector<Balken> balkenTemp = new Vector();
-		for (int i = 0; i < balken.size(); i++) {
-			Balken balk = balken.elementAt(i);
+		Vector<Bar> balkenTemp = new Vector();
+		for (int i = 0; i < bars.size(); i++) {
+			Bar bar = bars.elementAt(i);
 			int j = 0;
 			while (j < balkenTemp.size()
-					&& compareLexico(balk.name, balkenTemp.elementAt(j).name)) {
+					&& compareLexico(bar.name, balkenTemp.elementAt(j).name)) {
 				j++;
 			}
-			balkenTemp.insertElementAt(balk, j);
+			balkenTemp.insertElementAt(bar, j);
 
 		}
 
-		this.balken = balkenTemp;
+		this.bars = balkenTemp;
 		repaint();
 	}
 	
@@ -799,16 +912,16 @@ public void sortCHR() {
 		
 
 	
-		for (int i = 0; i < balken.size(); i++) {
-			for (int j = 0; j < balken.size(); j++) {
+		for (int i = 0; i < bars.size(); i++) {
+			for (int j = 0; j < bars.size(); j++) {
 			
-			Balken balk1 = balken.elementAt(i);
-			Balken balk2 = balken.elementAt(j);
+			Bar bar1 = bars.elementAt(i);
+			Bar bar2 = bars.elementAt(j);
 		
-			if ( compareCHR(balk1.name, balk2.name)) {
+			if ( compareCHR(bar1.name, bar2.name)) {
 				if (i<j) {
-					balken.set(j,balk1);
-					balken.set(i,balk2);
+					bars.set(j,bar1);
+					bars.set(i,bar2);
 				}
 			}
 			}
@@ -870,7 +983,7 @@ public boolean compareCHR(String a, String b) {
 	@Override
 	public void paint(Graphics g) {
 
-		if (this.balken == null || firstPaint) {
+		if (this.bars == null || firstPaint) {
 			this.updateSelection();
 			firstPaint = false;
 		}
@@ -878,36 +991,33 @@ public boolean compareCHR(String a, String b) {
 		g.setColor(Color.WHITE);
 		g.fillRect(0, 0, this.getWidth(), this.getHeight());
 
-		for (int i = 0; i < balken.size(); i++) {
+		for (int i = 0; i < bars.size(); i++) {
 
 			g.setColor(Color.BLACK);
+			
+			Bar bar = bars.elementAt(i);
 
-			g.drawString(balken.elementAt(i).nameKurz,
+			g.drawString(bar.nameShort,
 
-			abstandString, abstandOben + i * 2 * BinHeigth + BinHeigth * 3 / 4
+			abstandLinks - Tools.getStringSpace(bar.nameShort,g)-5, abstandOben + i * (BarSpace+ BarHeigth) + BarHeigth * 1 / 2 + 5
 
 			);
 
-			g.setColor(balken.elementAt(i).color);
+			g.setColor(bar.color);
 
-			g.fillRect(abstandLinks, abstandOben + i * 2 * BinHeigth, balken
-					.elementAt(i).balkenWidth, BinHeigth);
+			g.fillRect(abstandLinks, abstandOben + i *(BarSpace+ BarHeigth), bar.barWidth, BarHeigth);
 
 			g.setColor(Color.RED);
 
-			g.fillRect(abstandLinks, abstandOben + i * 2 * BinHeigth, balken
-					.elementAt(i).balkenSelectedWidth, BinHeigth);
+			g.fillRect(abstandLinks, abstandOben + i * (BarSpace+ BarHeigth), bar.barSelectedWidth, BarHeigth);
 
 			g.setColor(Color.BLACK);
 
-			g.drawRect(abstandLinks, abstandOben + i * 2 * BinHeigth, balken
-					.elementAt(i).balkenWidth, BinHeigth);
+			g.drawRect(abstandLinks, abstandOben + i * (BarSpace+ BarHeigth), bar.barWidth, BarHeigth);
 
-			if (balken.elementAt(i).balkenSelectedWidth == 1) {
+			if (bar.barSelectedWidth == 1) {
 				g.setColor(Color.RED);
-
-				g.fillRect(abstandLinks, abstandOben + i * 2 * BinHeigth,
-						balken.elementAt(i).balkenSelectedWidth, BinHeigth);
+				g.fillRect(abstandLinks, abstandOben + i * (BarSpace+ BarHeigth), bar.barSelectedWidth, BarHeigth);
 			}
 
 		}
@@ -921,94 +1031,93 @@ public boolean compareCHR(String a, String b) {
 
 	}
 
-	public int getBalken(MouseEvent e) {
+	public Bar getBar(MouseEvent e) {
 		int x = e.getX();
 		int y = e.getY();
 
-		int i = (y - abstandOben) / 2 / BinHeigth;
+		int i = (y - abstandOben) / (BarSpace + BarHeigth);
 
-		if (x > abstandLinks && x < this.getWidth() - 20)
-			return i;
+		if (x >= abstandLinks && x <= this.getWidth() - abstandRechts+2 && i < bars.size())
+			return bars.elementAt(i);
 
-		return -1;
+		return null;
 
 	}
-
-	public String round(double zahl) {
-		if (zahl == Math.round(zahl))
-			return "" + zahl;
-		return "" + (double) Math.round(zahl * 100) / 100;
+	
+	public boolean isLabelResizing(MouseEvent e) {
+		if ((e.getX() == abstandLinks || e.getX() == abstandLinks-1|| e.getX() == abstandLinks+2) && 
+				(e.getY() - abstandOben)%(BarHeigth + BarSpace)<BarHeigth) {
+			//System.out.println("Treffer");
+			return true;
+		}
+		else return false;
+	}
+	
+	
+	public boolean isBarWidthResizing(MouseEvent e) {
+		
+		Bar bar = getBar(e);
+		
+		if (bar != null && (abstandLinks + bar.barWidth == e.getX() || abstandLinks + bar.barWidth == e.getX()-1||abstandLinks + bar.barWidth == e.getX()-1)
+				&& 
+				(e.getY() - abstandOben)%(BarHeigth + BarSpace)<BarHeigth) {
+		
+			return true;
+		}
+		else return false;
+	}
+	
+	
+    public boolean isHeightResizing(MouseEvent e) {
+		
+		Bar bar = getBar(e);
+		
+		if (bar != null && bars.indexOf(bar) == 0
+				&& 
+				((e.getY() - abstandOben)%(BarHeigth + BarSpace)==BarHeigth || (e.getY() - abstandOben)%(BarHeigth + BarSpace)==BarHeigth-1 ||(e.getY() - abstandOben)%(BarHeigth + BarSpace)==BarHeigth+1)) {
+			//System.out.println("Treffer");
+			return true;
+		}
+		else return false;
+	}
+    
+    
+    public boolean isSpaceResizing(MouseEvent e) {
+		
+		Bar bar = getBar(e);
+		
+		if (bar != null
+				&& 
+				(e.getY() - abstandOben)%(BarHeigth + BarSpace)==0 || (e.getY() - abstandOben)%(BarHeigth + BarSpace)==BarHeigth + BarSpace-1 ||(e.getY() - abstandOben)%(BarHeigth + BarSpace)==+1) {
+			//System.out.println("Treffer");
+			return true;
+		}
+		else return false;
 	}
 
+	
+	
+	
+	
 	public ISelectable getVariable(int i) {
 		if (variables == null)
 			return null;
 		return variables.elementAt(i);
 	}
+	
 
-	public String cutLabels(String s, int availablePlace, Graphics g) {
-		s = s.replaceAll("\"", "");
-		String ss = this.cutLabelsHelp(s, availablePlace, g);
-		if (ss.length() < 5)
-			return ss;
-
-		int Width = 0;
-		for (int i = 0; i < ss.length(); i++)
-			Width += g.getFontMetrics().charWidth(ss.charAt(i));
-		if (Width < availablePlace)
-			return ss;
-
-		while (Width > availablePlace) {
-			Width = 0;
-			ss = ss.substring(0, ss.length() - 1);
-			for (int i = 0; i < ss.length(); i++)
-				Width += g.getFontMetrics().charWidth(ss.charAt(i));
-
-		}
-
-		return ss;
-
-	};
-
-	public String cutLabelsHelp(String s, int availablePlace, Graphics g) {
-		int Width = 0;
-		for (int i = 0; i < s.length(); i++)
-			Width += g.getFontMetrics().charWidth(s.charAt(i));
-		if (Width < availablePlace)
-			return s;
-
-		Width = 0;
-		/*
-		 * String[] split = s.split(" "); String cutS = ""; if (split.length >
-		 * 1) {
-		 * 
-		 * for (int i = 0; i < split.length; i++) if (split[i].length() > 1)
-		 * cutS += split[i].substring(0, 1); else cutS += split[i]; for (int i =
-		 * 0; i < cutS.length(); i++) Width +=
-		 * g.getFontMetrics().charWidth(cutS.charAt(i)); if (Width <
-		 * availablePlace) return cutS; }
-		 */
-
-		s = s.replaceAll("ck", "c");
-		String cutS = "";
-		for (int i = 0; i < s.length(); i++) {
-			char c = s.charAt(i);
-			// if (c != 'e' && c != 'u' && c != 'i' && c != 'o' && c != 'ü'
-			// && c != 'a' && c != 'ö' && c != 'ä' && c != 'y')
-			cutS += c;
-		}
-
-		return cutS;
-
-	}
+	
+	
+	
+	
 
 	@Override
 	public String getToolTipText(MouseEvent e) {
 		if (e.isControlDown()) {
-			int i = this.getBalken(e);
+			Bar bar =  this.getBar(e);
 
-			if (i != -1) {
-				String s = balken.elementAt(i).name;
+			if (bar != null) {
+				String s = bar.name;
 				int selectedCount = 0, gesamtExperInBalken = 0;
 
 				for (int j = 0; j < this.data.length; j++) {
@@ -1023,14 +1132,12 @@ public boolean compareCHR(String a, String b) {
 				double koeff = (double) selectedCount / gesamtExperInBalken;
 
 				return "<HTML><BODY BGCOLOR = 'WHITE'><FONT FACE = 'Verdana'><STRONG>"
-						+ balken.elementAt(i).name
+						+ bar.name
 						+ "<FONT FACE = 'Arial'><br>"
 						+ "</STRONG>"
-						+ (int) Math.round(balken.elementAt(i).balkenAbs
-								* koeff)
+						+ (int) Math.round(bar.barAbs*koeff)
 						+ "/"
-						+ balken.elementAt(i).balkenAbs
-						+ "	" + "(" + round(koeff * 100) + "%)</HTML>";
+						+ bar.barAbs + "	" + "(" + Tools.round100(koeff * 100) + "%)</HTML>";
 
 			}
 		}
@@ -1039,26 +1146,52 @@ public boolean compareCHR(String a, String b) {
 
 	public void mouseMoved(MouseEvent arg0) {
 		// TODO Auto-generated method stub
-
+        if (isLabelResizing(arg0) || isBarWidthResizing(arg0)) {
+        	this.setCursor(new Cursor(Cursor.E_RESIZE_CURSOR) );
+        	return;
+        }
+  
+        
+        if (isHeightResizing(arg0) || isSpaceResizing(arg0)) {
+        	this.setCursor(new Cursor(Cursor.N_RESIZE_CURSOR) );
+        	return;
+        }
+       
+        	this.setCursor(new Cursor(Cursor.DEFAULT_CURSOR ) );
+        
+        
+        
 	}
 
-	class Balken {
+	class Bar {
 		BarchartPanel panel;
 		String name;
 		double koeff;
-		int balkenWidth;
-		double balkenRel;
+		int barWidth;
+		double barRel;
 		double selectedBalken;
-		int balkenSelectedWidth;
-		int balkenAbs;
-		String nameKurz;
+		int barSelectedWidth;
+		int barAbs;
+		String nameShort;
 		Color color;
 		int selectedCount;
+		Vector<ISelectable> variables = new Vector();
 
-		public Balken(BarchartPanel panel, String name) {
+		public Bar(BarchartPanel panel, String name, ISelectable var) {
 			this.panel = panel;
 			this.name = name;
+			variables.add(var);
 		}
+		
+		public boolean select() {
+			boolean selected = false;
+			for (int i = 0; i < variables.size(); i++) {
+				variables.elementAt(i).select(true);
+				selected = true;
+			}
+			return selected;
+		}
+		
 
 	}
 

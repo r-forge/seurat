@@ -10,7 +10,7 @@ import java.awt.*;
 import Data.GeneVariable;
 import Data.ISelectable;
 import Data.Variable;
-import GUI.BarchartPanel.Balken;
+import GUI.BarchartPanel.Bar;
 
 public class ListBarchart extends JFrame implements IPlot {
 
@@ -248,22 +248,23 @@ class ListBarchartPanel extends JPanel implements KeyListener, MouseListener,
 
 			abstandOben + i * 2 * BinHeigth,
 
-			abstandLinks
-					+ (int) Math.round((this.getWidth() - abstandLinks - 20)
-							* balken.elementAt(i).balkenRel),
+			abstandLinks + (int) Math.round((this.getWidth() - abstandLinks - 20)* balken.elementAt(i).balkenRel),
 
 			abstandOben + i * 2 * BinHeigth + BinHeigth,
 
 			point1.x, point1.y, point2.x, point2.y))
-				selectedBalken[i] = true;
+				
+			        selectedBalken[i] = true;
 
 		}
 
-		//seurat.dataManager.deleteSelection();
 		
+		/*
 		 for (int i = 0; i < variables.size(); i++) {
 		    	variables.elementAt(i).unselect(true);
-		    }
+		 }*/
+		
+		
 		
 		
 		boolean selected = false;
@@ -313,17 +314,12 @@ class ListBarchartPanel extends JPanel implements KeyListener, MouseListener,
 
 		if (point1 != null && point2 != null) {
 
+			if (!e.isShiftDown()) seurat.dataManager.deleteSelection();
 			addSelection(point1, point2);
 			
 			
 			for (int i = 0; i < balken.size(); i++) {
-
-				
-				
-				
-				
-				int selectedCount = 0, gesamtExperInBalken = 0;
-				
+            	int selectedCount = 0, gesamtExperInBalken = 0;
 				int ID = balken.elementAt(i).ID;
 
 				

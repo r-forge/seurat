@@ -446,16 +446,12 @@ class ChrPanel extends JPanel implements MouseListener, IPlot,
 
 		if (point1 != null && point2 != null) {
 			
-			
             if (!e.isShiftDown()) {
-			dataManager.deleteSelection();
+            seurat.dataManager.deleteSelection();
 			selection = null;
             }
 			
-			selectRectangle(point1.x, point1.y, point2.x, point2.y);
-          //  seurat.dataManager.selectExperiments(); 
-			
-			
+			selectRectangle(point1.x, point1.y, point2.x, point2.y);		
 		}	
 			
 
@@ -473,25 +469,12 @@ class ChrPanel extends JPanel implements MouseListener, IPlot,
 		int start = (xx1-abstandLinks);
 		int end = (xx2-abstandLinks);
 		
-		
-		
-		int width = (this.getHeight()-2*abstandOben-pixelForCytoBand)/2;
-				
+		int width = (this.getHeight()-2*abstandOben-pixelForCytoBand)/2;			
 		int len = (this.getWidth()-2*abstandLinks);
 		
-
-		//public boolean containsRectInRect(int x1, int y1, int x2, int y2, int Sx1,
-			//	int Sy1, int Sx2, int Sy2) {
 		
 		for (int k = 0; k < chr.Clones.size(); k++) {
-		    	 Clone clone = chr.Clones.elementAt(k);
-		    	 
-		    	 
-		    //	 int startC = (int)Math.round(clone.NucleoPosition*len/chr.length);
-				// int endC = (int)Math.round(clone.NucleoPosition*len/chr.length);
-				    
-				
-				
+		    	 Clone clone = chr.Clones.elementAt(k);	
 				    
 				 if (containsRectInRect(abstandLinks + Position[k], abstandOben + width - posHist [k], abstandLinks + Position[k],  abstandOben + width, 
 						 xx1, yy1, xx2, yy2)) {
