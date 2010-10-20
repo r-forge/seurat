@@ -99,7 +99,11 @@ public class Seurat extends JFrame implements ColorListener{
 	
 	public int PosColor = 360;
 	public int NegColor = 120;
-	public Color NAColor = Color.YELLOW;
+	public int CGHPosColor = 300;
+	public int CGHPosColorMode2 = 240;
+	public int CGHNegColor = 220;
+	
+	public Color NAColor = Color.WHITE;
 	
 	public boolean globalScaling = true;
 	
@@ -125,6 +129,7 @@ public class Seurat extends JFrame implements ColorListener{
 	PicCanvas contIcon, numIcon;
 	
 	ClusteringManager clusteringManager;
+	SelectionManager selectionManager;
 
 	ImageIcon contImageIcon, numImageIcon, geneImageIcon,geneImageIconS, cloneImageIcon,cloneImageIconS,
 			chrImageIcon, chrImageIconS,expImageIcon,hclustIcon, CollapsedIcon, ExpandedIcon;
@@ -148,6 +153,7 @@ public class Seurat extends JFrame implements ColorListener{
 	DefaultMutableTreeNode topObj;
 	DefaultMutableTreeNode topData;
 	DefaultMutableTreeNode topClustering;
+	DefaultMutableTreeNode topSelection;
 	
 
 	JTree tree;
@@ -273,6 +279,10 @@ public class Seurat extends JFrame implements ColorListener{
 		treeNode.add(topData);
 		topClustering = new DefaultMutableTreeNode("Clusterings");
 		treeNode.add(topClustering);
+		
+		topSelection = new DefaultMutableTreeNode("Selected Objects");
+		treeNode.add(topSelection);
+		
 		this.clusteringManager = null;
 		
 		// objectsPane.setBorder(BorderFactory.createEtchedBorder());
@@ -437,8 +447,8 @@ public class Seurat extends JFrame implements ColorListener{
 								Clustering c1 = Clusterings.elementAt(0);
 								Clustering c2 = Clusterings.elementAt(1);
 								
-								Vector<Vector<ISelectable>> Exps = null;
-								Vector<Vector<ISelectable>> Gens = null;
+								Vector<Cluster> Exps = null;
+								Vector<Cluster> Gens = null;
 
 								KMeansView globalView = null;
 								
@@ -459,7 +469,7 @@ public class Seurat extends JFrame implements ColorListener{
 								
 								int count = 0;
 								for (int i = 0; i < Gens.size(); i++) {
-									count+=Gens.elementAt(i).size();
+									count+=Gens.elementAt(i).items.size();
 								}
 								
 								int aggr = 1;
@@ -482,7 +492,7 @@ public class Seurat extends JFrame implements ColorListener{
 								
 								count = 0;
 								for (int i = 0; i < Exps.size(); i++) {
-									count+=Exps.elementAt(i).size();
+									count+=Exps.elementAt(i).items.size();
 								}
 						
 								
@@ -642,15 +652,15 @@ public class Seurat extends JFrame implements ColorListener{
 								
 								int size = 0;
 								for (int i = 0; i < c.clusters.size(); i++){
-									size+=c.clusters.elementAt(i).size();
+									size+=c.clusters.elementAt(i).items.size();
 								}
 								
 								String [] data = new String [size];
 								
 								int s = 0;
 								for (int i = 0; i < c.clusters.size(); i++){
-									for (int j = 0; j < c.clusters.elementAt(i).size();j++) {
-									variables.add(c.clusters.elementAt(i).elementAt(j));
+									for (int j = 0; j < c.clusters.elementAt(i).items.size();j++) {
+									variables.add(c.clusters.elementAt(i).items.elementAt(j));
 									
 									
 									data [s] = ""+i;
@@ -887,18 +897,7 @@ public class Seurat extends JFrame implements ColorListener{
 
 					tree.scrollPathToVisible(new TreePath(topData.getPath()));
 
-					/*
-					 * ObjectTreeNode Chromosomes = new
-					 * ObjectTreeNode("Chromosomes"); for (int i = 0; i <
-					 * dataManager.Chromosomes.size(); i++) { Chromosome var =
-					 * dataManager.Chromosomes.elementAt(i); ObjectTreeNode
-					 * Experiment = new ObjectTreeNode(var);
-					 * Chromosomes.add(Experiment); }
-					 * 
-					 * ((DefaultTreeModel)tree.getModel()).insertNodeInto(
-					 * Chromosomes, topObj, topObj.getChildCount());
-					 */
-
+					
 					
 
 					tree.scrollPathToVisible(new TreePath(topObj.getPath()));
@@ -1567,8 +1566,20 @@ fileMenu.addSeparator();
 		infoPanel.repaint();
 		infoPanel.paint(infoPanel.getGraphics());
 		infoPanel.updateUI();
+		
+		updateSelectionTree();
 
 	}
+	
+	
+	public void updateSelectionTree() {
+		
+		if (selectionManager == null) selectionManager = new SelectionManager(this,tree,topSelection);
+		selectionManager.addObjects();
+		
+	}
+	
+	
 
 	public void updateWithoutConfusionsPlot(Object o1) {
 		dataManager.selectVariables();
@@ -1827,6 +1838,7 @@ fileMenu.addSeparator();
 			this.descriptionFrame.setVisible(false);
 		this.descriptionFrame = null;
 		this.clusteringManager = null;
+		this.selectionManager = null;
 		this.dataManager = new DataManager();
 		MainPanel.removeAll();
 		this.getContentPane().removeAll();
@@ -1853,76 +1865,10 @@ fileMenu.addSeparator();
 	}
 
 	public void createExperimentInfo(Variable exp) {
-		/*
-		 * JPanel middlePanel = new JPanel();
-		 * 
-		 * 
-		 * if (dataManager.descriptionVariables != null) {
-		 * 
-		 * 
-		 * 
-		 * 
-		 * 
-		 * String text = "";
-		 * 
-		 * 
-		 * int m = 0;
-		 * 
-		 * for (int i = 0 ; i < dataManager.descriptionVariables .size(); i++) {
-		 * 
-		 * DescriptionVariable var =
-		 * dataManager.descriptionVariables.elementAt(i);
-		 * 
-		 * 
-		 * 
-		 * if (m < var.getName().length()) m = var.getName().length();
-		 * 
-		 * }
-		 * 
-		 * for (int i = 0 ; i < dataManager.descriptionVariables .size(); i++) {
-		 * 
-		 * DescriptionVariable var =
-		 * dataManager.descriptionVariables.elementAt(i);
-		 * 
-		 * 
-		 * 
-		 * 
-		 * text += var.getName() + ":"; int k = m - var.getName().length(); for
-		 * (int j = 0; j < k; j++) text+=" ";
-		 * 
-		 * text+="\t"+var.stringData [exp.getID()]+ "\n";
-		 * 
-		 * 
-		 * 
-		 * 
-		 * 
-		 * 
-		 * }
-		 * 
-		 * 
-		 * 
-		 * 
-		 * JTextArea pp = new JTextArea(text); pp.setBackground(Color.WHITE); //
-		 * pp.setLayout(new
-		 * GridLayout(dataManager.descriptionVariables.size(),1));
-		 * middlePanel.setLayout(new BorderLayout()); middlePanel.add(new
-		 * JScrollPane(pp));
-		 * 
-		 * 
-		 * 
-		 * //infoLabel.setText("");
-		 * 
-		 * 
-		 * 
-		 * 
-		 * Info info = new Info(seurat,exp.getName());
-		 * info.getContentPane().add(middlePanel,BorderLayout.CENTER);
-		 * info.setVisible(true); }
-		 */
+		
 
 		JEditorPane editorPane = new JEditorPane("text/html", "");
-		StyleSheet css = ((HTMLEditorKit) editorPane.getEditorKit())
-				.getStyleSheet();
+		StyleSheet css = ((HTMLEditorKit) editorPane.getEditorKit()).getStyleSheet();
 		Style style = css.getStyle("body");
 		JTextField tempField = new JTextField();
 		editorPane.setBorder(tempField.getBorder());
@@ -1930,12 +1876,16 @@ fileMenu.addSeparator();
 		StyleConstants.setLeftIndent(style, (float) (2.0));
 		StyleConstants.setSpaceBelow(style, (float) (-2.0));
 		StyleConstants.setSpaceAbove(style, (float) (-2.0));
-		StyleConstants.setFontFamily(style, tempField.getFont().getFamily());
-		StyleConstants.setFontSize(style, tempField.getFont().getSize());
+		//StyleConstants.setLineSpacing(style, (float)5);
+		StyleConstants.setFontFamily(style, "Calibri");
+		StyleConstants.setFontSize(style, 11);
 
 		if (dataManager.descriptionVariables != null) {
 
-			String text = "<html><body><font face='Arial'><font color='#20000'><table border='0' ALIGN=LEFT>";
+			String text = "<html>" +
+					"" +
+					"" +
+					"<body><font face='Arial'><font color='#20000'><table border='0' ALIGN=LEFT cellspacing = 5>";
 
 			int m = 0;
 
@@ -1953,13 +1903,13 @@ fileMenu.addSeparator();
 				DescriptionVariable var = dataManager.descriptionVariables
 						.elementAt(i);
 
-				text += "<tr ALIGN=LEFT><th ALIGN=LEFT><FONT FACE = 'Courier New'><h4>"
+				text += "<tr ALIGN=LEFT><th ALIGN=LEFT><FONT FACE = 'Calibri'> <h5>"
 						+ var.getName() + ":</th>";
 				// int k = m - var.getName().length();
 				// for (int j = 0; j < k; j++)
 				// text+=" ";
 
-				text += "<th ALIGN=LEFT><FONT FACE = 'Courier New'><h4>"
+				text += "<th ALIGN=LEFT><FONT FACE = 'Calibri'><h5>"
 						+ var.stringData[exp.getID()] + "</th></tr>";
 
 			}
@@ -2024,7 +1974,7 @@ fileMenu.addSeparator();
 
 		if (dataManager.geneVariables != null) {
 
-			String text = "<html><body><font face='Arial'><font color='#20000'><table border='0' ALIGN=LEFT>";
+			String text = "<html><body><font face='Arial'><font color='#20000'><table border='0' ALIGN=LEFT cellspacing = 5>";
 
 			int m = 0;
 
@@ -2040,17 +1990,17 @@ fileMenu.addSeparator();
 
 				GeneVariable var = dataManager.geneVariables.elementAt(i);
 
-				text += "<tr ALIGN=LEFT><th ALIGN=LEFT><h4>" + var.getName()
+				text += "<tr ALIGN=LEFT><th ALIGN=LEFT><h5>" + var.getName()
 						+ ":</th>";
 				// int k = m - var.getName().length();
 				// for (int j = 0; j < k; j++)
 				// text+=" ";
 
 				if (!var.isLink)
-					text += "<th ALIGN=LEFT><h4>"
+					text += "<th ALIGN=LEFT><h5>"
 							+ var.stringData[gene.getID()] + "</th></tr>";
 				else {
-					text += "<th ALIGN=LEFT><h4><a href='"
+					text += "<th ALIGN=LEFT><h5><a href='"
 							+ var.stringData[gene.getID()].replace("\"", "")
 							+ "'> "
 							+ var.stringData[gene.getID()].replace("\"", "")
@@ -2121,7 +2071,7 @@ fileMenu.addSeparator();
 
 	
 
-			String text = "<html><body><font face='Arial'><font color='#20000'><table border='0' ALIGN=LEFT>";
+			String text = "<html><body><font face='Arial'><font color='#20000'><table border='0' ALIGN=LEFT cellspacing = 5>";
 
 			int m = 0;
 
@@ -2137,14 +2087,14 @@ fileMenu.addSeparator();
 
 				CGHVariable var = dataManager.cghVariables.elementAt(i);
 
-				text += "<tr ALIGN=LEFT><th ALIGN=LEFT><h4>" + var.getName()
+				text += "<tr ALIGN=LEFT><th ALIGN=LEFT><h5>" + var.getName()
 						+ ":</th>";
 				// int k = m - var.getName().length();
 				// for (int j = 0; j < k; j++)
 				// text+=" ";
 
 		
-					text += "<th ALIGN=LEFT><h4>"+ var.stringData[var.getID()] + "</th></tr>";
+					text += "<th ALIGN=LEFT><h5>"+ var.stringData[var.getID()] + "</th></tr>";
 			
 			}
 

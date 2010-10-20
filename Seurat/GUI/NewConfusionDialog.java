@@ -74,26 +74,8 @@ public class NewConfusionDialog extends JFrame {
 		
 		okBtn.setEnabled(false);
 		
-		/*
-		TreePath [] paths = seurat.tree.getSelectionPaths();
 		
-		if (paths != null) { 
-		for (int i = 0; i < paths.length; i++) {
-			Object o = paths [i].getLastPathComponent();
-			if (o != null) {
-			DataTreeNode node = (DataTreeNode)o;
-			System.out.println(o);
-			}
-		}
-		}
-		
-		*/
-		
-		
-		
-		
-		this.setBounds(100, 300, 400, 320);
-      //  this.setResizable(false);
+		this.setBounds(100, 300, 500, 320);
 		
 		this.getContentPane().setLayout(new BorderLayout());
 		JPanel panel = new JPanel();
@@ -184,9 +166,9 @@ public class NewConfusionDialog extends JFrame {
 				int j = box2.getSelectedIndex();
 				
 				if (experimentsBtn.isSelected())
-				new ConfusionsPlot(dialog.seurat,(String)box1.getSelectedValue(), (String)box2.getSelectedValue(), Columns.elementAt(i),Columns.elementAt(j)); 
+				new ConfusionsPlot2(dialog.seurat,(String)box1.getSelectedValue(), (String)box2.getSelectedValue(), Columns.elementAt(i),Columns.elementAt(j)); 
 				else	
-				new ConfusionsPlot(dialog.seurat,(String)box1.getSelectedValue(), (String)box2.getSelectedValue(), Rows.elementAt(i),Rows.elementAt(j)); 
+				new ConfusionsPlot2(dialog.seurat,(String)box1.getSelectedValue(), (String)box2.getSelectedValue(), Rows.elementAt(i),Rows.elementAt(j)); 
 				
 				dialog.setVisible(false);
 			}
@@ -300,12 +282,12 @@ public class NewConfusionDialog extends JFrame {
 	public boolean areClusteringsComparable(Clustering c1, Clustering c2) {
 	      int size1 = 0;
 	      for (int i = 0; i < c1.clusters.size(); i++) {
-	    	  size1+=c1.clusters.elementAt(i).size();	  
+	    	  size1+=c1.clusters.elementAt(i).items.size();	  
 	    	  
 	      }
 	      int size2 = 0;
 	      for (int i = 0; i < c2.clusters.size(); i++) {
-	    	  size2+=c2.clusters.elementAt(i).size();	  
+	    	  size2+=c2.clusters.elementAt(i).items.size();	  
 	    	  
 	      }
 	      
@@ -313,8 +295,8 @@ public class NewConfusionDialog extends JFrame {
 	      
 	      
 	      for (int i = 0; i < c1.clusters.size(); i++) {
-	    	  for (int j = 0; j < c1.clusters.elementAt(i).size(); j++) {
-	    		  if (!isObjectInClustering(c1.clusters.elementAt(i).elementAt(j),c2)) return false;
+	    	  for (int j = 0; j < c1.clusters.elementAt(i).items.size(); j++) {
+	    		  if (!isObjectInClustering(c1.clusters.elementAt(i).items.elementAt(j),c2)) return false;
 	    	  }	  
 	    	  
 	      }
@@ -328,8 +310,8 @@ public class NewConfusionDialog extends JFrame {
 	
 	public boolean isObjectInClustering(ISelectable o, Clustering c) {
 		for (int i = 0; i < c.clusters.size(); i++) {
-	    	  for (int j = 0; j < c.clusters.elementAt(i).size(); j++) {
-	    		  if (o == c.clusters.elementAt(i).elementAt(j)) return true;
+	    	  for (int j = 0; j < c.clusters.elementAt(i).items.size(); j++) {
+	    		  if (o == c.clusters.elementAt(i).items.elementAt(j)) return true;
 	    	  }	  
 	    	  
 	      }

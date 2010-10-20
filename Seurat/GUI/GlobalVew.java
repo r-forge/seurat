@@ -46,6 +46,9 @@ class GlobalView extends JFrame implements MatrixWindow, IPlot {
 	JPanel infoPanel;
 
 	int oldPixelCount;
+	
+	
+	
 
 	public void setInfo(String info) {
 		this.gPanel.setInfo(info);
@@ -375,16 +378,28 @@ class GlobalViewAbstractPanel extends JPanel implements MouseListener, IPlot,
 
 	public int Model;
 	
+	boolean SelectionView = false;
 	
 	public boolean exclusiveSelection = true;
+	
+	// Type of the global view 1 == Genexpression + SNP, 2 == CGH
+	int Type;
+	public static final int GEXP = 1, CGH = 2;
 
+	
+	
+	
 	public GlobalViewAbstractPanel(Seurat seurat, GlobalView globalView,
 			Vector Experiments, Vector Genes) {
 
 		this.seurat = seurat;
 		this.dataManager = seurat.dataManager;
 		this.globalView = globalView;
-
+        this.Type = GEXP; 
+        if (Genes.elementAt(0) instanceof Clone) Type = CGH;
+        System.out.println("--> "+Type); 
+        
+        
 		Model = seurat.settings.Model;
 
 		clustering = false;
@@ -393,8 +408,6 @@ class GlobalViewAbstractPanel extends JPanel implements MouseListener, IPlot,
 		this.Rows = Genes;
 		this.originalColumns = Experiments;
 		this.originalRows = Genes;
-
-		// this.originalOrderSpalten = orderSpalten;
 
 		ToolTipManager.sharedInstance().registerComponent(this);
 		ToolTipManager.sharedInstance().setInitialDelay(0);
@@ -466,15 +479,17 @@ class GlobalViewAbstractPanel extends JPanel implements MouseListener, IPlot,
 				for (int j = 0; j < PixelCount; j++) {
 
 					
-					Color c = null;
+					Color c = Color.WHITE;
 					
 					if (data[i][j] > 0) {
 
 						double koeff = data[i][j] / Max[i];
 						
+						if (!SelectionView) {
 						if (Model == 1) c = Tools.convertHLCtoRGB(new MyColor(Settings.Lmax -  Tools.fPos(koeff)*(Settings.Lmax-Settings.Lmin),Tools.fPos(koeff)*Settings.Cmax, seurat.PosColor )).getRGBColor();
 						if (Model == 2) c = Tools.convertHLCtoRGB(new MyColor(Settings.LSmin   +   Tools.fPos(koeff)*(Settings.Lmax-Settings.LSmin), Settings.Cmin + (Tools.fPos(koeff))*(Settings.Cmax-Settings.Cmin), seurat.PosColor )).getRGBColor();
-	
+						}
+					
 
 						if (PixelCount == Rows.size()
 								&& Columns.elementAt(i).getRealValue(
@@ -494,11 +509,39 @@ class GlobalViewAbstractPanel extends JPanel implements MouseListener, IPlot,
 							}
 						}
 
-						if (selected) {
-							if (Model == 1) 	c = Tools.convertHLCtoRGB(new MyColor((Settings.Lmax -  Tools.fPos(koeff)*(Settings.Lmax-Settings.Lmin))*(1-Settings.Selection),Tools.fPos(koeff)*Settings.Cmax*Settings.Selection, seurat.PosColor )).getRGBColor();	
-							if (Model ==2) c = Tools.convertHLCtoRGB(new MyColor(Settings.LSmin   + Tools.fPos(koeff)*(Settings.Lmax-Settings.LSmin) + Settings.Selection*(Settings.Lmax-Settings.LSmin-Tools.fPos(koeff)*(Settings.Lmax-Settings.LSmin)), (100 - Tools.fPos(koeff)*Settings.Cmax)*Settings.Selection + Tools.fPos(koeff)*Settings.Cmax, seurat.PosColor )).getRGBColor();
-						
+						if (selected && !SelectionView) {
+							if (Model == 1 && Type == GEXP) 	
+								    c = Tools.convertHLCtoRGB(new MyColor(
+								    		(Settings.Lmax -  Tools.fPos(koeff)*(Settings.Lmax-Settings.Lmin))*(1-Settings.Selection),
+								    		Tools.fPos(koeff)*Settings.Cmax*Settings.Selection, 
+								    		seurat.PosColor 
+								    )).getRGBColor();	
+							if (Model == 1 && Type == CGH) 	
+								 c = Tools.convertHLCtoRGB(new MyColor(
+								    		(Settings.Lmax -  Tools.fPos(koeff)*(Settings.Lmax-Settings.Lmin*2)),
+								    		Tools.fPos(koeff)*Settings.Cmax, 
+								    		seurat.CGHPosColor 
+								    )).getRGBColor();	
 							
+							
+							if (Model ==2) c = Tools.convertHLCtoRGB(new MyColor(
+									Settings.LSmin   + Tools.fPos(koeff)*(Settings.Lmax-Settings.LSmin) + Settings.Selection*(Settings.Lmax-Settings.LSmin-Tools.fPos(koeff)*(Settings.Lmax-Settings.LSmin)), 
+									(100 - Tools.fPos(koeff)*Settings.Cmax)*Settings.Selection + Tools.fPos(koeff)*Settings.Cmax, 
+									seurat.PosColor 
+							)).getRGBColor();
+							
+							if (Model ==2 && Type == CGH) c = Tools.convertHLCtoRGB(new MyColor(
+									Settings.LSmin   + Tools.fPos(koeff)*(Settings.Lmax-Settings.LSmin) + Settings.Selection*(Settings.Lmax-Settings.LSmin-Tools.fPos(koeff)*(Settings.Lmax-Settings.LSmin)), 
+									(100 - Tools.fPos(koeff)*Settings.Cmax)*Settings.Selection + Tools.fPos(koeff)*Settings.Cmax, 
+									seurat.CGHPosColorMode2
+							)).getRGBColor();
+							
+							
+							
+						}
+						if (selected && SelectionView) {
+							if (Model == 1) c = Tools.convertHLCtoRGB(new MyColor(Settings.Lmax -  Tools.fPos(koeff)*(Settings.Lmax-Settings.Lmin),Tools.fPos(koeff)*Settings.Cmax, seurat.PosColor )).getRGBColor();
+							if (Model == 2) c = Tools.convertHLCtoRGB(new MyColor(Settings.LSmin   +   Tools.fPos(koeff)*(Settings.Lmax-Settings.LSmin), Settings.Cmin + (Tools.fPos(koeff))*(Settings.Cmax-Settings.Cmin), seurat.PosColor )).getRGBColor();
 						}
 
 						
@@ -508,10 +551,14 @@ class GlobalViewAbstractPanel extends JPanel implements MouseListener, IPlot,
 						if (Min[i] == 0) koeff = 0;
 						
 					
-					
-						if (Model ==1) c = Tools.convertHLCtoRGB(new MyColor(Settings.Lmax- Tools.fNeg(koeff)*(Settings.Lmax-Settings.Lmin), Tools.fNeg(koeff)*Settings.Cmax, seurat.NegColor)).getRGBColor();
+						if (!SelectionView) {
+						if (Model ==1) c = Tools.convertHLCtoRGB(new MyColor(
+								              Settings.Lmax- Tools.fNeg(koeff)*(Settings.Lmax-Settings.Lmin), 
+								              Tools.fNeg(koeff)*Settings.Cmax, 
+								              seurat.NegColor
+								)).getRGBColor();
 						if (Model == 2) c = Tools.convertHLCtoRGB(new MyColor(Settings.LSmin+ Tools.fNeg(koeff)*(Settings.Lmax-Settings.LSmin), Settings.Cmin+ (Tools.fNeg(koeff))*(Settings.Cmax-Settings.Cmin), seurat.NegColor)).getRGBColor();
-						
+						}
 					
 						boolean selected = false;
                         for (int k = j * Aggregation; k < (j + 1) * Aggregation; k++) {
@@ -523,9 +570,35 @@ class GlobalViewAbstractPanel extends JPanel implements MouseListener, IPlot,
 							}
 						}
 
-						if (selected) {
-							if (Model == 1) 	c = Tools.convertHLCtoRGB(new MyColor((Settings.Lmax- Tools.fNeg(koeff)*(Settings.Lmax-Settings.Lmin))*(1-Settings.Selection), Tools.fNeg(koeff)*Settings.Cmax*Settings.Selection, seurat.NegColor)).getRGBColor();
-							if (Model ==2)      c = Tools.convertHLCtoRGB(new MyColor(Settings.LSmin+Tools.fNeg(koeff)*(Settings.Lmax-Settings.Lmin)+Settings.Selection*(Settings.Lmax-Settings.LSmin-Tools.fNeg(koeff)*(Settings.Lmax-Settings.LSmin)), (100 - Tools.fNeg(koeff))*Settings.Cmax*Settings.Selection + Tools.fNeg(koeff)*Settings.Cmax, seurat.NegColor)).getRGBColor();
+						if (selected && !SelectionView) {
+							if (Model == 1 && Type == GEXP)  
+								            c = Tools.convertHLCtoRGB(new MyColor((
+									               Settings.Lmax- Tools.fNeg(koeff)*(Settings.Lmax-Settings.Lmin))*(1-Settings.Selection), 
+									               Tools.fNeg(koeff)*Settings.Cmax*Settings.Selection, 
+									               seurat.NegColor
+									         )).getRGBColor();
+							if (Model == 1  && Type == CGH)  
+								 c = Tools.convertHLCtoRGB(new MyColor((
+							               Settings.Lmax- Tools.fNeg(koeff)*(Settings.Lmax-2*Settings.Lmin)), 
+							               Tools.fNeg(koeff)*Settings.Cmax, 
+							               seurat.CGHNegColor
+							         )).getRGBColor();
+								
+							if (Model ==2)   c = Tools.convertHLCtoRGB(new MyColor(
+									               Settings.LSmin+Tools.fNeg(koeff)*(Settings.Lmax-Settings.Lmin)+Settings.Selection*(Settings.Lmax-Settings.LSmin-Tools.fNeg(koeff)*(Settings.Lmax-Settings.LSmin)), 
+									               (100 - Tools.fNeg(koeff))*Settings.Cmax*Settings.Selection + Tools.fNeg(koeff)*Settings.Cmax, 
+									               seurat.NegColor
+									         )).getRGBColor();
+							/*
+							if (Model ==2 && Type == CGH)   c = Tools.convertHLCtoRGB(new MyColor(
+						               Settings.LSmin+Tools.fNeg(koeff)*(Settings.Lmax-Settings.Lmin)+Settings.Selection*(Settings.Lmax-Settings.LSmin-Tools.fNeg(koeff)*(Settings.Lmax-Settings.LSmin)), 
+						               (100 - Tools.fNeg(koeff))*Settings.Cmax*Settings.Selection + Tools.fNeg(koeff)*Settings.Cmax, 
+						               seurat.CGHNegColor
+						         )).getRGBColor();*/
+						}
+						if (selected && SelectionView) {
+							if (Model ==1) c = Tools.convertHLCtoRGB(new MyColor(Settings.Lmax- Tools.fNeg(koeff)*(Settings.Lmax-Settings.Lmin), Tools.fNeg(koeff)*Settings.Cmax, seurat.NegColor)).getRGBColor();
+							if (Model == 2) c = Tools.convertHLCtoRGB(new MyColor(Settings.LSmin+ Tools.fNeg(koeff)*(Settings.Lmax-Settings.LSmin), Settings.Cmin+ (Tools.fNeg(koeff))*(Settings.Cmax-Settings.Cmin), seurat.NegColor)).getRGBColor();
 						}
 
 					
@@ -602,7 +675,7 @@ class GlobalViewAbstractPanel extends JPanel implements MouseListener, IPlot,
 
 		if (point1 != null && point2 != null) {
 
-			dataManager.deleteSelection();
+			if (!e.isShiftDown()) dataManager.deleteSelection();
 
 				if (Math.max(point1.x, point2.x) < this.abstandLinks
 						&& Math.max(point1.y, point2.y) < this.abstandOben) {
@@ -1145,6 +1218,39 @@ class GlobalViewAbstractPanel extends JPanel implements MouseListener, IPlot,
 				}
 
 			});
+			
+			
+			
+			
+			box = new JCheckBoxMenuItem(
+			"selection view");
+	if (SelectionView)
+		box.setSelected(true);
+	else
+		box.setSelected(false);
+	menu.add(box);
+
+	box.addActionListener(new ActionListener() {
+		public void actionPerformed(ActionEvent e) {
+			JCheckBoxMenuItem box = (JCheckBoxMenuItem) e.getSource();
+			if (box.isSelected()) {
+				SelectionView = true;
+			} else
+				SelectionView = false;
+			globalView.applyNewPixelSize();
+
+		}
+
+	});
+			
+			
+			
+			
+			
+			
+			
+			
+			
 
 			item = new JMenuItem("set pixel dimension");
 			item.addActionListener(new ActionListener() {
@@ -1172,6 +1278,12 @@ class GlobalViewAbstractPanel extends JPanel implements MouseListener, IPlot,
 				}
 			});
 			menu.add(item);
+			
+			
+			
+			
+			
+			
 
 			menu.addSeparator();
 
@@ -1191,6 +1303,11 @@ class GlobalViewAbstractPanel extends JPanel implements MouseListener, IPlot,
 		}
 
 	}
+	
+	
+	
+	
+	
 
 	public void mouseMoved(MouseEvent e) {
 
@@ -1785,17 +1902,20 @@ class GlobalViewAbstractPanel extends JPanel implements MouseListener, IPlot,
 
 	}
 
+	
+	
+	
 	public void calculateClusteringRows(ClusterNode node) {
 
 		if (node.nodeL != null && node.nodeR != null) {
 
-			int pos = getYCoordinate(node.Cases);
+			int pos = getYCoordinate(node.cluster.items);
 			int x = (int) Math.round(this.abstandLinks - this.abstandLinks
 					* node.currentHeight);
 
 			if (node.nodeL != null) {
 
-				int posL = getYCoordinate(node.nodeL.Cases);
+				int posL = getYCoordinate(node.nodeL.cluster.items);
 				int xL = (int) Math.round(this.abstandLinks - this.abstandLinks
 						* node.nodeL.currentHeight);
 
@@ -1817,7 +1937,7 @@ class GlobalViewAbstractPanel extends JPanel implements MouseListener, IPlot,
 
 			if (node.nodeR != null) {
 
-				int posR = getYCoordinate(node.nodeR.Cases);
+				int posR = getYCoordinate(node.nodeR.cluster.items);
 				int xR = (int) Math.round(this.abstandLinks - this.abstandLinks
 						* node.nodeR.currentHeight);
 
@@ -1871,13 +1991,13 @@ class GlobalViewAbstractPanel extends JPanel implements MouseListener, IPlot,
 
 		if (node.nodeL != null && node.nodeR != null) {
 
-			int pos = getXCoordinate(node.Cases) - abstandLinks;
+			int pos = getXCoordinate(node.cluster.items) - abstandLinks;
 			int y = (int) Math.round(this.abstandOben - this.abstandOben
 					* node.currentHeight);
 
 			if (node.nodeL != null) {
 
-				int posL = getXCoordinate(node.nodeL.Cases) - abstandLinks;
+				int posL = getXCoordinate(node.nodeL.cluster.items) - abstandLinks;
 				int yL = (int) Math.round(this.abstandOben - this.abstandOben
 						* node.nodeL.currentHeight);
 
@@ -1897,7 +2017,7 @@ class GlobalViewAbstractPanel extends JPanel implements MouseListener, IPlot,
 
 			if (node.nodeR != null) {
 
-				int posR = getXCoordinate(node.nodeR.Cases) - abstandLinks;
+				int posR = getXCoordinate(node.nodeR.cluster.items) - abstandLinks;
 				int yR = (int) Math.round(this.abstandOben - this.abstandOben
 						* node.nodeR.currentHeight);
 

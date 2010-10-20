@@ -17,6 +17,8 @@ import javax.imageio.*;
 
 import org.rosuda.REngine.Rserve.RConnection;
 
+import Tools.Tools;
+
 import Data.ClusterNode;
 import Data.Gene;
 import Data.Variable;
@@ -70,28 +72,20 @@ public class ClusteringDialog extends JFrame {
 
 	JComboBox boxDRows2 = new JComboBox(Distance);
 	
-	
-
-//	String[] SeriationControl = {};
-
-	//String[] SeriationDistance = {};
-
 	Seurat seurat;
 
 	ClusteringDialog dialog = this;
-
-	int[] orderZeilen;
-
-	int[] orderSpalten;
-
-	ClusterNode nodeZeilen;
-
-	ClusterNode nodeSpalten;
-	
 	
 	Vector<ISelectable> Columns;
 	
 	Vector<ISelectable> Rows;
+	
+	ClusterNode nodeRows;
+	ClusterNode nodeColumns;
+	
+	
+	ClusterNode completeNodeRows;
+	ClusterNode completeNodeColumns;
 	
 	int pixelW = 1, pixelH = 1, aggregation;
 	
@@ -103,7 +97,7 @@ public class ClusteringDialog extends JFrame {
 	public ClusteringDialog(Seurat seurat,Vector Rows, Vector Columns, int pixelW, int pixelH, int aggr) {
 		super("Clustering");
 		
-		System.out.println(">Clsutering Dialog  Rows: " + Rows.size() + " Columns: "+Columns.size());
+		System.out.println(">Clustering Dialog  Rows: " + Rows.size() + " Columns: "+Columns.size());
 		this.seurat = seurat;
 		this.dataManager = seurat.dataManager;
 		this.setBounds(100, 270, 380, 240);
@@ -188,34 +182,34 @@ public class ClusteringDialog extends JFrame {
 					
 					if (!methodRows.equals("none")) {
 						calculateClustersZeilen(methodRows, DistanceRows);
+						nodeRows.name = " Clustering" +  "(\""+methodRows+","+DistanceRows+"\")";
 						
-						nodeZeilen.name = " Clustering" +  "(\""+methodRows+","+DistanceRows+"\")";
-						nodeZeilen.isRows = true;
-						cManager.addRowsClustering(nodeZeilen);
+						cManager.addRowsClustering(nodeRows);
 					}
 					else {
-                        nodeZeilen = new ClusterNode(dialog.Rows);
-                        nodeZeilen.getFirstOrder();
-                        nodeZeilen.Cases = dialog.Rows;
-						nodeZeilen.name = " Clustering: none";
-						nodeZeilen.isRows = true;
+						
+                        nodeRows = new ClusterNode(dialog.Rows);
+                        nodeRows.getFirstOrder();
+                        nodeRows.cluster = new Cluster(dialog.Rows,null);
+						nodeRows.name = " Clustering: none";
+						nodeRows.isRows = true;
 
 					}
 					
 					
 					if (!methodColumns.equals("none")) {
 						calculateClustersSpalten(methodColumns, DistanceColumns);
-						nodeSpalten.name = " Clustering"  + "(\""+methodColumns+","+DistanceColumns+"\")";
-						nodeSpalten.isRows = false;
-						cManager.addColumnsClustering(nodeSpalten);
+						nodeColumns.name = " Clustering"  + "(\""+methodColumns+","+DistanceColumns+"\")";
+						nodeColumns.isRows = false;
+						cManager.addColumnsClustering(nodeColumns);
 						
 					}
 					else {
-                        nodeSpalten = new ClusterNode(dialog.Columns);
-                        nodeSpalten.getFirstOrder();
-                        nodeSpalten.Cases = dialog.Columns;
-						nodeSpalten.name = " Clustering: none";
-						nodeSpalten.isRows = false;
+                        nodeColumns = new ClusterNode(dialog.Columns);
+                        nodeColumns.getFirstOrder();
+                        nodeColumns.cluster = new Cluster(dialog.Columns,null);
+						nodeColumns.name = " Clustering: none";
+						nodeColumns.isRows = false;
 
 					}
 					
@@ -224,7 +218,7 @@ public class ClusteringDialog extends JFrame {
 					
 					
 					GlobalView globalView = new GlobalView(dialog.seurat,
-							"Clustering" + dataManager.ClusteringNumber, nodeSpalten,nodeZeilen);
+							"Clustering" + dataManager.ClusteringNumber, nodeColumns,nodeRows);
 
 					if (methodColumns.equals("none")) globalView.gPanel.abstandOben = 2;
 					if (methodRows.equals("none")) globalView.gPanel.abstandLinks = 2;
@@ -393,13 +387,38 @@ public class ClusteringDialog extends JFrame {
 				
 				
 				Vector<String> ExpsNames = new Vector();
-				for (int i = 0; i < Gens.size(); i++) {
+				for (int i = 0; i < Exps.size(); i++) {
 					ExpsNames.add(""+i);
 				}
 				
 				Clustering cR = new Clustering(" Clustering"+dataManager.ClusteringNumber+"(\""+methodRows + " , " + DistanceRows + " , "+nR + "\")", Gens,GeneNames, true);
 				Clustering cC = new Clustering(" Clustering"+dataManager.ClusteringNumber+"(\""+methodColumns + " , " + DistanceColumns + " , "+nC+ "\")", Exps,ExpsNames, false);
-								dialog.seurat.dataManager.GeneClusters.insertElementAt(cR,0);
+				cR.node = nodeRows;
+				cC.node = nodeColumns;
+			     
+
+				/*makes the same order of leafs in the dendrogramm and clsuters*/
+				if (cC.node != null) {
+					cC.clusters = new Vector();
+					Vector<ClusterNode> nodes = cC.node.getLeafList();
+					for (int i = 0; i < nodes.size(); i++) {
+						cC.clusters.add(nodes.elementAt(i).cluster);
+						nodes.elementAt(i).cluster.name = ExpsNames.elementAt(i);
+					} 
+				}
+				
+				if (cR.node != null) {
+					cR.clusters = new Vector();
+					Vector<ClusterNode> nodes = cR.node.getLeafList();
+					for (int i = 0; i < nodes.size(); i++) {
+						cR.clusters.add(nodes.elementAt(i).cluster);
+						nodes.elementAt(i).cluster.name = GeneNames.elementAt(i);
+					} 
+				}
+				
+				
+				
+				dialog.seurat.dataManager.GeneClusters.insertElementAt(cR,0);
 				dialog.seurat.dataManager.ExpClusters.insertElementAt(cC,0);
 				
 				
@@ -464,244 +483,7 @@ public class ClusteringDialog extends JFrame {
 	
 	
 	
-	
-	
-	
-	
-/*
-	public ClusteringDialog(Seurat seurat,Vector Rows, Vector Columns, int pixelW, int pixelH, int aggr) {
-		super("Clustering");
-		
-		System.out.println(">Clsutering Dialog  Rows: " + Rows.size() + " Columns: "+Columns.size());
-		this.seurat = seurat;
-		this.dataManager = seurat.dataManager;
-		this.setBounds(100, 270, 350, 190);
-        this.pixelW = pixelW;
-        this.pixelH = pixelH;
-        this.aggregation = aggr;
-        
-			
-		this.Rows = Rows;
-		
-		this.Columns = Columns;
-		
-		
-		
-		this.getContentPane().setLayout(new BorderLayout());
-		JPanel panel = new JPanel();
-		panel.setLayout(new GridLayout(4,3));
-
-		panel.add(new JLabel("   "));
-
-		panel.add(new JLabel("Columns:"));
-
-		panel.add(new JLabel("Rows:"));
-
-		
-		
-		
-		
-		panel.add(new JLabel("Count:"));
-
-		panel.add(fieldC);
-
-		panel.add(fieldR);
-		
-		
-		panel.add(new JLabel("Method:       "));
-		
-		
-		
-		JPanel panel2 = new JPanel();
-		panel2.add(boxColumns);
-		panel.add(panel2);
-		
-		
-		panel2 = new JPanel();
-		panel2.add(boxRows);
-		panel.add(panel2);
-
-		panel.add(new JLabel("Distance:    "));
-		
-		panel2 = new JPanel();
-		panel2.add(boxDColumns);
-		panel.add(panel2);
-		
-		
-		panel2 = new JPanel();
-		panel2.add(boxDRows);
-		panel.add(panel2);
-
-	
-
-		panel.setBorder(BorderFactory.createEtchedBorder());
-		this.getContentPane().add(panel,BorderLayout.CENTER);
-		
-		panel = new JPanel();
-		panel.setLayout(new BorderLayout());
-	    panel.add(okBtn, BorderLayout.EAST);
-	    
-	    this.setResizable(false);
-		
-		this.getContentPane().add(panel,BorderLayout.SOUTH);
-		okBtn.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				String methodColumns = boxColumns.getSelectedItem().toString();
-				String DistanceColumns = boxDColumns.getSelectedItem()
-						.toString();
-
-				String methodRows = boxRows.getSelectedItem().toString();
-				String DistanceRows = boxDRows.getSelectedItem().toString();
-				
-				
-				int nR = 0;
-				int nC = 0;
-				
-				
-				if (!fieldR.getText().equals("")) nR= Integer.parseInt(fieldR.getText());
-				
-				if (!fieldC.getText().equals("")) nC= Integer.parseInt(fieldC.getText());
-				
-				
-				if (nR == 0 && nC == 0) {
-					
-					
-					calculateClustersZeilen(methodRows, DistanceRows);
-					calculateClustersSpalten(methodColumns, DistanceColumns);
-					
-				
-					nodeSpalten.name = " Clustering" + dataManager.ClusteringNumber + "(\""+methodColumns+","+DistanceColumns+"\")";
-					nodeZeilen.name = " Clustering" + dataManager.ClusteringNumber + "(\""+methodRows+","+DistanceRows+"\")";
-					nodeSpalten.isRows = false;
-					nodeZeilen.isRows = true;
-					
-					ClusteringManager cManager = dialog.seurat.getClusteringManager();
-					cManager.addRowsClustering(nodeZeilen);
-					cManager.addColumnsClustering(nodeSpalten);
-					
-					
-					GlobalView globalView = new GlobalView(dialog.seurat,
-							"Clustering" + dataManager.ClusteringNumber, nodeSpalten,nodeZeilen);
-
-					dataManager.ClusteringNumber++;
-					
-					globalView.applyNewPixelSize(dialog.pixelW,dialog.pixelH);
-		            if (aggregation > 0) globalView.gPanel.setAggregation(aggregation);
-
-
-					globalView.setLocation(350, 0);
-	                
-					dialog.setVisible(false);
-					return;
-				}
-				
-				
-				
-				
-				
-				
-				
-			 long time = System.currentTimeMillis();
-				
-				Vector<Vector<ISelectable>> Gens = new Vector();
-				if (nR != 0) {
-					Gens = calculateClustersZeilen(nR, methodRows, DistanceRows);
-				}
-				else {
-					
-					Gens.add(dialog.Rows);
-				}
-				
-				
-				Vector<Vector<ISelectable>> Exps = new Vector();
-				if (nC != 0) {
-					Exps = calculateClustersSpalten(nC, methodColumns, DistanceColumns);
-				}
-				else {
-					
-					Exps.add(dialog.Columns);
-				}
-				
-				System.out.println((System.currentTimeMillis() - time)/1000);
-				
-					
-				Vector<String> GeneNames = new Vector();
-				for (int i = 0; i < Gens.size(); i++) {
-					GeneNames.add(""+i);
-				}
-				
-				
-				
-				Vector<String> ExpsNames = new Vector();
-				for (int i = 0; i < Gens.size(); i++) {
-					ExpsNames.add(""+i);
-				}
-				
-				Clustering cR = new Clustering(" Clustering"+dataManager.ClusteringNumber+"(\""+methodRows + " , " + DistanceRows + " , "+nR + "\")", Gens,GeneNames, true);
-				Clustering cC = new Clustering(" Clustering"+dataManager.ClusteringNumber+"(\""+methodColumns + " , " + DistanceColumns + " , "+nC+ "\")", Exps,ExpsNames, false);
-								dialog.seurat.dataManager.GeneClusters.insertElementAt(cR,0);
-				dialog.seurat.dataManager.ExpClusters.insertElementAt(cC,0);
-				
-				
-				ClusteringManager cManager = dialog.seurat.getClusteringManager();
-				cManager.addRowsClustering(cR);
-				cManager.addColumnsClustering(cC);
-				
-				dialog.seurat.repaint();
-				
-				
-
-				KMeansView globalView = new KMeansView(dialog.seurat,
-						"Clustering"+ dataManager.ClusteringNumber, cC,cR);
-				
-				
-				dataManager.ClusteringNumber++;
-				
-
-				
-				int count = 0;
-				for (int i = 0; i < Gens.size(); i++) {
-					count+=Gens.elementAt(i).size();
-				}
-				
-				int aggr = 1;
-				while (count*dialog.seurat.settings.PixelH/aggr > 700) aggr++;
-				 	
-				globalView.panel.Aggregation = aggr;
-			
-				globalView.setLocation(350, 0);
-				globalView.panel.Model = dialog.seurat.settings.Model;
-				count = 0;
-				for (int i = 0; i < Exps.size(); i++) {
-					count+=Exps.elementAt(i).size();
-				}
-				
-				
- 
-				
-				
-				globalView.applyNewPixelSize(dialog.pixelW,dialog.pixelH);
-	            if (aggregation > 0) globalView.panel.setAggregation(aggregation);
-
-						//dialog.seurat.settings.PixelW,dialog.seurat.settings.PixelH);
-                
-				dialog.setVisible(false);
-			}
-		});
-
-		this.setVisible(true);
-	}
-	
-	*/
-	
-	
-
-	public Vector<Vector<ISelectable>> calculateClustersZeilen(int n, String method, String distance) {
-		
-		int[] geneClusters = new int[Rows.size()];
-		int max = 1;
-		
-		int [] clusterArray = null;
+  public Vector<Vector<ISelectable>> calculateClustersZeilen(int n, String method, String distance) {
 		
 		try {
 
@@ -709,37 +491,70 @@ public class ClusteringDialog extends JFrame {
 				dataManager.setRConnection(new RConnection());
 
 			RConnection rConnection = dataManager.getRConnection();
-			
-		
-			
-			
-			
-			//Vector<Variable> Experiments = dataManager.getExperiments();
-			
+				
 			rConnection.voidEval("require(stats)");
 			rConnection.voidEval("require(amap)");
 			rConnection.assign("tempData", Columns
 					.elementAt(0).getColumn(Rows));
 
 			for (int i = 1; i < Columns.size(); i++) {
-				rConnection.assign("x",
-			Columns.elementAt(i).getColumn(Rows));
+				rConnection.assign("x",Columns.elementAt(i).getColumn(Rows));
 				rConnection.voidEval("tempData <- cbind(tempData, x)");
-
 			}
 			
 			if (!method.equals("kmeans")) {
 
-		//	rConnection.voidEval("h <- hclust(dist(tempData, method = '"
-		//			+ distance + "', p = " + 2 + " ), method = '" + method
-		//			+ "', members=NULL)"); 
 				rConnection.voidEval("h <- hcluster(tempData, method = '"
 						+ distance + "', link = '" + method + "',diag=FALSE," +
 						"upper=FALSE, doubleprecision = TRUE, nbproc=2, members=NULL)"); 
 		
-			rConnection.voidEval("c <- cutree(h,k = " + n + ")");
-			
-			
+			    rConnection.voidEval("c <- cutree(h,k = " + (n) + ")");
+			    
+			    
+			    /**makes the tree to the clustering*/
+			    
+			    double [] height = rConnection.eval("h$height").asDoubles();
+				 
+			    
+		
+				rConnection.voidEval("hm<-h$merge");
+				
+				
+				 int [] [] merge = new int [Rows.size()-1][2];
+	             for (int i = 0; i < Rows.size()-1; i++) {
+	            	 merge [i][0] = rConnection.eval("hm [" +  (i+1)+ ","+1+"]").asInteger();
+	            	 merge [i][1] = rConnection.eval("hm [" +  (i+1)+ ","+2+"]").asInteger();
+	             }
+	             
+	             
+	             Vector<ClusterNode> Nodes = new Vector();
+	             for (int i = 0; i < Rows.size(); i++) {
+	            	 Vector<ISelectable> cases = new Vector();
+	            	 cases.add(Rows.elementAt(i));
+	            	 ClusterNode nd = new ClusterNode(cases);
+	            	 nd.ClusterNumber = -(i+1);
+	               	 Nodes.add(nd);
+	             }
+	             
+	             
+	             for (int i = 0; i < Rows.size()-n; i++) {
+	                    Nodes = union(Nodes,merge [i][0],merge [i][1],i+1, height [i]);	
+	             }
+	             
+	             for (int i = 0; i < Nodes.size(); i++) {
+	             	Nodes.elementAt(i).nodeR = null;
+	             	Nodes.elementAt(i).nodeL = null;
+	             }
+	             
+	             
+	             for (int i = Rows.size()-n; i < Rows.size()-1; i++) {
+	            	   Nodes = union(Nodes,merge [i][0],merge [i][1],i+1, height [i]);
+	             }
+	             
+	             
+	            nodeRows = Nodes.firstElement();
+				nodeRows.calculateHeight(height [height.length-1]);
+
 			}
 			else {
 				  rConnection.voidEval("cl <- Kmeans(tempData,"+n+" ,method = '"
@@ -747,22 +562,26 @@ public class ClusteringDialog extends JFrame {
 				  rConnection.voidEval("c <- cl$cluster");
 			}
 			
-			
-            clusterArray = new int [Rows.size()];
-			
-			
-				for (int j = 0; j < Rows.size(); j++)
-					clusterArray [j] = rConnection.eval(
-							"c [[" + (j + 1) + "]]").asInteger();
+	
+			int [] clusterArray = new int [Rows.size()];
+		
+			for (int j = 0; j < Rows.size(); j++)
+					clusterArray [j] = rConnection.eval("c [[" + (j + 1) + "]]").asInteger();
 				
+			Vector<Vector<ISelectable>> result = new Vector();
+		    
+			for (int i = 0; i <= n; i++) result.add(new Vector());	
+            for (int i = 0; i < Rows.size(); i++) result.elementAt(clusterArray [i]).add(Rows.elementAt(i));
+				
+			result.remove(0);
 				
 			
-				for (int j = 0; j < Rows.size(); j++)
-				if (max < clusterArray [j]) max = clusterArray [j];
 				
 
-				rConnection.voidEval("rm(list=ls())");
-				rConnection.voidEval("gc()"); 
+			rConnection.voidEval("rm(list=ls())");
+			rConnection.voidEval("gc()"); 
+				
+			return result;	
 	
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -770,22 +589,8 @@ public class ClusteringDialog extends JFrame {
 		}
 
 		
+		return null;
 		
-		Vector<Vector<ISelectable>> result = new Vector();
-		
-		for (int i = 0; i <= max; i++) {
-			
-			result.add(new Vector());
-		}
-		
-		for (int i = 0; i < Rows.size(); i++) {
-			result.elementAt(clusterArray [i]).add(Rows.elementAt(i));
-		}
-		
-		
-		result.remove(0);
-		
-		return result;
 		
 
 	}
@@ -798,25 +603,10 @@ public class ClusteringDialog extends JFrame {
 
 	public Vector<Vector<ISelectable>> calculateClustersSpalten(int n, String method, String distance) {
 
-	int max = 1;
-		
-		int [] clusterArray = null;
-		int spaltenCount = Columns.size();
-
-	
-
-		boolean weiter = true;
-
 		try {
 
-			
-			
-			if (dataManager.getRConnection() == null)
-				dataManager.setRConnection(new RConnection());
-			
-			
+			if (dataManager.getRConnection() == null) dataManager.setRConnection(new RConnection());			
 			RConnection rConnection = dataManager.getRConnection();
-		
 			rConnection.assign("tempData", Rows.elementAt(0).getRow(Columns));
 
 			for (int i = 1; i < Rows.size(); i++) {
@@ -825,28 +615,68 @@ public class ClusteringDialog extends JFrame {
 			}
 
 			
-			
+			/**hierarchical clustering*/
 			if (!method.equals("kmeans")) {
 
-				
-				
-		//	rConnection.voidEval("h <- hclust(dist(tempData, method = '"
-		//			+ distance + "', p = " + 2 + " ), method = '" + method
-		//			+ "', members=NULL)");
-
-			
-
-					
+							
 			rConnection.voidEval("h <- hcluster(tempData, method = '"
-			+ distance + "', link = '" + method + "',diag=FALSE," +
-			"upper=FALSE, doubleprecision = TRUE, nbproc=2, members=NULL)");
+					+ distance + "', link = '" + method + "',diag=FALSE," +
+			        "upper=FALSE, doubleprecision = TRUE, nbproc=2, members=NULL)");
 			
-			
-			
-			
-			
-			rConnection.voidEval("c <- cutree(h,k = " + n + ")");
+			rConnection.voidEval("c <- cutree(h,k = " + (n) + ")");
            
+			
+			
+			/**Creatinga tree*/
+            double [] height = rConnection.eval("h$height").asDoubles();
+			rConnection.voidEval("hm<-h$merge");
+				
+			/*Merge object in R**/	
+			int [] [] merge = new int [Columns.size()-1][2];
+	        for (int i = 0; i < Columns.size()-1; i++) {
+	            	
+	             	 merge [i][0] = rConnection.eval("hm [" +  (i+1)+ ","+1+"]").asInteger();
+	            	 merge [i][1] = rConnection.eval("hm [" +  (i+1)+ ","+2+"]").asInteger();
+	            	     	 
+	        }
+		
+		    /**Bulding a hierarchical structure in Seurat*/
+            Vector<ClusterNode> Nodes = new Vector();
+            for (int i = 0; i < Columns.size(); i++) {
+       	            Vector<ISelectable> cases = new Vector();
+       	            cases.add(Columns.elementAt(i));
+       	            ClusterNode nd = new ClusterNode(cases);
+       	            nd.ClusterNumber = -(i+1);
+       	            Nodes.add(nd);
+            }
+        
+            
+            for (int i = 0; i < Columns.size()- n; i++) {
+   	            int c1 = merge [i][0]; 
+   	            int c2 = merge [i][1];
+                Nodes = union(Nodes,c1,c2,i+1, height [i]);	
+            }
+            
+            for (int i = 0; i < Nodes.size(); i++) {
+            	Nodes.elementAt(i).nodeR = null;
+            	Nodes.elementAt(i).nodeL = null;
+            }
+            
+            
+            for (int i = Columns.size()- n; i < Columns.size()-1; i++) {
+       	            int c1 = merge [i][0]; 
+       	            int c2 = merge [i][1];
+                    Nodes = union(Nodes,c1,c2,i+1, height [i]);	
+            }
+        
+            // Nodes consists of one single element
+            // nodeColumns contains the complete tree 
+            nodeColumns = Nodes.firstElement();	 
+            nodeColumns.calculateHeight(height [height.length-1]);
+
+        
+        
+        
 			
 			
 		}
@@ -857,27 +687,16 @@ public class ClusteringDialog extends JFrame {
 		}
 			
 			
-			clusterArray = new int [Columns.size()];
-			
-			
+			    int [] clusterArray = new int [Columns.size()];
 				for (int j = 0; j < Columns.size(); j++)
-					clusterArray [j] = rConnection.eval(
-							"c [[" + (j + 1) + "]]").asInteger();
-				
-				
-			
-				for (int j = 0; j < Columns.size(); j++)
-				if (max < clusterArray [j]) max = clusterArray [j];
+					clusterArray [j] = rConnection.eval("c [[" + (j + 1) + "]]").asInteger();
 				
 				
 				
 				
 				Vector<Vector<ISelectable>> result = new Vector();
 				
-				for (int i = 0; i <= max; i++) {
-					
-					result.add(new Vector());
-				}
+				for (int i = 0; i <= n; i++) result.add(new Vector());
 				
 				for (int i = 0; i < Columns.size(); i++) {
 					result.elementAt(clusterArray [i]).add(Columns.elementAt(i));
@@ -935,27 +754,17 @@ public class ClusteringDialog extends JFrame {
 
 			RConnection rConnection = dataManager.getRConnection();
 			
-			
-	//		rConnection.voidEval("require(amap)");
-
 			rConnection.voidEval("require(stats)");
 			rConnection.voidEval("require(amap)");
 			
 			rConnection.assign("tempData", Columns.elementAt(0).getColumn(Rows));
 
+			
 			for (int i = 1; i < Columns.size(); i++) {
-				rConnection.assign("x",
-			(Columns.elementAt(i)).getColumn(Rows));
+				rConnection.assign("x",(Columns.elementAt(i)).getColumn(Rows));
 				rConnection.voidEval("tempData <- cbind(tempData, x)");
-
 			}
-			
-			
-			
-			
-	//		rConnection.voidEval("h <- hclust(dist(tempData, method = '"
-	//				+ distance + "', p = " + 2 + " ), method = '" + method
-	//				+ "', members=NULL)"); 
+	
 			
 			rConnection.voidEval("h <- hcluster(tempData, method = '"
 					+ distance + "', link = '" + method + "',diag=FALSE," +
@@ -963,12 +772,10 @@ public class ClusteringDialog extends JFrame {
 			
 		
 		    height = rConnection.eval("h$height").asDoubles();
-		    
-		   // for (int i = 0; i < height.length; i++) System.out.println(height [i]);
-
+		  
+		   
 			clusterArray = new int[2][Rows.size()];
-
-			
+	
 
 			
 			rConnection.voidEval("hm<-h$merge");
@@ -1008,109 +815,12 @@ public class ClusteringDialog extends JFrame {
              }
              
              
-             nodeZeilen = Nodes.firstElement();
-             
-             
-             
-			
-			/*
-			
-			for (int count = 1; count < Genes.size() - 1; count++) {
-
-				rConnection.voidEval("c <- cutree(h,k = " + count + ")");
-
-				System.out.println(count);
-				
-				for (int j = 0; j < Genes.size(); j++)  clusterArray[0][j] = rConnection.eval("c [[" + (j + 1) + "]]").asInteger();
-
-				rConnection.voidEval("c <- cutree(h,k = " + (count + 1)+ ")");
-
-				for (int j = 0; j < Genes.size(); j++) clusterArray[1][j] = rConnection.eval("c [[" + (j + 1) + "]]").asInteger();
-
-				int k = 0;
-				int geteilterNode = 0;
-				int newNode = 0;
-
-				for (int j = 0; j < Genes.size(); j++) {
-					if (clusterArray[0][j] != clusterArray[1][j]) {
-						k = j;
-						geteilterNode = clusterArray[0][j];
-						newNode = clusterArray[1][j];
-						break;
-					}
-				}
-				
-				ClusterNode oldNode = nodeZeilen.getClusterNode(k);
-
-				Vector<Integer> nodeR = new Vector();
-				Vector<Integer> nodeL = new Vector();
-
-				for (int j = 0; j < Genes.size(); j++) {
-					if (clusterArray[0][j] == geteilterNode) {
-						if (clusterArray[1][j] == geteilterNode)
-							nodeR.add(j);
-						else
-							nodeL.add(j);
-					}
-				}
-				
-				oldNode.nodeL = new ClusterNode(nodeL, dataManager, false, Experiments, Genes);
-				oldNode.nodeR = new ClusterNode(nodeR, dataManager, false, Experiments, Genes);
-                oldNode.currentHeight = height [height.length-count];
-				
-				
-			}
-			
-			
-		
-			
-
-			int count = Genes.size() - 1;
-
-			rConnection.voidEval("c <- cutree(h,k = " + count + ")");
-
-			for (int j = 0; j < Genes.size(); j++)
-				clusterArray[0][j] = rConnection.eval(
-						"c [[" + (j + 1) + "]]").asInteger();
-
-			for (int j = 0; j < Genes.size(); j++)
-				clusterArray[1][j] = j + 1;
-
-			int k = 0;
-			int geteilterNode = 0;
-			int newNode = 0;
-
-			for (int j = 0; j < Genes.size(); j++) {
-				if (clusterArray[0][j] != clusterArray[1][j]) {
-					k = j;
-					geteilterNode = clusterArray[0][j];
-					newNode = clusterArray[1][j];
-					break;
-				}
-			}
-
-			ClusterNode oldNode = nodeZeilen.getClusterNode(k);
-
-			Vector<Integer> nodeR = new Vector();
-			Vector<Integer> nodeL = new Vector();
-
-			for (int j = 0; j <  Genes.size(); j++) {
-				if (clusterArray[0][j] == geteilterNode) {
-					if (clusterArray[1][j] == geteilterNode)
-						nodeR.add(j);
-					else
-						nodeL.add(j);
-				}
-			}
-			oldNode.nodeL = new ClusterNode(nodeL, dataManager, false, Experiments, Genes);
-			oldNode.nodeR = new ClusterNode(nodeR, dataManager, false, Experiments, Genes);
-			
-			
-			*/
-			
-			
-             
-             
+            nodeRows = Nodes.firstElement();
+                        
+            
+           
+			nodeRows.isRows = true;
+            
          	rConnection.voidEval("rm(list=ls())");
 			rConnection.voidEval("gc()");
 
@@ -1123,8 +833,8 @@ public class ClusteringDialog extends JFrame {
 		
 
 		
-		System.out.println(nodeZeilen);
-		nodeZeilen.calculateHeight(height [height.length-1]);
+		System.out.println(nodeRows);
+		nodeRows.calculateHeight(height [height.length-1]);
 		System.out.println("Clustering Rows calculated...");
 
 	}
@@ -1186,6 +896,8 @@ public class ClusteringDialog extends JFrame {
 
 		try {
 
+			if (dataManager.getRConnection() == null)
+				dataManager.setRConnection(new RConnection());
 			
 			RConnection rConnection = dataManager.getRConnection();
 			
@@ -1245,8 +957,8 @@ public class ClusteringDialog extends JFrame {
         }
         
         
-        nodeSpalten = Nodes.firstElement();	
-		nodeSpalten.calculateHeight(height [height.length-1]);
+        nodeColumns = Nodes.firstElement();	
+		nodeColumns.calculateHeight(height [height.length-1]);
 		
 		
 		rConnection.voidEval("rm(list=ls())");

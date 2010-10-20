@@ -32,7 +32,7 @@ import Data.Clone;
 import Data.DescriptionVariable;
 import Data.ISelectable;
 import Data.Variable;
-import GUI.BarchartPanel.Balken;
+import GUI.BarchartPanel.Bar;
 import Tools.Tools;
 
 public class EventChart extends JFrame implements IPlot{
@@ -596,7 +596,7 @@ class EventPanel extends JPanel implements KeyListener,MouseListener, MouseMotio
 		
 		if (point1 != null && point2 != null) {
 
-			seurat.dataManager.deleteSelection();
+			if (!e.isShiftDown()) seurat.dataManager.deleteSelection();
 		    applySelection((int)point1.getX(),(int)point1.getY(),(int)point2.getX(),(int)point2.getY());	
 		 
 		 	

@@ -438,8 +438,7 @@ class CorrelationPanel extends JPanel implements MouseListener,
 	
 	public void addSelection(int start, int end) {
 		this.selection = new boolean[data.length];
-		this.dataManager.deleteSelection();	
-        boolean selected = false;
+		boolean selected = false;
 		
 		
 		if (this.isVariables) {
@@ -508,7 +507,10 @@ class CorrelationPanel extends JPanel implements MouseListener,
 			int start = Math.min(point1.x, point1.x) / pixelSize;
 			int end = Math.min(point2.x, point2.x) / pixelSize;
 			if (start == end) end++;
-			if (start<=PixelCount) addSelection(start, end);
+			if (start<=PixelCount) {
+				if (!e.isShiftDown()) seurat.dataManager.deleteSelection();
+				addSelection(start, end);
+			}
 
 		}
 		point1 = null;
