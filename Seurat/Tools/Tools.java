@@ -77,16 +77,19 @@ public static Vector<ISelectable> sortIDs(Vector<ISelectable> objects) {
 		
 	}
 	
-	System.out.println();
+	//System.out.println();
 	for (int j = 0; j < res.size(); j++) {
 		ISelectable o = res.elementAt(j);
-		System.out.println(o.getID() + " ");
+	//	System.out.println(o.getID() + " ");
 	}
 		
 	
 	
 	return res;
 } 
+
+
+
 
 
 

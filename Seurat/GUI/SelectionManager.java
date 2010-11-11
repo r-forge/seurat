@@ -12,7 +12,9 @@ import Data.Biclustering;
 import Data.Clone;
 import Data.Clustering;
 import Data.DataTreeNode;
+import Data.DescriptionVariable;
 import Data.Gene;
+import Data.GeneVariable;
 import Data.Variable;
 
 public class SelectionManager {
@@ -23,36 +25,56 @@ public class SelectionManager {
 	JTree tree;
 	
 	DefaultMutableTreeNode root;
-	DataTreeNode Genes = new DataTreeNode("Genes");
-	DataTreeNode Samples = new DataTreeNode("Samples");
-	DataTreeNode Clones= new DataTreeNode("Clones");
+	DataTreeNode Genes;
+	DataTreeNode Samples;
+	DataTreeNode Clones;
 	
 	
 	public SelectionManager(Seurat seurat, JTree tree ,DefaultMutableTreeNode root ) {
-	       // super("ClusteringBrowser");
+	     
 			this.seurat = seurat;
 			this.root = root;
 	        this.tree = tree;
-		//	this.getContentPane().setLayout(new BorderLayout());
-			
-	        
-	        root.add(Samples);
-	        root.add(Genes);
-			root.add(Clones);
+	
 	}		
 	
 	
-	public void addObjects() {
+	public void loadGenes(GeneVariable var) {
+		System.out.println("LoadGenes");
+	}
+    public void loadClones(GeneVariable var) {
+    	System.out.println("LoadClones");
+	}
+    public void loadSamples(GeneVariable var) {
+    	System.out.println("LoadSamples");
+    } 
+	
+	
+	
+	public void addObjects(GeneVariable var) {
 		
-
+        if (Genes == null) {
+        	Genes = new DataTreeNode("Genes");
+	        root.add(Genes);
+        }
+        if (Samples == null) {
+        	Samples = new DataTreeNode("Samples");
+        	root.add(Samples);
+        }
+        if (Clones == null) {
+        	  Clones= new DataTreeNode("Clones");
+        	  if (seurat.snpLoaded) Clones = new DataTreeNode("SNPs");
+        	  root.add(Clones);
+        }
+		
 		int l = Genes.getChildCount();
 		
         for (int i = 0; i < l; i++) {
         	DefaultMutableTreeNode c = Genes.getLastLeaf(); 
         	((DefaultTreeModel)tree.getModel()).removeNodeFromParent(c);	           
-       }
+        }
 	   
-      l = Clones.getChildCount();
+        l = Clones.getChildCount();
 		
         for (int i = 0; i < l; i++) {
         	DefaultMutableTreeNode c = Clones.getLastLeaf(); 
@@ -60,7 +82,7 @@ public class SelectionManager {
        }
         
         
-      l = Samples.getChildCount();
+       l = Samples.getChildCount();
 		
         for (int i = 0; i < l; i++) {
         	DefaultMutableTreeNode c = Samples.getLastLeaf(); 
@@ -72,7 +94,7 @@ public class SelectionManager {
 		
 		for (int i = 0; i < seurat.dataManager.Genes.size(); i++) {
 			Gene g = seurat.dataManager.Genes.elementAt(i);
-			if (g.isSelected()) addGene(g);
+			if (g.isSelected()) addGene(g,var);
 		}
 		
 		
@@ -92,41 +114,38 @@ public class SelectionManager {
 	
 	}
 	
-	public void addGene(Gene g) {
+	public void addGene(Gene g, GeneVariable var) {
 		
-		DataTreeNode node = new DataTreeNode(g);
-		node.cObject = g;
+		String name = g.getName();
+		if (var != null && g.annGene != null) {
+			
+			name = var.getStringData(g.annGene.ID);
+		}
 		
+		DataTreeNode node = new DataTreeNode(g,name);
 		
-		((DefaultTreeModel) tree.getModel()).insertNodeInto(
-				node, Genes, Genes.getChildCount());
+		node.cObject = g;		
+		((DefaultTreeModel) tree.getModel()).insertNodeInto(node, Genes, Genes.getChildCount());
 		node.setParent(Genes);
-
 		tree.scrollPathToVisible(new TreePath(Genes.getPath()));
+		
 	}
 	
     public void addClone(Clone c) {
 		
 		DataTreeNode node = new DataTreeNode(c);
-		node.cObject = c;
-		
-		
-		((DefaultTreeModel) tree.getModel()).insertNodeInto(
-				node, Clones, Clones.getChildCount());
-
+		node.cObject = c;		
+		((DefaultTreeModel) tree.getModel()).insertNodeInto(node, Clones, Clones.getChildCount());
 		tree.scrollPathToVisible(new TreePath(Clones.getPath()));
+		
 	}
     
     
   public void addSample(Variable c) {
 		
 		DataTreeNode node = new DataTreeNode(c);
-		node.cObject = c;
-		
-		
-		((DefaultTreeModel) tree.getModel()).insertNodeInto(
-				node, Samples, Samples.getChildCount());
-
+		node.cObject = c;	
+		((DefaultTreeModel) tree.getModel()).insertNodeInto(node, Samples, Samples.getChildCount());
 		tree.scrollPathToVisible(new TreePath(Samples.getPath()));
 	}
 	

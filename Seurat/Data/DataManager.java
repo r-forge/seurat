@@ -11,12 +11,8 @@ import GUI.ExperimentDescriptionFrame;
 
 
 public class DataManager {
-	public Vector<Variable> variables;
-
-	//public boolean[] selectedVariables;
-
-	//public boolean[] selectedRows;
 	
+	public Vector<Variable> variables;
 	
 	public String geneexpressionName;
 	
@@ -43,26 +39,16 @@ public class DataManager {
 	public Vector<Variable> ExperimentDescr;
 	
     public Vector<GeneVariable> geneVariables;
-    
-    
+       
     public Vector<CGHVariable> cghVariables;
     
-  
-    
     public Vector<Clone> CLONES;
-    
-   
-    
+      
     public Vector<AnnGene> AnnGenes;
-	
 	
 	public int RowCount;
 	
-	
-	public Vector<DescriptionVariable> descriptionVariables;
-
-//	public Object rConnection;
-	
+	public Vector<DescriptionVariable> descriptionVariables;	
 	
 	public Vector<Vector<ISelectable>> seriationsGenes = new Vector();
 	
@@ -72,20 +58,16 @@ public class DataManager {
 	
 	public Vector<String> seriationExperimentNames = new Vector();
 	
-	
-	
 	public Vector<Clustering> GeneClusters = new Vector();
+	
 	public Vector<Clustering> ExpClusters = new Vector();
 	
 	public Vector<Biclustering> Biclusterings = new Vector();
 	
 	public Vector<Chromosome> Chromosomes;
 	
-	
-	
 
 	/**Konstanten */
-	
 	
 	public String NucleotidePosition = "Physical.Position";
 	public String ChromosomeNumber = "ChromosomeNumber";

@@ -438,19 +438,17 @@ class ConfusionsPanel2 extends JPanel implements KeyListener, MouseListener,
 	
 	
 	public void permuteMatrix() {
-		for (int i = 0; i < Experiments1.clusters.size(); i++) {
-			Experiments1.clusters.elementAt(i).tempID = i;
-		}
-		for (int i = 0; i < Experiments2.clusters.size(); i++) {
-			Experiments2.clusters.elementAt(i).tempID = i;
-		}
+		setTempIDs();
+		
 		int Crit = calculateCriterion(Experiments1,Experiments2);
 		int temp;
-		
-		while (Crit<(temp = permute())) {
+		System.out.println("Start Crit: " + Crit);
+		while (Crit>(temp = permute())) {
 			Crit = temp;
+			setTempIDs();
+			calculateMatrix();
 		}
-		
+		System.out.println("End Crit: " + Crit);
 		
 		updateSelection();
 		paint(this.getGraphics());
@@ -458,6 +456,15 @@ class ConfusionsPanel2 extends JPanel implements KeyListener, MouseListener,
 	}
 	
 	
+	
+	public void setTempIDs() {
+		for (int i = 0; i < Experiments1.clusters.size(); i++) {
+			Experiments1.clusters.elementAt(i).tempID = i;
+		}
+		for (int i = 0; i < Experiments2.clusters.size(); i++) {
+			Experiments2.clusters.elementAt(i).tempID = i;
+		}
+	}
 
 	public int permute() {
 		
@@ -466,12 +473,7 @@ class ConfusionsPanel2 extends JPanel implements KeyListener, MouseListener,
 		int maxI = colPermutations.size()-1;
 		int maxJ = rowPermutations.size()-1;
 		
-		for (int i = 0; i < Experiments1.clusters.size(); i++) {
-			Experiments1.clusters.elementAt(i).tempID = i;
-		}
-		for (int i = 0; i < Experiments2.clusters.size(); i++) {
-			Experiments2.clusters.elementAt(i).tempID = i;
-		}
+		
 				
 		int criterion = calculateCriterion(Experiments1,Experiments2);
 		
@@ -484,7 +486,7 @@ class ConfusionsPanel2 extends JPanel implements KeyListener, MouseListener,
 				
 				int crit = calculateCriterion(c,r);
 				
-				if (crit > criterion) {
+				if (crit < criterion) {
 					criterion = crit;
 					maxI = i;
 					maxJ = j;
@@ -497,13 +499,14 @@ class ConfusionsPanel2 extends JPanel implements KeyListener, MouseListener,
 		Experiments2 = Experiments2.permute(rowPermutations.elementAt(maxJ)); 
 		System.out.println("   ->  " + criterion);
 		
-		
-		
-		
-		matrix = new int[Experiments1.clusters.size()][Experiments2.clusters.size()];
-		
+		return criterion;
 
-		
+	}
+	
+	
+	
+	public void calculateMatrix() {
+        matrix = new int[Experiments1.clusters.size()][Experiments2.clusters.size()];
 		
 		for (int i = 0; i < Experiments1.clusters.size(); i++) {
 		Vector cluster1 = (Vector) Experiments1.clusters.elementAt(i).items;
@@ -519,20 +522,12 @@ class ConfusionsPanel2 extends JPanel implements KeyListener, MouseListener,
                    }
 			}
 		}
-
-		
-		return criterion;
-
 	}
 	
 	
 	
-	
-	
-	
-	
 	public int calculateCriterion(Clustering Experiments1,Clustering Experiments2) {
-		int crit = 0;
+	/*	int crit = 0;
 		for (int i = 0; i < Experiments1.clusters.size(); i++) {
 		for (int j = 0; j < Experiments2.clusters.size(); j++) {
 			for (int ii = i; ii < Experiments1.clusters.size(); ii++) {
@@ -540,13 +535,28 @@ class ConfusionsPanel2 extends JPanel implements KeyListener, MouseListener,
 			    crit+= 
 			    matrix [Experiments1.clusters.elementAt(i).tempID][Experiments2.clusters.elementAt(j).tempID]*
 			    matrix [Experiments1.clusters.elementAt(ii).tempID][Experiments2.clusters.elementAt(jj).tempID];
-			   // intersect(Experiments1.clusters.elementAt(i),Experiments2.clusters.elementAt(j))*
-			   // intersect(Experiments1.clusters.elementAt(ii),Experiments2.clusters.elementAt(jj));
 			}
 			}
 		}
 		}
-		return crit;
+		*/
+	//	System.out.print(" Krit:  " + crit + "   ");
+		int crit2 = 0;
+		int [] sum = new int  [Experiments1.clusters.size()]; 
+		
+		for (int j = 0; j < Experiments2.clusters.size()-1; j++) {
+		int temp  = 0;
+		for (int i = Experiments1.clusters.size()-1; i >0; i--) {
+			temp+= matrix [Experiments1.clusters.elementAt(i).tempID][Experiments2.clusters.elementAt(j).tempID];
+			sum  [i] +=  temp;
+			
+			crit2+= sum [i] * 
+			matrix [Experiments1.clusters.elementAt(i-1).tempID][Experiments2.clusters.elementAt(j+1).tempID];
+		}
+		}
+		//System.out.println(crit2 + "   ");
+		
+		return crit2;
 		
 	}
 	
@@ -588,12 +598,98 @@ class ConfusionsPanel2 extends JPanel implements KeyListener, MouseListener,
 
 	public void keyPressed(KeyEvent e) {
 
+		// <- 37
+		// -> 39
+		// up  38
+		// down   40
 		
-      //  permute();
-	//	this.repaint();
-
+		if (e.getKeyCode() == 37) decreaseClustering(Experiments2); 
+		if (e.getKeyCode() == 39) increaseClustering(Experiments2); 
+		if (e.getKeyCode() == 38) increaseClustering(Experiments1); 
+		if (e.getKeyCode() == 40) decreaseClustering(Experiments1); 
+	
+		updateSelection();
+		
+     
 	}
 
+	
+	
+	
+	
+	public void decreaseClustering(Clustering Experiments) {
+		Vector<ClusterNode> nodes = Experiments.node.getFathersOfLeafList();
+		if (nodes.size() == 0) return;
+		if (Experiments.node.getLeafList().size() <= 2) return;
+		
+		int max = -1;
+		double maxHeight = -1;
+		
+		for (int i = 0; i < nodes.size(); i++) {
+			if (nodes.elementAt(i).currentHeight > maxHeight) {
+				maxHeight = nodes.elementAt(i).currentHeight;
+				max = i;
+			}		
+		}
+		
+		//System.out.println(nodes.size() + "  ___  " + max);
+		
+		if (max != -1) {
+			ClusterNode toClose = nodes.elementAt(max);
+			toClose.isLeaf = true;
+			
+			nodes = Experiments.node.getLeafList();
+			//System.out.println(nodes.size() + "  ___  " + max);
+			Vector<Cluster> clusters = new Vector();
+			for (int i = 0; i < nodes.size(); i++) {
+				clusters.add(nodes.elementAt(i).cluster);
+				nodes.elementAt(i).cluster.name = i+"";
+			}
+			Experiments.clusters = clusters;
+		}
+		
+	} 
+	
+	
+	
+	
+	
+	public void increaseClustering(Clustering Experiments) {
+		Vector<ClusterNode> nodes = Experiments.node.getLeafList();
+		int max = -1;
+		double maxHeight = -1;
+		
+		for (int i = 0; i < nodes.size(); i++) {
+			if (nodes.elementAt(i).currentHeight > maxHeight && nodes.elementAt(i).nodeR != null) {
+				maxHeight = nodes.elementAt(i).currentHeight;
+				max = i;
+			}		
+		}
+		
+		if (max != -1) {
+			ClusterNode toExpand = nodes.elementAt(max);
+			toExpand.isLeaf = false;
+			toExpand.nodeR.isLeaf = true;
+			toExpand.nodeL.isLeaf = true;
+			nodes = Experiments.node.getLeafList();
+			Vector<Cluster> clusters = new Vector();
+			for (int i = 0; i < nodes.size(); i++) {
+				clusters.add(nodes.elementAt(i).cluster);
+				nodes.elementAt(i).cluster.name = i+"";
+			}
+			Experiments.clusters = clusters;
+			
+		}
+		
+	} 
+	
+	
+	
+	
+	
+	
+	
+	
 	public void keyTyped(KeyEvent e) {
 
 	}
@@ -856,7 +952,7 @@ class ConfusionsPanel2 extends JPanel implements KeyListener, MouseListener,
 	public void calculateClusteringRows(ClusterNode node) {
 		
        
-		if (node.nodeL != null && node.nodeR != null) {
+		if (node.nodeL != null && node.nodeR != null && !node.isLeaf) {
 			
 			
 			int pos = getYCoordinate(node);
@@ -901,7 +997,6 @@ class ConfusionsPanel2 extends JPanel implements KeyListener, MouseListener,
 		else {
 			int pos = getYCoordinate(node);
 			int x = (int) Math.round(this.spaceClusteringC - this.spaceClusteringC * node.currentHeight);
-
 			CoordinateNode nodeC = node.cNode;
 			nodeC.Lines.add(new Line(x, pos, spaceClusteringC, pos));
 			
@@ -924,7 +1019,7 @@ class ConfusionsPanel2 extends JPanel implements KeyListener, MouseListener,
 	
 	public void calculateClusteringColumns(ClusterNode node) {
 
-		if (node.nodeL != null && node.nodeR != null) {
+		if (node.nodeL != null && node.nodeR != null && !node.isLeaf) {
 
 			int pos = getXCoordinate(node) - spaceLeft-spaceClusteringC;
 			int y = (int) Math.round(this.spaceClusteringR - this.spaceClusteringR * node.currentHeight);

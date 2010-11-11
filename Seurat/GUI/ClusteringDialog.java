@@ -538,12 +538,13 @@ public class ClusteringDialog extends JFrame {
 	             
 	             
 	             for (int i = 0; i < Rows.size()-n; i++) {
-	                    Nodes = union(Nodes,merge [i][0],merge [i][1],i+1, height [i]);	
+	                 Nodes = union(Nodes,merge [i][0],merge [i][1],i+1, height [i]);	
 	             }
 	             
 	             for (int i = 0; i < Nodes.size(); i++) {
-	             	Nodes.elementAt(i).nodeR = null;
-	             	Nodes.elementAt(i).nodeL = null;
+	            // 	Nodes.elementAt(i).nodeR = null;
+	            // 	Nodes.elementAt(i).nodeL = null;
+	             	Nodes.elementAt(i).isLeaf = true;
 	             }
 	             
 	             
@@ -658,8 +659,9 @@ public class ClusteringDialog extends JFrame {
             }
             
             for (int i = 0; i < Nodes.size(); i++) {
-            	Nodes.elementAt(i).nodeR = null;
-            	Nodes.elementAt(i).nodeL = null;
+            	//Nodes.elementAt(i).nodeR = null;
+            	//Nodes.elementAt(i).nodeL = null;
+            	Nodes.elementAt(i).isLeaf = true;
             }
             
             

@@ -150,6 +150,11 @@ public class AnnGene implements ISelectable,NodeCase{
 		// TODO Auto-generated method stub
 		return null;
 	}
+	
+	public String getStringData(GeneVariable var) {
+		// TODO Auto-generated method stub
+		return var.getStringData(ID);
+	}
 
 	public Vector<ISelectable> getVariables() {
 		// TODO Auto-generated method stub

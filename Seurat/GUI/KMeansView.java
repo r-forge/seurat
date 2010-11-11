@@ -369,6 +369,8 @@ class KmeansPanel extends JPanel implements MouseListener, IPlot,
 
 	Block[][] blocks;
 	
+	boolean updateBlocks = false;
+	
 	
 
 	
@@ -398,7 +400,6 @@ class KmeansPanel extends JPanel implements MouseListener, IPlot,
 		this.Genes = Genes;
         if (Experiments.node != null) {
         	abstandOben = 100;
-        	
         } 
         if (Genes.node != null) {
         	
@@ -441,7 +442,7 @@ class KmeansPanel extends JPanel implements MouseListener, IPlot,
 
 	public void updateSelection() {
 
-		if (blocks == null) {
+		if (blocks == null || updateBlocks) {
 			blocks = new Block[this.Experiments.clusters.size()][this.Genes.clusters.size()];
 
 			for (int i = 0; i < this.Experiments.clusters.size(); i++) {
@@ -457,6 +458,7 @@ class KmeansPanel extends JPanel implements MouseListener, IPlot,
 
 			}
 
+			updateBlocks = false;
 		}
 		
 		
@@ -489,7 +491,6 @@ class KmeansPanel extends JPanel implements MouseListener, IPlot,
 		
 		
 	
-
 		int shiftX = abstandLinks+1;
 
 		boolean isSelection = seurat.dataManager.isSomethingSelected();
@@ -622,8 +623,7 @@ class KmeansPanel extends JPanel implements MouseListener, IPlot,
 			}
 			
 
-			shiftX = shiftX
-					+ exps.size() * pixelW + 1;
+			shiftX = shiftX	+ exps.size() * pixelW + 1;
 
 		}
 		
@@ -656,14 +656,14 @@ this.repaint();
 	
 	
 	public Block getBlockInThePoint(Point e) {
-		 int shiftX = 2;
+		
+		int shiftX = abstandLinks + 1;
 		 int ii =0, jj = 0;
 		  
 		  for (int i = 0; i < this.Experiments.clusters.size(); i++) {
 				Vector<ISelectable> exps = this.Experiments.clusters.elementAt(i).items;
 				
-				shiftX = shiftX
-				+ (exps.size() * pixelW + 1);
+				shiftX = shiftX + (exps.size() * pixelW + 1);
 				
 				if (shiftX>e.getX()) {
 					ii = i;
@@ -673,7 +673,11 @@ this.repaint();
 		  }
 		  
 		  
-		  int shiftY = 2;
+		  int shiftY = abstandOben+1;
+			
+		 shiftY = shiftY
+				+ this.dataManager.Experiments.elementAt(0).getBarchartToColors().size() * (2 * this.pixelH + 2);
+		
 		  
 		  for (int j = 0; j < Genes.clusters.size(); j++) {
 			  
@@ -820,8 +824,7 @@ this.repaint();
 		point1 = e.getPoint();
 		
 		
-		if (!(e.getButton() == MouseEvent.BUTTON3) && e.getClickCount() == 2) {
-		
+		if (!(e.getButton() == MouseEvent.BUTTON3) && e.getClickCount() == 2) {	
 		GlobalView g = new GlobalView(seurat, "GlobalView", this.getBlockInThePoint(e.getPoint()).Experiments.items, this.getBlockInThePoint(e.getPoint()).Genes.items);
         g.applyNewPixelSize(pixelW,pixelH);
 		}
@@ -830,11 +833,7 @@ this.repaint();
 
 		
 		if (e.getButton() == MouseEvent.BUTTON3 || e.isControlDown()) {
-           /* Block block = this.getBlockInThePoint(e.getPoint());
-			
-			new ClusteringDialog(seurat,block.Genes,block.Experiments);*/
-			
-			
+      
 			
 			
 			
@@ -1013,12 +1012,7 @@ this.repaint();
 		
 		g.setColor(Color.WHITE);
 		g.fillRect(0, 0, this.getWidth(), this.getHeight());
-
-		
 		int shiftX = 1;
-		
-		
-		
 		
 		
 		if (Experiments == null) return; 
@@ -1150,7 +1144,7 @@ this.repaint();
 
 	public void calculateClusteringRows(ClusterNode node) {
 
-		if (node.nodeL != null && node.nodeR != null) {
+		if (node.nodeL != null && node.nodeR != null && !node.isLeaf) {
 
 			int pos = getYCoordinate(node)-abstandOben;
 			int x = (int) Math.round(this.abstandLinks - this.abstandLinks
@@ -1204,7 +1198,7 @@ this.repaint();
 			int x = (int) Math.round(this.abstandLinks - this.abstandLinks * node.currentHeight);
 
 			CoordinateNode nodeC = node.cNode;
-			nodeC.Lines.add(new Line(x, pos, abstandLinks, pos));
+			if(nodeC != null) nodeC.Lines.add(new Line(x, pos, abstandLinks, pos));
 			
 		}
 
@@ -1220,7 +1214,7 @@ this.repaint();
 				node.cNode.isSelected = false;
 		}
 
-		if (node.nodeL != null && node.nodeR != null) {
+		if (node.nodeL != null && node.nodeR != null && !node.isLeaf) {
 
 			if (node.nodeL != null) {
 				updateClustering(node.nodeL);
@@ -1240,7 +1234,7 @@ this.repaint();
 
 	public void calculateClusteringColumns(ClusterNode node) {
 
-		if (node.nodeL != null && node.nodeR != null) {
+		if (node.nodeL != null && node.nodeR != null && !node.isLeaf) {
 
 			int pos = getXCoordinate(node) - abstandLinks;
 			int y = (int) Math.round(this.abstandOben - this.abstandOben
@@ -1292,14 +1286,12 @@ this.repaint();
 			int pos = getXCoordinate(node) - abstandLinks;
 			int y = (int) Math.round(this.abstandOben - this.abstandOben * node.currentHeight);
 			CoordinateNode nodeC = node.cNode;
-			nodeC.Lines.add(new Line(pos, y, pos, abstandOben));
+			if(nodeC != null) nodeC.Lines.add(new Line(pos, y, pos, abstandOben));
 
 		}
 
 	}
 
-	
-	
 	
 	
 	
@@ -1454,30 +1446,36 @@ this.repaint();
             int x = (int)Math.floor((e.getPoint().getX()  - block.x)/pixelW);
             int y = (int)Math.floor((e.getPoint().getY()  - block.y)/pixelH);
             
+       
+            
             ISelectable var = block.Experiments.items.elementAt(x);
            
 				String s = "<HTML><BODY BGCOLOR = 'WHITE'><FONT FACE = 'Verdana'><STRONG>";
 			
 				s += "<FONT FACE = 'Arial'><TR><TD>" + var.getName()
 						+ "  </TD><TD> ";
+				
+				Vector<DescriptionVariable> Vars = seurat.getSelectedDescriptionVariables();
+				
+				for (int i = 0; i < Vars.size(); i++) if (var instanceof Variable) s += "<FONT FACE = 'Arial'><TR><TD>"+Vars.elementAt(i).name+ " " + Vars.elementAt(i).getStringData() [var.getID()] + "  </TD><TD> ";
+				
+				if (Aggregation == 1) {
+					 ISelectable gene = block.Genes.items.elementAt(x);
+					 Vector<GeneVariable> geneVars = seurat.getSelectedGeneVariables();
+					 for (int i = 0; i < geneVars.size(); i++) {
+							if (gene instanceof Gene && ((Gene)gene).annGene != null) s += "<FONT FACE = 'Arial'><TR><TD>"+geneVars.elementAt(i).name+ " " + geneVars.elementAt(i).getStringData(((Gene)gene).annGene.ID) + "  </TD><TD> ";
+					 }				
+				}
 
 
 				String value = "";
-
-				double valueD = block.values [x][y]; 
+                double valueD = block.values [x][y]; 
 				
-				if (valueD == seurat.dataManager.NA) {
-					value = "NA";
-				} else {
-
-					value = valueD + "";
-				}
-
-				
-				s += "<FONT FACE = 'Arial'><TR><TD>" + value + "  </TD><TD> ";
-
+				if (valueD == seurat.dataManager.NA) value = "NA";
+				else value = valueD + "";
+			
+				s += "<FONT FACE = 'Arial'><TR><TD>value: " + value + "  </TD><TD> ";
 				s += "</P></FONT></STRONG>";
-
 				return s;
 			}
 
@@ -1827,7 +1825,80 @@ this.repaint();
 
 
 
-
+	public void decreaseClustering(Clustering Experiments) {
+		if (Experiments.node == null) return;
+		if (Experiments.node.getLeafList().size()<=1) return;
+		updateBlocks = true;
+		Vector<ClusterNode> nodes = Experiments.node.getFathersOfLeafList();
+		if (nodes.size() == 0) return;
+		
+		int max = -1;
+		double maxHeight = -1;
+		
+		for (int i = 0; i < nodes.size(); i++) {
+			if (nodes.elementAt(i).currentHeight > maxHeight) {
+				maxHeight = nodes.elementAt(i).currentHeight;
+				max = i;
+			}		
+		}
+		
+		//System.out.println(nodes.size() + "  ___  " + max);
+		
+		if (max != -1) {
+			ClusterNode toClose = nodes.elementAt(max);
+			toClose.isLeaf = true;
+			
+			nodes = Experiments.node.getLeafList();
+			//System.out.println(nodes.size() + "  ___  " + max);
+			Vector<Cluster> clusters = new Vector();
+			for (int i = 0; i < nodes.size(); i++) {
+				clusters.add(nodes.elementAt(i).cluster);
+				nodes.elementAt(i).cluster.name = i+"";
+			}
+			Experiments.clusters = clusters;
+		}
+		
+	} 
+	
+	
+	
+	
+	
+	public void increaseClustering(Clustering Experiments) {
+		
+		if (Experiments.node == null) return;
+		updateBlocks = true;
+		
+		Vector<ClusterNode> nodes = Experiments.node.getLeafList();
+		int max = -1;
+		double maxHeight = -1;
+		
+		for (int i = 0; i < nodes.size(); i++) {
+			if (nodes.elementAt(i).currentHeight > maxHeight && nodes.elementAt(i).nodeR != null) {
+				maxHeight = nodes.elementAt(i).currentHeight;
+				max = i;
+			}		
+		}
+		
+		if (max != -1) {
+			ClusterNode toExpand = nodes.elementAt(max);
+			toExpand.isLeaf = false;
+			toExpand.nodeR.isLeaf = true;
+			toExpand.nodeL.isLeaf = true;
+			nodes = Experiments.node.getLeafList();
+			Vector<Cluster> clusters = new Vector();
+			for (int i = 0; i < nodes.size(); i++) {
+				clusters.add(nodes.elementAt(i).cluster);
+				nodes.elementAt(i).cluster.name = i+"";
+			}
+			Experiments.clusters = clusters;
+			
+		}
+		
+	} 
+	
+	
+	
 
 
 
@@ -1836,32 +1907,27 @@ this.repaint();
 	public void keyPressed(KeyEvent arg0) {
 		// TODO Auto-generated method stub
 		
+		if (arg0.isControlDown()) {
+		
+			if (arg0.getKeyCode() == 37) decreaseClustering(Genes); 
+			if (arg0.getKeyCode() == 39) increaseClustering(Genes); 
+			if (arg0.getKeyCode() == 38) increaseClustering(Experiments); 
+			if (arg0.getKeyCode() == 40) decreaseClustering(Experiments); 
+		
+			updateSelection();	
+			
+			
+		}
+		else {
 		
 		
-int panelH = this.dataManager.Experiments.elementAt(0).getBarchartToColors().size() * (2 * this.pixelH + 2);
+        int panelH = this.dataManager.Experiments.elementAt(0).getBarchartToColors().size() * (2 * this.pixelH + 2);
 		
+  
+
 		if (arg0.getKeyCode() == 38) {
 			
-			
-			 if (pixelH>1) pixelH--;
-	           plot.applyNewPixelSize(pixelW,pixelH);
-	           
-	           
-			
-			/*
-			int maxAggr = 0;
-			for (int i = 0; i < Genes.size(); i++) {
-				maxAggr = (int)Math.max(maxAggr,Genes.elementAt(i).size());
-			}
-			
-			
-			
-			if (Aggregation < maxAggr) Aggregation++;
-			
-		    plot.infoLabel.setText("Aggregation: 1 : " + Aggregation);
-		    plot.applyNewPixelSize(pixelW,pixelH);
-			*/
-			
+			 if (pixelH>1) pixelH--; plot.applyNewPixelSize(pixelW,pixelH);	           
 			
 		}
 		
@@ -1871,15 +1937,6 @@ int panelH = this.dataManager.Experiments.elementAt(0).getBarchartToColors().siz
         	pixelH++;
             plot.applyNewPixelSize(pixelW,pixelH);
             
-            
-        	
-        	/*
-        	if (Aggregation > 1) Aggregation--;
-        	
-			
-			plot.infoLabel.setText("Aggregation: 1 : " + Aggregation);
-			plot.applyNewPixelSize();
-			*/
 		}
         
         
@@ -1896,7 +1953,7 @@ int panelH = this.dataManager.Experiments.elementAt(0).getBarchartToColors().siz
            plot.applyNewPixelSize(pixelW,pixelH);
          
         }
-		
+		}
 		
 		
 		
@@ -1911,6 +1968,9 @@ int panelH = this.dataManager.Experiments.elementAt(0).getBarchartToColors().siz
 		// TODO Auto-generated method stub
 		
 	}
+	
+	
+	
 
 	public void setAggregation(int aggr) {
 		// TODO Auto-generated method stub

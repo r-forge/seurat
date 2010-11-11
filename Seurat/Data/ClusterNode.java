@@ -26,6 +26,8 @@ public class ClusterNode {
 	
 	public boolean firstOrder = true;
 	
+	public boolean isLeaf = false;
+	
 	
 	
 	public ClusterNode(Vector<ISelectable> cases) {
@@ -47,7 +49,7 @@ public class ClusterNode {
 
 	public Vector<ClusterNode> getLeafList() {
 
-		if (nodeR == null && nodeR == null) {
+		if (isLeaf()) {
 			Vector List = new Vector();
 			List.add(this);
 			return List;
@@ -63,6 +65,44 @@ public class ClusterNode {
 		}
 
 	}
+	
+	
+	public boolean isLeaf() {
+		if ((nodeR == null && nodeR == null) || isLeaf) return true;
+		return false;
+	}
+	
+	public Vector<ClusterNode> getFathersOfLeafList() {
+
+		if (isLeaf()) {
+			Vector List = new Vector();
+			return List;
+		} 
+		
+		if (nodeR.isLeaf() && nodeL.isLeaf()) {
+			Vector List = new Vector();
+			List.add(this);
+			return List;
+		} 
+	
+	
+			Vector List = nodeL.getFathersOfLeafList();
+			Vector List2 = nodeR.getFathersOfLeafList();
+
+			for (int i = 0; i < List2.size(); i++) {
+				List.add(List2.elementAt(i));
+			}
+
+			return List;
+		
+
+	}
+	
+	
+	
+	
+	
+	
 	
 
 	public Vector<ISelectable> getOrder() {
@@ -165,9 +205,7 @@ public class ClusterNode {
 		if (nodeL != null) node.nodeL = nodeL.copy(); 
 		
 		
-		
 		node.ClusterNumber = ClusterNumber;
-
 
 		node.currentHeight = currentHeight;
 		
@@ -181,6 +219,8 @@ public class ClusterNode {
 		
 		node.firstOrder = firstOrder;
 		
+		node.isLeaf = isLeaf;
+		
 		return node;
 		
 	}
@@ -188,7 +228,7 @@ public class ClusterNode {
 	
 
 	public int getTiefe() {
-		if (nodeL == null)
+		if (nodeL == null || isLeaf)
 			return 1;
 		else
 			return Math.max(nodeL.getTiefe() + 1, nodeR.getTiefe() + 1);
@@ -197,7 +237,7 @@ public class ClusterNode {
 	
 	// returns all nodes in the tree not children
 	public Vector<ClusterNode> getParents() {
-		if (nodeL != null && nodeR != null) {
+		if (nodeL != null && nodeR != null && !isLeaf) {
 			Vector v = Tools.mergeVectors(nodeL.getParents(),nodeR.getParents());
 			v.add(this);
 			return v;
