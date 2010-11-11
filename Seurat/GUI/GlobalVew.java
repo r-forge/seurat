@@ -141,8 +141,6 @@ class GlobalView extends JFrame implements MatrixWindow, IPlot {
 			
 			gPanel.nodeSpalten = columns;
 			gPanel.nodeZeilen = rows;
-
-			// this.addKeyListener(gPanel);
 		
 	}
 	
@@ -1356,6 +1354,8 @@ class GlobalViewAbstractPanel extends JPanel implements MouseListener, IPlot,
 				}
 			}
 		}
+		
+		
 
 		if (e.isControlDown()) {
 			ISelectable exp = this.getExpAtPoint(e.getPoint());
@@ -1365,51 +1365,59 @@ class GlobalViewAbstractPanel extends JPanel implements MouseListener, IPlot,
 
 				String s = "<HTML><BODY BGCOLOR = 'WHITE'><FONT FACE = 'Verdana'><STRONG>";
 
-				s += "<FONT FACE = 'Arial'><TR><TD>" + exp.getName()
-						+ "  </TD><TD> ";
+				s += "<FONT FACE = 'Arial'> <TR><TD>" + exp.getName()+ "  </TR></TD>";
 
-				if (Aggregation == 1)
-					s += gene.getName() + "  </TD><TD> ";
-				int x = Math.max(0, e.getPoint().x - abstandLinks)
-						/ this.pixelW;
+				if (Aggregation == 1) s += " </R><TD>"+gene.getName() + "</TR></TD><TD> ";
+			
+				int x = Math.max(0, e.getPoint().x - abstandLinks)/ this.pixelW;
 				int y = Math.max(0, e.getPoint().y - upShift) / (this.pixelH);
 
 				double valueD = 0;
 				boolean isNA = true;
 
 				for (int i = 0; i < Columns.size(); i++) {
-					if (i == x) {
+				if (i == x) {
 
 						for (int j = 0; j < Rows.size(); j++) {
-							if (j == y) {
+						if (j == y) {
 
-								if (Columns.elementAt(i).getRealValue(
-										Rows.elementAt(j).getID()) != dataManager.NA) {
-									valueD += Columns.elementAt(i).getValue(
-											Rows.elementAt(j).getID());
+								if (Columns.elementAt(i).getRealValue(Rows.elementAt(j).getID()) != dataManager.NA) {
+									valueD += Columns.elementAt(i).getValue(Rows.elementAt(j).getID());
 									isNA = false;
 								}
 
-							}
 						}
-					}
+						}
+				}
 				}
 
 				String value = "";
 
-				if (isNA) {
-					value = "NA";
-				} else {
+				if (isNA) value = "NA";
+				else value = valueD + "";
+				
 
-					value = valueD + "";
+				if (Aggregation != 1) value = this.data[x][y] + "";
+				
+
+				s += "<FONT FACE = 'Arial'><TR><TD>value: " + value + "  </TD><TD> ";
+				
+				
+				Vector<DescriptionVariable> Vars = seurat.getSelectedDescriptionVariables();
+				for (int i = 0; i < Vars.size(); i++) {
+					if (exp instanceof Variable) s += "<FONT FACE = 'Arial'><TR><TD>"+Vars.elementAt(i).name+ " " + Vars.elementAt(i).getStringData() [exp.getID()] + "  </TD><TD> ";
+				}
+				
+				if (Aggregation == 1) {
+					Vector<GeneVariable> geneVars = seurat.getSelectedGeneVariables();
+					for (int i = 0; i < geneVars.size(); i++) {
+						if (gene instanceof Gene && ((Gene)gene).annGene != null) s += "<FONT FACE = 'Arial'><TR><TD>"+geneVars.elementAt(i).name+ " " + geneVars.elementAt(i).getStringData(((Gene)gene).annGene.ID) + "  </TD><TD> ";
+					}
+
 				}
 
-				if (Aggregation != 1) {
-
-					value = this.data[x][y] + "";
-				}
-
-				s += "<FONT FACE = 'Arial'><TR><TD>" + value + "  </TD><TD> ";
+				
+				
 
 				s += "</P></FONT></STRONG>";
 

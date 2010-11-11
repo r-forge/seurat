@@ -142,6 +142,7 @@ public class Seurat extends JFrame implements ColorListener{
 	JScrollPane datasetsPane;
 	JPanel middlePanel = new JPanel();
 
+	boolean snpLoaded = false;
 	// JTree objectsTree;
 	// JTree datasetsTree;
 
@@ -154,7 +155,7 @@ public class Seurat extends JFrame implements ColorListener{
 	DefaultMutableTreeNode topData;
 	DefaultMutableTreeNode topClustering;
 	DefaultMutableTreeNode topSelection;
-	
+	DataTreeNode GenesNode; 
 
 	JTree tree;
 
@@ -181,21 +182,20 @@ public class Seurat extends JFrame implements ColorListener{
 	Vector<Clustering> Clusterings;	
 	Vector<ClusterNode> HClusterings;	
 	Vector<Biclustering> Biclusterings;
+
+	
+	
+	GeneVariable displayedGeneVariable;
 	
 	
 
 	public Seurat() {
 		super("Seurat");
 		this.setBounds(0, 0, 330, 400);
-		
-		
-
 		System.out.println((System.getProperties().getProperty("os.name")));
 
-		if ((System.getProperties().getProperty("os.name"))
-				.equals("Windows XP")
-				|| (System.getProperties().getProperty("os.name"))
-						.equals("Windows Vista"))
+		if ((System.getProperties().getProperty("os.name")).equals("Windows XP")
+				|| (System.getProperties().getProperty("os.name")).equals("Windows Vista"))
 			this.SYSTEM = this.WINDOWS;
 		else {
 			if ((System.getProperties().getProperty("os.name"))
@@ -356,23 +356,17 @@ public class Seurat extends JFrame implements ColorListener{
 					 Clusterings = new Vector();	
 					 HClusterings = new Vector();
 					 Biclusterings = new Vector();
-						
+				
+					 
+					if (paths != null) { 
 					for (int i = 0; i < paths.length; i++) {
 						Object o = paths [i].getLastPathComponent();
 						if (o != null && o instanceof DataTreeNode) {
 						DataTreeNode node = (DataTreeNode)o;
-						if (node.object instanceof Gene) {
-							Genes.add(node.object);
-							
-							
-						}
+						if (node.object instanceof Gene) Genes.add(node.object);
 						if (node.object instanceof Clone) Clones.add(node.object);
-						if (node.object instanceof Variable) {
+						if (node.object instanceof Variable) Samples.add(node.object);
 							
-							Samples.add(node.object);
-							
-							
-						}
 						
 						if (node.cObject!= null && node.cObject instanceof Clustering) {
 							Clustering c = (Clustering)node.cObject;
@@ -389,48 +383,36 @@ public class Seurat extends JFrame implements ColorListener{
 						if (node.cObject!= null && node.cObject instanceof Biclustering) {
 							Biclustering c = (Biclustering)node.cObject;
 							Biclusterings.add((Biclustering)node.cObject);
+						}	
 						}
-						
-						
-						
-						}
+					}
 					}
 					
 					
 					Genes = Tools.sortIDs(Genes);
 					Samples = Tools.sortIDs(Samples);
 					
+		
+					
+					
 					
 
-					if (Genes.size() > 0 && Samples.size() >0 
-							&& ((Genes.elementAt(0) instanceof Gene && Samples.elementAt(0) instanceof Variable)||
-								(Genes.elementAt(0) instanceof Clone && Samples.elementAt(0) instanceof CGHVariable)	)) {
+					if (Genes.size() > 0 && Samples.size() >0 && 
+						((Genes.elementAt(0) instanceof Gene && Samples.elementAt(0) instanceof Variable)||
+						(Genes.elementAt(0) instanceof Clone && Samples.elementAt(0) instanceof CGHVariable))) {
 					
 					JMenuItem item = new JMenuItem("Heatmap");
 					item.addActionListener(new ActionListener() {
-						public void actionPerformed(ActionEvent e) {
-							// createCorrelationExperiments();
-
-							GlobalView frame = new GlobalView(seurat, "Heatmap Gene Expressions",
-									Samples, Genes);
+					public void actionPerformed(ActionEvent e) {
 							
-							
+							GlobalView frame = new GlobalView(seurat, "Heatmap Gene Expressions",Samples, Genes);
 							int pixelW = settings.PixelW;
 							int pixelH = settings.PixelH;
 							
-							if (Genes.size() < 400) {
-								pixelH = 400 / Genes.size();
-							}
-							
-							
-							if (Samples.size() < 400) {
-								pixelW = 400 / Samples.size();
-							}
-							
+							if (Genes.size() < 400) pixelH = 400 / Genes.size();
+							if (Samples.size() < 400) pixelW = 400 / Samples.size();
 							
 							frame.applyNewPixelSize(pixelW,pixelH);
-							
-							
 						}
 					});
 					menu.add(item);
@@ -540,6 +522,38 @@ public class Seurat extends JFrame implements ColorListener{
 					
 					
 					
+					if (dataManager.geneVariables != null) {
+					 JMenu m = new JMenu("display genes as");
+					 for (int i = 0; i < dataManager.geneVariables.size(); i++) {
+						 
+						 JMenuItem item = new JMenuItem(dataManager.geneVariables.elementAt(i).name+"");
+						 item.setActionCommand(i+"");
+						 item.addActionListener(new ActionListener() {
+								public void actionPerformed(ActionEvent e) {
+									
+									int i = Integer.parseInt(e.getActionCommand());
+									updateGenesNodes(dataManager.geneVariables.elementAt(i));
+
+								}
+							});
+							m.add(item);
+					}
+					 
+					 menu.add(m);
+					 
+					 }
+					 
+					 
+						
+					
+					
+					
+					
+					
+					
+					
+					
+					
 					
 					
 					if (Genes.size() == 0 && Samples.size() == 0 && Clusterings.size() < 2) {
@@ -548,57 +562,25 @@ public class Seurat extends JFrame implements ColorListener{
 							JMenuItem item = new JMenuItem("Heatmap");
 							item.addActionListener(new ActionListener() {
 								public void actionPerformed(ActionEvent e) {
-									// createCorrelationExperiments();
 									
 									ClusterNode c1 = HClusterings.elementAt(0);
-									ClusterNode c2 = HClusterings.elementAt(1);
-									
-									
+									ClusterNode c2 = HClusterings.elementAt(1);		
 									GlobalView globalView = null;
-									
 									
 									int pixelW = settings.PixelW;
 									int pixelH = settings.PixelH;
-
 									
 									if (c1.isRows) {
-										globalView = new GlobalView(seurat,
-												"Clustering" + dataManager.ClusteringNumber, c2,c1);
-
-										if (c1.getOrder().size() < 400) {
-											pixelH = 400 / c1.getOrder().size();
-										}
-										
-										
-										if (c2.getOrder().size() < 560) {
-											pixelW = 560 / c2.getOrder().size();
-										}
-										
+										globalView = new GlobalView(seurat,"Clustering" + dataManager.ClusteringNumber, c2,c1);
+										if (c1.getFirstOrder().size() < 400) pixelH = 400 / c1.getFirstOrder().size();
+										if (c2.getFirstOrder().size() < 560) pixelW = 560 / c2.getFirstOrder().size();		
 									}
 									else {
-										globalView = new GlobalView(seurat,
-												"Clustering" + dataManager.ClusteringNumber, c1,c2);
-
-										
-										if (c2.getOrder().size() < 400) {
-											pixelH = 400 / c2.getOrder().size();
-										}
-										
-										
-										if (c1.getOrder().size() < 560) {
-											pixelW = 560 / c1.getOrder().size();
-										}
-										
+										globalView = new GlobalView(seurat,"Clustering" + dataManager.ClusteringNumber, c1,c2);										
+										if (c2.getFirstOrder().size() < 400) pixelH = 400 / c2.getFirstOrder().size();
+										if (c1.getFirstOrder().size() < 560) pixelW = 560 / c1.getFirstOrder().size();
 									}
 										
-									
-									
-																	
-
-									
-									
-									
-									
 									globalView.applyNewPixelSize(pixelW,pixelH);
 									
 								}
@@ -607,16 +589,9 @@ public class Seurat extends JFrame implements ColorListener{
 						
 						}	
 					}
-					
-					
-					
-					
-					
-
 					menu.show(tree, e.getX(), e.getY());
 					
-					
-					
+		
 					
 				}
 				
@@ -735,18 +710,14 @@ public class Seurat extends JFrame implements ColorListener{
 						}
 
 						if (object instanceof Chromosome) {
-							// System.out.println(object.getName() + "  "
-							// +object.getType());
-
-							// System.out.println("Chromosome");
+						
+							
 							Vector Cases = seurat.dataManager.getStates();
 							Vector<Chromosome> v = new Vector();
 							v.add((Chromosome) object);
 
-							//new ChrView(seurat, "Cariogramm", v, Cases);
+							new ChrView(seurat, "Chromosome " + v.elementAt(0).name, v,Cases);
 							
-							new ChrView(seurat, "Chromosome " + v.elementAt(0).name, v,
-					    			Cases);
 							return;
 						}
 
@@ -1029,7 +1000,7 @@ public class Seurat extends JFrame implements ColorListener{
 
 					tree.scrollPathToVisible(new TreePath(topData.getPath()));
 
-					DataTreeNode Clones = new DataTreeNode("Clones");
+					DataTreeNode Clones = new DataTreeNode("SNPs");
 					for (int i = 0; i < dataManager.CLONES.size(); i++) {
 						Clone var = dataManager.CLONES.elementAt(i);
 						DataTreeNode Experiment = new DataTreeNode(var);
@@ -1052,7 +1023,9 @@ public class Seurat extends JFrame implements ColorListener{
 					tree.scrollPathToVisible(new TreePath(topObj.getPath()));
 
 					
-
+                    
+					snpLoaded = true;
+					
 					infoLabel.setText("");
 					infoPanel.remove(progressBar);
 					MainPanel.remove(infoPanel);
@@ -1512,7 +1485,7 @@ fileMenu.addSeparator();
 					selectedExps++;
 
 			}
-
+			if (anzahlExps == 0) anzahlExps++;
 			s += "   Samples: " + selectedExps + "/" + anzahlExps + " ("
 					+ (double) (selectedExps * 10000 / anzahlExps) / 100 + "%)";
 
@@ -1567,17 +1540,55 @@ fileMenu.addSeparator();
 		infoPanel.paint(infoPanel.getGraphics());
 		infoPanel.updateUI();
 		
-		updateSelectionTree();
+		updateSelectionTree(displayedGeneVariable);
 
 	}
 	
 	
-	public void updateSelectionTree() {
+	public void updateGenesNode(GeneVariable var) {
 		
-		if (selectionManager == null) selectionManager = new SelectionManager(this,tree,topSelection);
-		selectionManager.addObjects();
+		
+        int l = GenesNode.getChildCount();
+		
+        for (int i = 0; i < l; i++) {
+        	DefaultMutableTreeNode c = GenesNode.getLastLeaf(); 
+        	((DefaultTreeModel)tree.getModel()).removeNodeFromParent(c);	           
+        }
+		
+		
+		for (int i = 0; i < dataManager.Genes.size(); i++) {
+			Gene g = dataManager.Genes.elementAt(i);
+			String name = g.getName();
+			if (var != null && g.annGene != null) {
+				
+				name = var.getStringData(g.annGene.ID);
+			}
+			DataTreeNode Gene = new DataTreeNode(g,name);
+			Gene.cObject = g;		
+			((DefaultTreeModel) tree.getModel()).insertNodeInto(Gene, GenesNode, GenesNode.getChildCount());
+			Gene.setParent(GenesNode);
+
+			GenesNode.add(Gene);
+		}
 		
 	}
+	
+	public void updateSelectionTree(GeneVariable var) {
+		
+		displayedGeneVariable = var;
+		if (selectionManager == null) selectionManager = new SelectionManager(this,tree,topSelection);
+		selectionManager.addObjects(var);
+		
+	}
+	
+	
+    public void updateGenesNodes(GeneVariable var) {
+		
+    	updateGenesNode(var);
+    	updateSelectionTree(var);
+    	
+	}
+
 	
 	
 
@@ -1668,15 +1679,9 @@ fileMenu.addSeparator();
 				}
 
 				topObj.add(Experiments);
-
-				DataTreeNode Genes = new DataTreeNode("Genes");
-				for (int i = 0; i < dataManager.Genes.size(); i++) {
-					Gene var = dataManager.Genes.elementAt(i);
-					DataTreeNode Gene = new DataTreeNode(var);
-					Genes.add(Gene);
-				}
-
-				topObj.add(Genes);
+				GenesNode = new DataTreeNode("Genes");
+				updateGenesNodes(null);
+                topObj.add(GenesNode);
 
 				DataTreeNode GeneExpressions = new DataTreeNode(
 						"Genexpression data");
@@ -1842,6 +1847,7 @@ fileMenu.addSeparator();
 		this.dataManager = new DataManager();
 		MainPanel.removeAll();
 		this.getContentPane().removeAll();
+		snpLoaded = false;
 		menuBar.removeAll();
 		infoPanel.removeAll();
 		middlePanel.removeAll();
@@ -2140,6 +2146,53 @@ fileMenu.addSeparator();
 	}
 	
 	
+	
+	/**
+	 * 
+	 * */
+	public Vector<GeneVariable> getSelectedGeneVariables() {
+		TreePath [] paths = seurat.tree.getSelectionPaths();
+		
+		Vector<GeneVariable> SelectedGeneVariables = new Vector();	
+		 
+		if (paths != null) { 
+		for (int i = 0; i < paths.length; i++) {
+			Object o = paths [i].getLastPathComponent();
+			if (o != null && o instanceof DataTreeNode) {
+			DataTreeNode node = (DataTreeNode)o;	
+			if (node.object instanceof GeneVariable) {
+				SelectedGeneVariables.add((GeneVariable)node.object);
+			}
+			}
+		}
+		}
+		return SelectedGeneVariables;
+	}
+	
+	
+	
+	
+	/**
+	 * 
+	 * */
+	public Vector<DescriptionVariable> getSelectedDescriptionVariables() {
+		TreePath [] paths = seurat.tree.getSelectionPaths();
+		
+		Vector<DescriptionVariable> SelectedVariables = new Vector();	
+		 
+		if (paths != null) { 
+		for (int i = 0; i < paths.length; i++) {
+			Object o = paths [i].getLastPathComponent();
+			if (o != null && o instanceof DataTreeNode) {
+			DataTreeNode node = (DataTreeNode)o;	
+			if (node.object instanceof DescriptionVariable) {
+				SelectedVariables.add((DescriptionVariable)node.object);
+			}
+			}
+		}
+		}
+		return SelectedVariables;
+	}
 	
 	
 	

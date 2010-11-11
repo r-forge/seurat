@@ -29,6 +29,14 @@ public class DataTreeNode extends DefaultMutableTreeNode{
     }
     
     
+    public DataTreeNode(ISelectable object, String name) {
+    	super(name);
+    	this.object = object;
+    	this.name = object.getName();
+    	TYPE = object.getType();
+    }
+    
+    
     public DataTreeNode(ISelectable object, boolean datasetVar) {
     	super(object.getName());
     	this.object = object;

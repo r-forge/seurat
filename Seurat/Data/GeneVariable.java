@@ -7,6 +7,7 @@ import GUI.IPlot;
 
 
 public class GeneVariable implements ISelectable{
+	
 	public String name;
 
 	public int type; // Double,String
@@ -16,7 +17,6 @@ public class GeneVariable implements ISelectable{
 	public boolean isDiscrete = false;
 	
 	public boolean isList = false;
-	
 
 	public final double NA = Math.PI;
 
@@ -304,6 +304,11 @@ public class GeneVariable implements ISelectable{
 	public String [] getStringData() {
 		// TODO Auto-generated method stub
 		return stringData;
+	}
+	
+	public String getStringData(int ID) {
+		// TODO Auto-generated method stub
+		return stringData [ID];
 	}
 
 
