@@ -17,13 +17,15 @@ microarray data</title>
 <hr> <br>
 <p align="justify"> In order to run SEURAT the latest <a
  href="http://java.sun.com/javase/downloads/index.jsp" target="_blank">JRE</a>
-(or JDK) and the latest <a href="http://cran.r-project.org/" target="_blank">R</a>
+(or JDK) and the latest <a href="http://cran.r-project.org/"
+ target="_blank">R</a>
 version need to be installed. In addition, to perform any clustering
 and seriation analysis, the R packages <a
  href="http://www.rforge.net/Rserve/index.html" target="_blank">Rserve</a>,
 <a href="http://cran.r-project.org/web/packages/amap/index.html">amap</a>
 , <a href="http://cran.r-project.org/web/packages/seriation/index.html"
- target="_blank">seriation</a> and <a href="http://cran.r-project.org/web/packages/biclust/index.html"
+ target="_blank">seriation</a> and <a
+ href="http://cran.r-project.org/web/packages/biclust/index.html"
  target="_blank">biclust</a> need to be installed.</p>
 This can be done by typing the following into the R console:<br>
 <br>
@@ -38,14 +40,15 @@ By downloading any version of SEURAT, you accept the following license:
  href="http://www.gnu.org/licenses/" target="_blank">http://www.gnu.org/licenses/</a>.<br></pre>
 <br>
 <br>
-<b>Version 0.91 September 10, 2009</b> <br>
+<b>Version 1.0 January, 2011</b> <br>
 <br>
-<a href="download/SeuratMac.zip">Seurat</a>  (Application for Mac)<br>
-<a href="download/SeuratWin.zip">Seurat</a>  (Windows batch and Jar file)<br>
+<a href="download/SeuratMac.zip">Seurat</a> (Application for Mac)<br>
+<a href="download/SeuratWin.zip">Seurat</a> (Windows batch and Jar file)<br>
 <a href="download/Seurat.jar">Seurat.jar</a> (Jar file for Unix)<br>
 <br>
 <br>
-The source code is available from the <a href="http://r-forge.r-project.org/scm/?group_id=423">Subversion-Repository</a> 
+The source code is available from the <a
+ href="http://r-forge.r-project.org/scm/?group_id=423">Subversion-Repository</a>
 <br>
 <br>
 <h2>Installation and Run</h2>
@@ -55,7 +58,8 @@ The source code is available from the <a href="http://r-forge.r-project.org/scm/
 <ul>
   <br>
   <br>
-  <li><strong>Windows</strong>: extract the zip archive and double click the Seurat.bat or type Seurat.bat in the command line. <br>
+  <li><strong>Windows</strong>: extract the zip archive and double
+click the Seurat.bat or type Seurat.bat in the command line. <br>
     <br>
   </li>
   <li><strong>Linux</strong>: launch the Seurat.jar file via the
@@ -64,7 +68,8 @@ terminal by: <br>
     <pre>java -jar Seurat.jar</pre>
   </li>
   <br>
-  <li><strong>MacOS X</strong>: extract the zip archive and double click the Seurat.app in the Seurat folder<br>
+  <li><strong>MacOS X</strong>: extract the zip archive and double
+click the Seurat.app in the Seurat folder<br>
   </li>
   <br>
   <br>
@@ -75,13 +80,7 @@ software could not connect to Rserve. In this case you have to lauch
 Rserve manually by typing the following into the R console: </p>
 <br>
 <br>
-<pre>
-library(Rserve)
-library(amap)
-library(seriation)
-library(biclust)
-Rserve()
-</pre>
+<pre>library(Rserve)<br>library(amap)<br>library(seriation)<br>library(biclust)<br>Rserve()<br></pre>
 <br>
 <h2>Sample Data</h2>
 <hr> <br>
@@ -100,11 +99,13 @@ variables collected from the 50 samples
 of the 7.705 genes
 <br>
 <br>
-<code> aCGHData.txt </code>&nbsp;&nbsp;&nbsp; CGH data for 7.873 clones
+<code> aCGHData.txt </code>&nbsp;&nbsp;&nbsp; CGH data for 7.873
+clones
 as measured by the 50 samples
 <br>
 <br>
-The mapping of the 7.873 CGH clones to the 7.705 genes is time consuming,
+The mapping of the 7.873 CGH clones to the 7.705 genes is time
+consuming,
 thus loading the array-CGH file will last some time (depending on your
 machine).
 <br>
@@ -128,34 +129,42 @@ variables collected from the 50 samples
 of the 299 genes
 <br>
 <br>
-<code> aCGHData.txt </code>&nbsp;&nbsp;&nbsp; CGH data for 1.144 clones
+<code> aCGHData.txt </code>&nbsp;&nbsp;&nbsp; CGH data for 1.144
+clones
 (chromosome 1) as measured by the 50 samples
 <br>
 <br>
-<a href="download/SampleDataShort.zip">SampleDataShort.zip</a> 
+<a href="download/SampleDataShort.zip">SampleDataShort.zip</a> <br>
+<br>
+The second example data set is based on Affymetrix exon (GeneChip Human
+Exon 1.0 ST Arrays) and SNP arrays (Genome-Wide Human SNP Arrays 6.0).
+Most of the preprocessing of the Affymetrix chips has been done using
+the R-package <a
+ href="http://cran.r-project.org/web/packages/aroma.affymetrix/index.html"
+ target="_blank"> aroma.affymetrix</a>.
+Help regarding this package and the implemented statistical methods can
+be found <a href="http://groups.google.com/group/aroma-affymetrix/"
+ target="_blank">here</a>. In addition we provide a R-script that
+describes the preprocessing of the raw data: <br>
+<br>
+<code> GeneExpression.txt</code>&nbsp;&nbsp;&nbsp; gene expression
+values of 17.502 genes of 8 samples <br>
+<br>
+<code> ClinicalData.txt </code>&nbsp;&nbsp;&nbsp; 16 clinicial
+variables collected from the 8 samples
 <br>
 <br>
-The second example data set is based on Affymetrix exon (GeneChip Human Exon 1.0 ST Arrays) and SNP arrays (Genome-Wide Human SNP Arrays 6.0).
-Most of the preprocessing of the Affymetrix chips has been done using the R-package <a href="http://cran.r-project.org/web/packages/aroma.affymetrix/index.html" target="_blank"> aroma.affymetrix</a>.
-Help regarding this package and the implemented statistical methods can be found <a href="http://groups.google.com/group/aroma-affymetrix/" target="_blank">here</a>.   
-In addition we provide a R-script that describes the preprocessing of the raw data: 
+<code> GeneAnnotations.txt </code>&nbsp;&nbsp;&nbsp; gene annotations
+of the 17.502 genes
 <br>
 <br>
-<code> GeneExpression.txt</code>&nbsp;&nbsp;&nbsp; gene expression values of 17.502 genes of 8 samples <br>
-<br>
-<code> ClinicalData.txt </code>&nbsp;&nbsp;&nbsp; 16 clinicial variables collected from the 8 samples
-<br>
-<br>
-<code> GeneAnnotations.txt </code>&nbsp;&nbsp;&nbsp; gene annotations of the 17.502 genes
+<code> SNPdata.txt </code>&nbsp;&nbsp;&nbsp; 198.965 SNPs measured by
+the 8 samples
 <br>
 <br>
-<code> SNPdata.txt </code>&nbsp;&nbsp;&nbsp; 198.965 SNPs measured by the 8 samples
+<a href="download/SampleDataAffy.zip">SampleDataAffy.zip</a> <br>
 <br>
-<br>
-<a href="download/SampleDataAffy.zip">SampleDataAffy.zip</a> 
-<br>
-<br>
-<a href="download/preprocessing.R" >preprocessing.R</a></div>
+<a href="download/preprocessing.R">preprocessing.R</a></div>
 <br>
 <br>
 </body>

@@ -25,7 +25,7 @@
 	<key>Java</key>
 	<dict>
 		<key>VMOptions</key>
-		<string>-Xmx512m</string>
+		<string>-Xmx1024m</string>
 		<key>MainClass</key>
 		<string>GUI.Seurat</string>
 		<key>JVMVersion</key>
