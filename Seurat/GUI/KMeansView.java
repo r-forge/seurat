@@ -177,42 +177,10 @@ class KMeansView extends JFrame implements MatrixWindow, IPlot {
 
 			@Override
 			public void componentResized(ComponentEvent e) {
-				/*
-				
-				long newTimeResized = System.currentTimeMillis();
-				if (newTimeResized - timeResized > 200) {
-				
-				timeResized = newTimeResized;
-				
-				
-				  int Approx = 1;
-				  boolean weiter = true;
-				  
-				  
-				  while (weiter) {
-				
-					  int shiftY = 2;
-					  shiftY = shiftY
-						+ plot.Experiments.elementAt(0).elementAt(0).getColors().size() * (2 * panel.pixelH + 2);
-					
-					  
-					  for (int j = 0; j < plot.Genes.size(); j++) {
-						  
-							shiftY = shiftY
-							+ (plot.Genes.elementAt(j).size() * panel.pixelH / Approx + 1);
-					  
-					  }
-                  
-					  if (shiftY <= panel.getHeight()) weiter = false;
-                  
-					  else Approx++;
-				  }
-				  
-				  panel.Approx = Approx;
-				  
-				  plot.applyNewPixelSize(panel.pixelW,panel.pixelH);
-				  
-				}*/
+			
+				   panel.image = null;
+                   panel.repaint();
+                   
 			}
 
 		});
@@ -388,6 +356,12 @@ class KmeansPanel extends JPanel implements MouseListener, IPlot,
 	Vector<CoordinateNode> nodesR;
 
 	Vector<CoordinateNode> nodesC;
+	
+	Image image;
+    int oldWidth, oldHeight;
+	
+    
+    
 
 	public KmeansPanel(Seurat seurat, KMeansView plot, Clustering Experiments, Clustering Genes) {
 
@@ -441,6 +415,8 @@ class KmeansPanel extends JPanel implements MouseListener, IPlot,
 	}
 
 	public void updateSelection() {
+		
+		image = null;
 
 		if (blocks == null || updateBlocks) {
 			blocks = new Block[this.Experiments.clusters.size()][this.Genes.clusters.size()];
@@ -1005,10 +981,18 @@ this.repaint();
 
 	}
 
-	@Override
-	public void paint(Graphics g) {
+    public void paint(Graphics graphics) {
+
 		
 		
+		if (image == null || oldWidth != this.getWidth() || oldHeight != this.getHeight() ) {
+
+		oldWidth = this.getWidth();
+		oldHeight = this.getHeight();			
+	 	image = this.createImage(this.getWidth(),this.getHeight());
+		
+		
+		Graphics g = image.getGraphics();
 		
 		g.setColor(Color.WHITE);
 		g.fillRect(0, 0, this.getWidth(), this.getHeight());
@@ -1063,11 +1047,15 @@ this.repaint();
 		paintClustering(g);
 		
 
+
+		}
+		graphics.drawImage(image,0,0,this.getWidth(), this.getHeight(),this);
+		
 		if (point1 != null && point2 != null) {
-	        if (Model == 1) g.setColor(Color.BLACK);
-	        else g.setColor(Color.WHITE);
+	        if (Model == 1) graphics.setColor(Color.BLACK);
+	        else graphics.setColor(Color.WHITE);
 			
-			g.drawRect(Math.min(point1.x, point2.x), Math.min(point1.y,
+	        graphics.drawRect(Math.min(point1.x, point2.x), Math.min(point1.y,
 					point2.y), Math.abs(point2.x - point1.x), Math
 					.abs(point2.y - point1.y));
 	

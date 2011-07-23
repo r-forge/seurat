@@ -24,7 +24,7 @@ public class Settings {
 	
 //	public boolean invertShading = false;
 	
-	public static int DiscretLimit = 105;
+	public static int DiscretLimit = 15;
 
 	
 

@@ -124,13 +124,11 @@ public class ExperimentDescriptionFrame extends JFrame {
 
 			int length = 0;
 
-			while ((line = bfr.readLine()) != null) {
-				length++;
+			while ((line = bfr.readLine()) != null) length++;
 
-			}
+			
 
-			bfr = new BufferedReader(new FileReader(fileDialog.getDirectory()
-					+ "/" + fileDialog.getFile()));
+			bfr = new BufferedReader(new FileReader(fileDialog.getDirectory()+ "/" + fileDialog.getFile()));
 
 			line = bfr.readLine();
 
@@ -231,6 +229,7 @@ public class ExperimentDescriptionFrame extends JFrame {
 					}
 					
 					for (int i = 0; i < seurat.dataManager.Experiments.size(); i++) {
+						
 						ISelectable exp = seurat.dataManager.Experiments.elementAt(i);
 					  
 					    

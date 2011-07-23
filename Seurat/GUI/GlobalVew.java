@@ -263,7 +263,9 @@ class GlobalView extends JFrame implements MatrixWindow, IPlot {
 
 			@Override
 			public void componentResized(ComponentEvent e) {
-
+				
+                    gPanel.image = null;
+                    gPanel.repaint();
 			}
 
 		});
@@ -383,7 +385,10 @@ class GlobalViewAbstractPanel extends JPanel implements MouseListener, IPlot,
 	// Type of the global view 1 == Genexpression + SNP, 2 == CGH
 	int Type;
 	public static final int GEXP = 1, CGH = 2;
-
+    
+	
+	Image image;
+    int oldWidth, oldHeight;
 	
 	
 	
@@ -470,6 +475,7 @@ class GlobalViewAbstractPanel extends JPanel implements MouseListener, IPlot,
 	
 	public void updateSelection() {
 
+		image = null;
 		cellColor = new Color[this.Columns.size()][this.data[0].length];
     	exclusiveSelection = false;
 	
@@ -1780,8 +1786,19 @@ class GlobalViewAbstractPanel extends JPanel implements MouseListener, IPlot,
 	
 	
 	@Override
-	public void paint(Graphics g) {
+	public void paint(Graphics graphics) {
 
+		
+		
+		if (image == null || oldWidth != this.getWidth() || oldHeight != this.getHeight() ) {
+
+		oldWidth = this.getWidth();
+		oldHeight = this.getHeight();			
+	 	image = this.createImage(this.getWidth(),this.getHeight());
+		
+		
+		Graphics g = image.getGraphics();
+		
 		g.setColor(Color.white);
 		g.fillRect(0, 0, this.getWidth(), this.getHeight());
 
@@ -1813,6 +1830,8 @@ class GlobalViewAbstractPanel extends JPanel implements MouseListener, IPlot,
 		if (cellColor == null)
 			this.updateSelection();
 
+		
+		
 		for (int i = 0; i < data.length; i++) {
 			for (int j = 0; j < PixelCount; j++) {
 
@@ -1833,31 +1852,25 @@ class GlobalViewAbstractPanel extends JPanel implements MouseListener, IPlot,
 
 		paintClustering(g);
 
+		
+		}
+		graphics.drawImage(image,0,0,this.getWidth(), this.getHeight(),this);
+		
+		
+		
 		if (point1 != null && point2 != null) {
-			if (Model == 1) g.setColor(Color.BLACK);
-			else g.setColor(Color.WHITE);
+			if (Model == 1) graphics.setColor(Color.BLACK);
+			else graphics.setColor(Color.WHITE);
 			
 			
-			g.drawRect(Math.min(point1.x, point2.x), Math.min(point1.y,
+			graphics.drawRect(Math.min(point1.x, point2.x), Math.min(point1.y,
 					point2.y), Math.abs(point2.x - point1.x), Math
 					.abs(point2.y - point1.y));
 			
-			/*			if (SelectionColor == Color.BLACK) {
-
-				g.drawRect(Math.min(point1.x, point2.x), Math.min(point1.y,
-						point2.y), Math.abs(point2.x - point1.x), Math
-						.abs(point2.y - point1.y));
-			} else {
-
-				g.drawRect(this.abstandLinks - 1, Math.min(point1.y, point2.y),
-						this.getWidth() - abstandLinks - 2, Math.abs(point2.y
-								- point1.y));
-				g.drawRect(this.abstandLinks - 1, 1 + Math.min(point1.y,
-						point2.y), this.getWidth() - abstandLinks - 2, Math
-						.abs(point2.y - point1.y));*/
-
-			//}
+			
 		}
+		
+		
 
 	}
 	

@@ -60,8 +60,8 @@ public class BiclusteringDialog extends JFrame{
 	JTextField fieldminRBimax = new JTextField("5",2);
 	JTextField fieldnumberBimax = new JTextField("10",2);
 	JTextField quantileBimax = new JTextField("0.2",2);
-	JTextField fieldRowrel = new JTextField("0.6",2);
-	JTextField fieldColrel = new JTextField("0.6",2);
+	JTextField fieldRowrel = new JTextField("0.7",2);
+	JTextField fieldColrel = new JTextField("0.7",2);
 	JTextField fieldShuffle = new JTextField("3",2);
 	String[] bimaxopt = {"up","down"};
 	JComboBox boxBimaxopt = new JComboBox(bimaxopt);
@@ -330,16 +330,23 @@ public class BiclusteringDialog extends JFrame{
 	    	
 	    	bicresult.add(new Bicluster("Bicluster"+i+"(PlaidModel,Rows:"+rowresult.elementAt(i-1).size()+",Columns:"+colresult.elementAt(i-1).size()+")",
 	    			rowresult.elementAt(i-1),colresult.elementAt(i-1)));
-	    	GlobalView globalView = new GlobalView(seurat,bicresult.elementAt(i-1).name,bicresult.elementAt(i-1).colums,bicresult.elementAt(i-1).rows);
+	    /*	GlobalView globalView = new GlobalView(seurat,bicresult.elementAt(i-1).name,bicresult.elementAt(i-1).colums,bicresult.elementAt(i-1).rows);
 	        
-	        
+	    	
+	    	
+	    	
 	        int aggr = 1;
 			while (rowresult.elementAt(i-1).size()*5/aggr > 700) aggr++;
             globalView.gPanel.setAggregation(aggr);
             globalView.applyNewPixelSize(15, 5);
 	        globalView.setLocation(320 + (1000 * (i-1))/nbiclusters,0);	
-	    
+	    */
 	    }    
+
+	    new Bimatrix(new Biclustering("PlaidModel",bicresult));
+	    new BiHeatmap("PlaidModel",new Biclustering("PlaidModel",bicresult));
+
+	    
 	    rConnection.voidEval("rm(list=ls())");
  	    rConnection.voidEval("gc()");
 	    
@@ -420,6 +427,7 @@ public class BiclusteringDialog extends JFrame{
 		    	
 		    	bicresult.add(new Bicluster("Bicluster"+i+"(Bimax,Rows:"+rowresult.elementAt(i-1).size()+",Columns:"+colresult.elementAt(i-1).size()+")",
 		    			rowresult.elementAt(i-1),colresult.elementAt(i-1)));
+		    /*
 		    	GlobalView globalView = new GlobalView(seurat,bicresult.elementAt(i-1).name,bicresult.elementAt(i-1).colums,bicresult.elementAt(i-1).rows);
 		    	
 		    	
@@ -428,9 +436,16 @@ public class BiclusteringDialog extends JFrame{
 	            globalView.gPanel.setAggregation(aggr);
 	            globalView.applyNewPixelSize(15, 5);
 			    globalView.setLocation(320 + (1000 * (i-1))/nbiclusters,0);		
-		    
+		    */
 		    
 		    }    
+		    
+		    
+		    new Bimatrix(new Biclustering("Bimax",bicresult));
+		    new BiHeatmap("Bimax",new Biclustering("PlaidModel",bicresult));
+
+		    
+		    
 
 		    rConnection.voidEval("rm(list=ls())");
 		    rConnection.voidEval("gc()");    
