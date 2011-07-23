@@ -153,6 +153,8 @@ public class DataLoader {
 						}
 					} else {
 						(dataManager.variables.elementAt(i)).stringData[len] = token;
+						
+
 					}
 				}
 

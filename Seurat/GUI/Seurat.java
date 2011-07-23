@@ -493,6 +493,9 @@ public class Seurat extends JFrame implements ColorListener{
 					}	
 					
 					
+					
+					
+					
 					if (Clusterings.size() == 2 && (Clusterings.elementAt(0).isRows == Clusterings.elementAt(1).isRows)) {
 					
 					
@@ -512,7 +515,37 @@ public class Seurat extends JFrame implements ColorListener{
 					menu.add(item);
 					}
 					
+					
+					
+					if (Biclusterings.size() == 2) {
+						
+						
+						   JMenuItem item = new JMenuItem("Biconfusion Matrix");
+							item.addActionListener(new ActionListener() {
+								public void actionPerformed(ActionEvent e) {
+									// createCorrelationExperiments();
+									
+									Biclustering c1 = Biclusterings.elementAt(0);
+									Biclustering c2 = Biclusterings.elementAt(1);
+
+									new Biconf(c1,c2); 
+									
+									
+								}
+							});
+							menu.add(item);
+							}
+					
+					
 					}
+					
+					
+					
+					
+
+					
+					
+					
 					
 					
 					

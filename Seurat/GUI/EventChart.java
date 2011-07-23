@@ -199,8 +199,8 @@ class EventPanel extends JPanel implements KeyListener,MouseListener, MouseMotio
 
 	public void calculatePatients(Seurat seurat, DescriptionVariable time, DescriptionVariable status) {
 		patients = new Vector();
-		Vector<Variable> exps = seurat.dataManager.Experiments;
 		
+		Vector<Variable> exps = seurat.dataManager.Experiments;
 		Vector<String> buffer = Tools.sortBuffer(status.stringBuffer);
 		
 		for (int i = 0; i < exps.size(); i++) {
