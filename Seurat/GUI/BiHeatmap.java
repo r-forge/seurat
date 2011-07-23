@@ -625,7 +625,7 @@ class BiPanel extends JPanel implements MouseListener, KeyListener{
 			menu.add(item);
 			
 			
-			
+			/*
 			item = new JMenuItem("Presort");
 			item.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
@@ -635,7 +635,7 @@ class BiPanel extends JPanel implements MouseListener, KeyListener{
 				}
 			});
 			menu.add(item);
-			
+			*/
 			
 			item = new JMenuItem("Original order");
 			item.addActionListener(new ActionListener() {
