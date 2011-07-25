@@ -11,6 +11,8 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
+import org.rosuda.REngine.Rserve.RConnection;
+
 
 import Data.Bicluster;
 import Data.Biclustering;
@@ -18,6 +20,7 @@ import Data.ISelectable;
 import Data.MyColor;
 import Settings.Settings;
 import Tools.Tools;
+import Data.DataManager;
 
 
 
@@ -29,10 +32,20 @@ public class Bimatrix extends JFrame{
 	
 	int maxWidth = 400, maxHeight = 400;
 	
-	public Bimatrix(Biclustering biclust) {
+	Seurat seurat;
+	
+	DataManager dataManager;
+	
+	public Bimatrix(Seurat seurat,Biclustering biclust) {
 		super("Bimatrix " + biclust.name);
 	    this.biclust = biclust;
-		panel = new BiConfPanel(this,biclust);
+	    this.seurat = seurat;
+		this.dataManager = seurat.dataManager;
+	    
+	    
+	    sortBiclustering();
+    
+	    panel = new BiConfPanel(this,this.biclust);
 		
 	    setPlotSize();
 	    this.getContentPane().add(new JScrollPane(panel));
@@ -42,29 +55,138 @@ public class Bimatrix extends JFrame{
 		this.setVisible(true);
 	}
 	
-	
-	public void sortBiclusters() {
-		for (int i = 0; i < biclust.biclusters.size(); i++) {
+	// Sort Biclusters with TSP Method
+	public void sortBiclustering() {
+		try {
+
+			if (dataManager.getRConnection() == null)
+				dataManager.setRConnection(new RConnection());
 			
-			sortBicluster(i); 
+			RConnection rConnection = dataManager.getRConnection();
+				
 			
+			dataManager.rConnection.voidEval("require(stats)");
+			dataManager.rConnection.voidEval("require(seriation)");
+			
+			
+			double [][]matrix = new double [biclust.biclusters.size()][biclust.biclusters.size()];
+			for (int i = 0; i< matrix.length; i++) {
+				System.out.println();
+				for (int j = 0; j< matrix.length; j++) {
+					
+					Bicluster inter = intersect(biclust.biclusters.elementAt(i),biclust.biclusters.elementAt(j));
+					Bicluster union = union(biclust.biclusters.elementAt(i),biclust.biclusters.elementAt(j));
+					
+					matrix [i][j] = 1- (double)(inter.columns.size()*inter.rows.size())/(union.columns.size()*union.rows.size()); 
+				  
+				//	matrix [i][j] = 1-inter.columns.size()*inter.rows.size()/30;
+				}
+				
+			}
+			System.out.println();
+			
+		
+			rConnection.assign("m", matrix [0]);
+
+			for (int i = 1; i < matrix.length; i++) {
+				rConnection.assign("x",matrix [i]);
+				rConnection.voidEval("m <- cbind(m, x)");
+			}
+			
+			dataManager.rConnection.voidEval("order<-seriate(as.dist(m),method = \"TSP\")");
+			
+			int[] order = dataManager.rConnection.eval("get_order(order)").asIntegers();
+			
+			Vector<Bicluster> biclusters = new Vector();
+			for (int i = 0 ; i < biclust.biclusters.size(); i++) {
+				biclusters.add(biclust.biclusters.elementAt(order[i]-1));
+			}
+			
+			biclust = new Biclustering(biclust.name,biclusters);
+			
+			
+		}
+		catch (Exception e) {
+			e.printStackTrace();
 		}
 	}
 	
 	
-	public void sortBicluster(int i) {
-		Bicluster bi = biclust.biclusters.elementAt(i);
-	}
 	
-	public int calculateCrit(int j) {
-		int crit = 0;
-		Bicluster cl = biclust.biclusters.elementAt(j);
+	
+	
+	public Bicluster intersect(Bicluster b1, Bicluster b2) {
+	     Vector<ISelectable> cols1 = b1.columns;	
+	     Vector<ISelectable> cols2 = b2.columns;	
 
-		
-	
-		return crit;
+	     Vector<ISelectable> rows1 = b1.rows;	
+	     Vector<ISelectable> rows2 = b2.rows;	
+  
+	     return new Bicluster(b1.name + " " + b2.name, intersectV(b1.rows,b2.rows), intersectV(b1.columns,b2.columns)); 
+	     
 	}
 	
+	
+	
+	public Bicluster union(Bicluster b1, Bicluster b2) {
+	     Vector<ISelectable> cols = new Vector();	
+	     Vector<ISelectable> rows = new Vector();	
+
+	     for (int i = 0; i<b1.columns.size(); i++) {
+	    	 cols.add(b1.columns.elementAt(i));
+	     }
+	     
+	     
+	     for (int i = 0; i<b2.columns.size(); i++) {
+	    	 if (cols.indexOf(b2.columns.elementAt(i))==-1) cols.add(b2.columns.elementAt(i));
+	     }
+	     
+	     
+	     
+
+	     for (int i = 0; i<b1.rows.size(); i++) {
+	    	 rows.add(b1.rows.elementAt(i));
+	     }
+	     
+	     
+	     for (int i = 0; i<b2.rows.size(); i++) {
+	    	 if (rows.indexOf(b2.rows.elementAt(i))==-1) rows.add(b2.rows.elementAt(i));
+	     }
+	     
+	     
+	   
+ 
+	     return new Bicluster(b1.name + " " + b2.name,cols,rows); 
+	     
+	}
+	
+	
+	
+	
+	
+	public int getPosition(ISelectable el, Vector<ISelectable> v) {
+		for (int i = 0; i < v.size(); i++) {
+			if (el.getID() == v.elementAt(i).getID()) return i;
+		}
+		return -1;
+	}
+	
+	
+	public Vector<ISelectable> intersectV(Vector<ISelectable> v1, Vector<ISelectable> v2) {
+	       Vector<ISelectable> v = new Vector();
+	       
+	       for(int i = 0; i < v1.size(); i++) {
+	       for(int j = 0; j < v2.size(); j++) {
+	   	         if (v1.elementAt(i).getID() == v2.elementAt(j).getID()) {
+	   	        	 v.add(v1.elementAt(i)); 	
+	   	        	 break;
+	   	         }
+	       }
+	       }
+	       
+	       return v;
+	}
+
 	
 	
 	
@@ -73,7 +195,7 @@ public class Bimatrix extends JFrame{
 	public void setPlotSize() {
 		int width = 0;
 		for (int i = 0; i < biclust.biclusters.size(); i++) {
-			width+= biclust.biclusters.elementAt(i).colums.size();
+			width+= biclust.biclusters.elementAt(i).columns.size();
 		}
 		
 		int height = 0;
@@ -99,7 +221,7 @@ public class Bimatrix extends JFrame{
 	public void updatePlot() {
 		int width = 0;
 		for (int i = 0; i < biclust.biclusters.size(); i++) {
-			width+= biclust.biclusters.elementAt(i).colums.size() ;
+			width+= biclust.biclusters.elementAt(i).columns.size() ;
 		}
 		
 		int height = 0;
@@ -152,13 +274,41 @@ class BiConfPanel extends JPanel implements KeyListener{
 	
 	
 	
+
+	
+	public void sortBiclusters() {
+		for (int i = 0; i < biclust.biclusters.size(); i++) {
+			
+			sortBicluster(i); 
+			
+		}
+	}
+	
+	
+	public void sortBicluster(int i) {
+		Bicluster bi = biclust.biclusters.elementAt(i);
+	}
+	
+	public int calculateCrit(int j) {
+		int crit = 0;
+		Bicluster cl = biclust.biclusters.elementAt(j);
+
+		
+	
+		return crit;
+	}
+	
+	
+	
+	
+	
 	public void calculateMinMax() {
 		Max = 0;
 		Min = 0;
 		for (int i = 0; i < biclust.biclusters.size(); i++) {
 	        Bicluster b = biclust.biclusters.elementAt(i);
-	        for (int j = 0; j < b.colums.size(); j++) {
-	        	ISelectable col = b.colums.elementAt(j);
+	        for (int j = 0; j < b.columns.size(); j++) {
+	        	ISelectable col = b.columns.elementAt(j);
 	        	
 	        	
 	        	for (int ii = 0; ii < biclust.biclusters.size(); ii++) {
@@ -197,7 +347,7 @@ class BiConfPanel extends JPanel implements KeyListener{
 	    	
 	    	
 	    	Bicluster b = biclusters.elementAt(i);
-	        maxX += b.colums.size()*pixelW+bidist;
+	        maxX += b.columns.size()*pixelW+bidist;
 	        maxY += b.rows.size()*pixelH+bidist;
 	    
 	    }
@@ -213,16 +363,16 @@ class BiConfPanel extends JPanel implements KeyListener{
 	    	g.fillRect(
 						abstandLinks+( xStart.elementAt(i))-1 , 
 						 abstandOben+(yStart.elementAt(j))-1 , 
-						pixelW*biclusters.elementAt(i).colums.size() +2, 
+						pixelW*biclusters.elementAt(i).columns.size() +2, 
 						pixelH*biclusters.elementAt(j).rows.size()+2
 					  ); 
 	    	
 	    	 g.setColor(new Color(212,212,212));
 					
 	    	 g.drawLine(
-	    			 abstandLinks+( xStart.elementAt(i)) + pixelW*biclusters.elementAt(i).colums.size() +1, 
+	    			 abstandLinks+( xStart.elementAt(i)) + pixelW*biclusters.elementAt(i).columns.size() +1, 
 					 abstandOben+(yStart.elementAt(j)) , 
-					 abstandLinks+( xStart.elementAt(i)) + pixelW*biclusters.elementAt(i).colums.size() +1, 
+					 abstandLinks+( xStart.elementAt(i)) + pixelW*biclusters.elementAt(i).columns.size() +1, 
 					 abstandOben+(yStart.elementAt(j))-1+pixelH*biclusters.elementAt(j).rows.size()+2
 	    	 
 	    	 );
@@ -231,7 +381,7 @@ class BiConfPanel extends JPanel implements KeyListener{
 	    	 g.drawLine(
 	    			 abstandLinks+( xStart.elementAt(i)) +1, 
 					 abstandOben+(yStart.elementAt(j)) +pixelH*biclusters.elementAt(j).rows.size()+1 , 
-					 abstandLinks+( xStart.elementAt(i)) + pixelW*biclusters.elementAt(i).colums.size() +2, 
+					 abstandLinks+( xStart.elementAt(i)) + pixelW*biclusters.elementAt(i).columns.size() +2, 
 					 abstandOben+(yStart.elementAt(j))+pixelH*biclusters.elementAt(j).rows.size()+1
 	    	 
 	    	 );
@@ -242,17 +392,17 @@ class BiConfPanel extends JPanel implements KeyListener{
 	    	 
 						
 	    	
-	    	    Bicluster  b = intersect(biclusters.elementAt(i),biclusters.elementAt(j));
+	    	    Bicluster  b = biconf.intersect(biclusters.elementAt(i),biclusters.elementAt(j));
 	    	    
 	    	    
-	    	    if (b.colums.size()>0 && b.rows.size()>0) {
+	    	    if (b.columns.size()>0 && b.rows.size()>0) {
 	    	    	
 	    	    	
 	    	    	
-	    	    	 for (int ii = 0; ii < b.colums.size(); ii++) {
+	    	    	 for (int ii = 0; ii < b.columns.size(); ii++) {
 	    	    	 for (int jj = 0; jj < b.rows.size(); jj++) {
 	    	    	
-	    	         ISelectable col = b.colums.elementAt(ii);
+	    	         ISelectable col = b.columns.elementAt(ii);
 	    	         ISelectable row = b.rows.elementAt(jj);
 	 
 	    	    		 
@@ -289,8 +439,8 @@ class BiConfPanel extends JPanel implements KeyListener{
 	  					int shiftY = jj;
 	  					if (i != j)
 	  					{
-	  						shiftX = getPosition(col,biclusters.elementAt(i).colums);
-	  						shiftY = getPosition(row,biclusters.elementAt(j).rows);
+	  						shiftX = biconf.getPosition(col,biclusters.elementAt(i).columns);
+	  						shiftY = biconf.getPosition(row,biclusters.elementAt(j).rows);
 
 	  					}
 	  					
@@ -342,7 +492,7 @@ class BiConfPanel extends JPanel implements KeyListener{
 		    		    	    	
 		    	    				abstandLinks+ xStart.elementAt(i) -2, 
 		  							abstandOben+yStart.elementAt(j)-2 , 
-		  							b.colums.size()*pixelW +3, 
+		  							b.columns.size()*pixelW +3, 
 		  							b.rows.size()*pixelH+3);
 		    	    		
 				        	 g.setColor(Color.getHSBColor((float)(0.1 + 0.9*i/biclusters.size()),(float)0.75,(float)0.75));
@@ -350,16 +500,16 @@ class BiConfPanel extends JPanel implements KeyListener{
 		    	    	
 				        	 g.drawLine(
 			    		    	    	
-			    	    				abstandLinks+ xStart.elementAt(i) -1 + b.colums.size()*pixelW +3, 
+			    	    				abstandLinks+ xStart.elementAt(i) -1 + b.columns.size()*pixelW +3, 
 			  							abstandOben+yStart.elementAt(j)-1 , 
-			  							abstandLinks+ xStart.elementAt(i) -1 + b.colums.size()*pixelW +3, 
+			  							abstandLinks+ xStart.elementAt(i) -1 + b.columns.size()*pixelW +3, 
 			  							abstandOben+yStart.elementAt(j)-2  + b.rows.size()*pixelH+3);
 				        	 
 				        	 g.drawLine(
 			    		    	    	
 			    	    				abstandLinks+ xStart.elementAt(i) -1, 
 			  							abstandOben+yStart.elementAt(j)-1 + b.rows.size()*pixelH+3 , 
-			  							abstandLinks+ xStart.elementAt(i) -1+ b.colums.size()*pixelW +3, 
+			  							abstandLinks+ xStart.elementAt(i) -1+ b.columns.size()*pixelW +3, 
 			  							abstandOben+yStart.elementAt(j)-1 + b.rows.size()*pixelH+3)
 			  							;
 				        	 
@@ -405,40 +555,6 @@ class BiConfPanel extends JPanel implements KeyListener{
 	
 	
 	
-	public Bicluster intersect(Bicluster b1, Bicluster b2) {
-	     Vector<ISelectable> cols1 = b1.colums;	
-	     Vector<ISelectable> cols2 = b2.colums;	
-
-	     Vector<ISelectable> rows1 = b1.rows;	
-	     Vector<ISelectable> rows2 = b2.rows;	
-   
-	     return new Bicluster(b1.name + " " + b2.name, intersectV(b1.rows,b2.rows), intersectV(b1.colums,b2.colums)); 
-	     
-	}
-	
-	
-	public int getPosition(ISelectable el, Vector<ISelectable> v) {
-		for (int i = 0; i < v.size(); i++) {
-			if (el.getID() == v.elementAt(i).getID()) return i;
-		}
-		return -1;
-	}
-	
-	
-	public Vector<ISelectable> intersectV(Vector<ISelectable> v1, Vector<ISelectable> v2) {
-	       Vector<ISelectable> v = new Vector();
-	       
-	       for(int i = 0; i < v1.size(); i++) {
-	       for(int j = 0; j < v2.size(); j++) {
-	   	         if (v1.elementAt(i).getID() == v2.elementAt(j).getID()) {
-	   	        	 v.add(v1.elementAt(i)); 	
-	   	        	 break;
-	   	         }
-	       }
-	       }
-	       
-	       return v;
-	}
 
 
 
