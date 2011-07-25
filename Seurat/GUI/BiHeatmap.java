@@ -37,10 +37,12 @@ public class BiHeatmap extends JFrame{
 	BiPanel panel;
 	Biclustering biclust;
 	int maxWidth = 450,maxHeight = 450;
+	Seurat seurat;
 	
-	public BiHeatmap(String name,Biclustering biclust) {
+	public BiHeatmap(Seurat seurat,String name,Biclustering biclust) {
 		super("Biheatmap: " + name);
 		
+		this.seurat = seurat;
 	    this.biclust = biclust;
 		panel = new BiPanel(this,biclust);
 		
@@ -489,7 +491,7 @@ class BiPanel extends JPanel implements MouseListener, KeyListener{
 	
 	public void addBicluster(Bicluster cl, int bi) {
 		
-		Vector<ISelectable> newcols = cl.colums; 
+		Vector<ISelectable> newcols = cl.columns; 
 		Vector<ISelectable> newrows = cl.rows; 
 
 		for(int i = 0; i < newcols.size(); i++) {
@@ -1313,7 +1315,7 @@ public void sortRows3() {
 		    }
 		    
 		    
-		    gescrit+=rowcrit*biclust.biclusters.elementAt(bi).colums.size();
+		    gescrit+=rowcrit*biclust.biclusters.elementAt(bi).columns.size();
 
 		    
 		    
@@ -1390,8 +1392,8 @@ public void sortRows3() {
 	   	     for (int i = 0; i < b.biclusters.size(); i++) {
 	   	    	 Bicluster bc = b.biclusters.elementAt(i);
 	   	    	 
-	   	    	 for (int j = 0;  j< bc.colums.size(); j++) {
-	   	    		 ISelectable col = bc.colums.elementAt(j);
+	   	    	 for (int j = 0;  j< bc.columns.size(); j++) {
+	   	    		 ISelectable col = bc.columns.elementAt(j);
 	   	    		 
 	   	    		 boolean isIn = false;
 	   	    		 for (int k = 0; k < u.size(); k++) {

@@ -187,9 +187,9 @@ Vector<ISelectable> Experiments;
 			System.out.println("RowIDs");
 			for (int i = 0; i < Genes.size(); i++) {
 				G.add(Genes.elementAt(orderZeilen[i]-1));
-				System.out.print(((ISelectable)G.lastElement()).getID() + ",");
+		//		System.out.print(((ISelectable)G.lastElement()).getID() + ",");
 			}
-			System.out.println();
+			//System.out.println();
 			
 			seurat.dataManager.seriationsGenes.add(G);
 			seurat.dataManager.seriationGeneNames.add(method + " "+Distance);

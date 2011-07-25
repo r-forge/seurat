@@ -23,12 +23,15 @@ Biclustering biclust1,biclust2;
 	
 BiPanel panel;
 
+Seurat seurat;
+
 int MaxWidth = 700, MaxHeight = 700;
 	
-	public Biconf(Biclustering biclust1,Biclustering biclust2) {
+	public Biconf(Seurat seurat,Biclustering biclust1,Biclustering biclust2) {
 		super("Biconfusionsmatrix");
 		this.biclust1 = biclust1;
 		this.biclust2 = biclust2;
+		this.seurat = seurat;
 		
 		panel = new BiPanel(biclust1,biclust2);
 		
@@ -52,13 +55,13 @@ int MaxWidth = 700, MaxHeight = 700;
 		
 		int rowWidth = 0;
 		for (int i = 0; i < biclust1.biclusters.size(); i++) {
-			if (rowWidth < biclust1.biclusters.elementAt(i).colums.size()) rowWidth = biclust1.biclusters.elementAt(i).colums.size();
+			if (rowWidth < biclust1.biclusters.elementAt(i).columns.size()) rowWidth = biclust1.biclusters.elementAt(i).columns.size();
 		}
 		
 		
 		int columnsWidth = 0;
 		for (int i = 0; i < biclust2.biclusters.size(); i++) {
-			columnsWidth += biclust2.biclusters.elementAt(i).colums.size();
+			columnsWidth += biclust2.biclusters.elementAt(i).columns.size();
 		}
 	  
 		
@@ -133,8 +136,8 @@ class BiPanel extends JPanel {
 		Min = 0;
 		for (int i = 0; i < biclust1.biclusters.size(); i++) {
 	        Bicluster b = biclust1.biclusters.elementAt(i);
-	        for (int j = 0; j < b.colums.size(); j++) {
-	        	ISelectable col = b.colums.elementAt(j);
+	        for (int j = 0; j < b.columns.size(); j++) {
+	        	ISelectable col = b.columns.elementAt(j);
 	        	
 	        	
 	        	for (int ii = 0; ii < biclust1.biclusters.size(); ii++) {
@@ -153,8 +156,8 @@ class BiPanel extends JPanel {
 		
 		for (int i = 0; i < biclust2.biclusters.size(); i++) {
 	        Bicluster b = biclust2.biclusters.elementAt(i);
-	        for (int j = 0; j < b.colums.size(); j++) {
-	        	ISelectable col = b.colums.elementAt(j);
+	        for (int j = 0; j < b.columns.size(); j++) {
+	        	ISelectable col = b.columns.elementAt(j);
 	        	
 	        	
 	        	for (int ii = 0; ii < biclust2.biclusters.size(); ii++) {
@@ -179,7 +182,7 @@ class BiPanel extends JPanel {
 	public void calculateAbstande() {
 		abstandLinks = 0;
 		for (int i = 0; i < biclust1.biclusters.size(); i++) {
-			if (abstandLinks < biclust1.biclusters.elementAt(i).colums.size()) abstandLinks = biclust1.biclusters.elementAt(i).colums.size();
+			if (abstandLinks < biclust1.biclusters.elementAt(i).columns.size()) abstandLinks = biclust1.biclusters.elementAt(i).columns.size();
 		}
 		abstandLinks = abstandLinks*pixelW + 2*minDist;
 		
@@ -227,11 +230,11 @@ class BiPanel extends JPanel {
 			
 			Bicluster biclust = biclust1.biclusters.elementAt(k);
 			
-			for (int i = 0; i < biclust.colums.size(); i++) {
+			for (int i = 0; i < biclust.columns.size(); i++) {
 			for (int j = 0; j < biclust.rows.size(); j++) {
 					
 				
-				 ISelectable col = biclust.colums.elementAt(i);
+				 ISelectable col = biclust.columns.elementAt(i);
 		         ISelectable row = biclust.rows.elementAt(j);
 		         
 		         
@@ -262,7 +265,7 @@ class BiPanel extends JPanel {
 	             g.setColor(c);
 	             
 	             g.fillRect(
-	                   abstandLinks - pixelW*biclust.colums.size() -minDist+ i*pixelW,
+	                   abstandLinks - pixelW*biclust.columns.size() -minDist+ i*pixelW,
 	                   abstandOben + shift + j*pixelH,
 	                   pixelW,
 	                   pixelH
@@ -279,25 +282,25 @@ class BiPanel extends JPanel {
 			
 			 g.setColor(Color.getHSBColor((float)(0.1 + 0.9*k/biclust1.biclusters.size()),(float)0.95,(float)0.95));
              g.drawRect(
-            		 abstandLinks - pixelW*biclust.colums.size() -minDist-2,
+            		 abstandLinks - pixelW*biclust.columns.size() -minDist-2,
                    shift + abstandOben -2,
-                   biclust.colums.size()*pixelW+3,
+                   biclust.columns.size()*pixelW+3,
                    biclust.rows.size()*pixelH+3
              
              );
              
 			 g.setColor(Color.getHSBColor((float)(0.1 + 0.9*k/biclust1.biclusters.size()),(float)0.75,(float)0.75));
 			   g.drawLine(
-	            		 abstandLinks - pixelW*biclust.colums.size() -minDist-2+1,
+	            		 abstandLinks - pixelW*biclust.columns.size() -minDist-2+1,
 	                   shift + abstandOben -2+ biclust.rows.size()*pixelH+3+1,
-	                   abstandLinks - pixelW*biclust.colums.size() -minDist-2+1+  biclust.colums.size()*pixelW+3,
+	                   abstandLinks - pixelW*biclust.columns.size() -minDist-2+1+  biclust.columns.size()*pixelW+3,
 	                   shift + abstandOben -2+ biclust.rows.size()*pixelH+3+1
 	             
 	             );
 			   g.drawLine(
-	            		 abstandLinks - pixelW*biclust.colums.size() -minDist-2 +  biclust.colums.size()*pixelW+3+1,
+	            		 abstandLinks - pixelW*biclust.columns.size() -minDist-2 +  biclust.columns.size()*pixelW+3+1,
 	                   shift + abstandOben -2+1,
-	                   abstandLinks - pixelW*biclust.colums.size() -minDist-2 +  biclust.colums.size()*pixelW+3+1,
+	                   abstandLinks - pixelW*biclust.columns.size() -minDist-2 +  biclust.columns.size()*pixelW+3+1,
 	                   shift + abstandOben -2+ biclust.rows.size()*pixelH+3+1
 	             
 	             );
@@ -321,11 +324,11 @@ class BiPanel extends JPanel {
 		
 		for (int k = 0; k < biclust2.biclusters.size(); k++) {
 			Bicluster biclust = biclust2.biclusters.elementAt(k);
-			for (int i = 0; i < biclust.colums.size(); i++) {
+			for (int i = 0; i < biclust.columns.size(); i++) {
 			for (int j = 0; j < biclust.rows.size(); j++) {
 					
 				
-				 ISelectable col = biclust.colums.elementAt(i);
+				 ISelectable col = biclust.columns.elementAt(i);
 		         ISelectable row = biclust.rows.elementAt(j);
 		         
 		         
@@ -378,7 +381,7 @@ class BiPanel extends JPanel {
              g.drawRect(
                    abstandLinks + shift-2,
                    abstandOben - biclust.rows.size()*pixelH-minDist-2,
-                   biclust.colums.size()*pixelW+3,
+                   biclust.columns.size()*pixelW+3,
                    biclust.rows.size()*pixelH+3
              
              );
@@ -386,9 +389,9 @@ class BiPanel extends JPanel {
              
           	 g.setColor(Color.getHSBColor((float)(0.1 + 0.9*k/biclust1.biclusters.size()),(float)0.75,(float)0.75));
              g.drawLine(
-                   abstandLinks + shift-2 + biclust.colums.size()*pixelW+3+1,
+                   abstandLinks + shift-2 + biclust.columns.size()*pixelW+3+1,
                    abstandOben - biclust.rows.size()*pixelH-minDist-2+1,
-                   abstandLinks + shift-2 + biclust.colums.size()*pixelW+3+1,
+                   abstandLinks + shift-2 + biclust.columns.size()*pixelW+3+1,
                    abstandOben - biclust.rows.size()*pixelH-minDist-2+ biclust.rows.size()*pixelH+3+1
              
              );
@@ -397,13 +400,13 @@ class BiPanel extends JPanel {
              g.drawLine(
                      abstandLinks + shift-2+1,
                      abstandOben - biclust.rows.size()*pixelH-minDist-2 +  biclust.rows.size()*pixelH+3+1,
-                     abstandLinks + shift-2+ biclust.colums.size()*pixelW+3+1,
+                     abstandLinks + shift-2+ biclust.columns.size()*pixelW+3+1,
                      abstandOben - biclust.rows.size()*pixelH-minDist-2 +  biclust.rows.size()*pixelH+3+1
                );
            	 
            	 
 			
-			shift += biclust.colums.size()*pixelW + minDist;
+			shift += biclust.columns.size()*pixelW + minDist;
 		}
 		
 		
@@ -439,7 +442,7 @@ class BiPanel extends JPanel {
 		    g.fillRect(
 	                   abstandLinks + shiftX ,
 	                   abstandOben + shiftY,
-	                   pixelW*biclust2.biclusters.elementAt(t).colums.size(),
+	                   pixelW*biclust2.biclusters.elementAt(t).columns.size(),
 	                   pixelH *biclust1.biclusters.elementAt(k).rows.size()
 	                                     
 	             );
@@ -449,16 +452,16 @@ class BiPanel extends JPanel {
 	    	 g.drawLine(
 	    			 abstandLinks + shiftX+1 ,
 	                   abstandOben + shiftY +  pixelH *biclust1.biclusters.elementAt(k).rows.size()+1,
-	                   abstandLinks + shiftX+1 + 	                   pixelW*biclust2.biclusters.elementAt(t).colums.size(),
+	                   abstandLinks + shiftX+1 + 	                   pixelW*biclust2.biclusters.elementAt(t).columns.size(),
 	                   abstandOben + shiftY +  pixelH *biclust1.biclusters.elementAt(k).rows.size()+1
 	    	 
 	    	 );
 	    	 
 	    	 
 	    	 g.drawLine(
-	    			 abstandLinks + shiftX+1 + pixelW*biclust2.biclusters.elementAt(t).colums.size() ,
+	    			 abstandLinks + shiftX+1 + pixelW*biclust2.biclusters.elementAt(t).columns.size() ,
 	                   abstandOben + shiftY+1,
-	                   abstandLinks + shiftX+1 + pixelW*biclust2.biclusters.elementAt(t).colums.size() ,
+	                   abstandLinks + shiftX+1 + pixelW*biclust2.biclusters.elementAt(t).columns.size() ,
 	                   abstandOben + shiftY+1    +      pixelH *biclust1.biclusters.elementAt(k).rows.size()
 	    	 
 	    	 );
@@ -468,11 +471,11 @@ class BiPanel extends JPanel {
 		    
 			Bicluster biclust = intersect(biclust1.biclusters.elementAt(k),biclust2.biclusters.elementAt(t));
 			
-			for (int i = 0; i < biclust.colums.size(); i++) {
+			for (int i = 0; i < biclust.columns.size(); i++) {
 			for (int j = 0; j < biclust.rows.size(); j++) {
 					
 				
-				 ISelectable col = biclust.colums.elementAt(i);
+				 ISelectable col = biclust.columns.elementAt(i);
 		         ISelectable row = biclust.rows.elementAt(j);
 		         
 		         
@@ -503,7 +506,7 @@ class BiPanel extends JPanel {
 	             g.setColor(c);
 	             
 	             
-	             	int shX = getPosition(col,biclust2.biclusters.elementAt(t).colums);
+	             	int shX = getPosition(col,biclust2.biclusters.elementAt(t).columns);
 				    int shY = getPosition(row,biclust1.biclusters.elementAt(k).rows);
 					
 					
@@ -538,7 +541,7 @@ class BiPanel extends JPanel {
 		    
              
 			
- 			shiftX += biclust2.biclusters.elementAt(t).colums.size()*pixelW + minDist;
+ 			shiftX += biclust2.biclusters.elementAt(t).columns.size()*pixelW + minDist;
 			
 		}
 		shiftY += biclust1.biclusters.elementAt(k).rows.size()*pixelH + minDist;
@@ -556,13 +559,13 @@ class BiPanel extends JPanel {
 
 	
 	public Bicluster intersect(Bicluster b1, Bicluster b2) {
-	     Vector<ISelectable> cols1 = b1.colums;	
-	     Vector<ISelectable> cols2 = b2.colums;	
+	     Vector<ISelectable> cols1 = b1.columns;	
+	     Vector<ISelectable> cols2 = b2.columns;	
 
 	     Vector<ISelectable> rows1 = b1.rows;	
 	     Vector<ISelectable> rows2 = b2.rows;	
    
-	     return new Bicluster(b1.name + " " + b2.name, intersectV(b1.rows,b2.rows), intersectV(b1.colums,b2.colums)); 
+	     return new Bicluster(b1.name + " " + b2.name, intersectV(b1.rows,b2.rows), intersectV(b1.columns,b2.columns)); 
 	     
 	}
 	

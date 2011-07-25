@@ -343,8 +343,8 @@ public class BiclusteringDialog extends JFrame{
 	    */
 	    }    
 
-	    new Bimatrix(new Biclustering("PlaidModel",bicresult));
-	    new BiHeatmap("PlaidModel",new Biclustering("PlaidModel",bicresult));
+	    new Bimatrix(seurat,new Biclustering("PlaidModel",bicresult));
+	    new BiHeatmap(seurat,"PlaidModel",new Biclustering("PlaidModel",bicresult));
 
 	    
 	    rConnection.voidEval("rm(list=ls())");
@@ -441,8 +441,8 @@ public class BiclusteringDialog extends JFrame{
 		    }    
 		    
 		    
-		    new Bimatrix(new Biclustering("Bimax",bicresult));
-		    new BiHeatmap("Bimax",new Biclustering("PlaidModel",bicresult));
+		    new Bimatrix(seurat,new Biclustering("Bimax",bicresult));
+		    new BiHeatmap(seurat,"Bimax",new Biclustering("PlaidModel",bicresult));
 
 		    
 		    
