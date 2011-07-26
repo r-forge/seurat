@@ -3,6 +3,8 @@ package GUI;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.util.Vector;
 
 import javax.swing.JFrame;
@@ -11,12 +13,15 @@ import javax.swing.JScrollPane;
 
 import Data.Bicluster;
 import Data.Biclustering;
+import Data.ClusterNode;
+import Data.Clustering;
 import Data.ISelectable;
 import Data.MyColor;
+import Data.Permutation;
 import Settings.Settings;
 import Tools.Tools;
 
-public class Biconf extends JFrame {
+public class Biconf extends JFrame{
 	
 	
 Biclustering biclust1,biclust2;
@@ -27,22 +32,274 @@ Seurat seurat;
 
 int MaxWidth = 700, MaxHeight = 700;
 	
+double [][] matrix; 
+
+int [] orderCols,orderRows;
+
+
+int maxC = -1, maxR = -1;
+
 	public Biconf(Seurat seurat,Biclustering biclust1,Biclustering biclust2) {
 		super("Biconfusionsmatrix");
 		this.biclust1 = biclust1;
 		this.biclust2 = biclust2;
 		this.seurat = seurat;
 		
-		panel = new BiPanel(biclust1,biclust2);
+	
+		
+		
+		permuteMatrix();
+		
+		panel = new BiPanel(this,biclust1,biclust2);
 		
 		this.getContentPane().add(new JScrollPane(panel));
 		
 		setLocation(400,0);
 		setSize();
 	    panel.calculateAbstande();
-		
+		this.addKeyListener(panel);
+	    
 		this.setVisible(true);
 	}
+	
+	
+public void permuteMatrix() {
+	matrix = new double [biclust1.biclusters.size()][biclust2.biclusters.size()];
+	
+	for (int i = 0; i < matrix.length; i++){
+	for (int j = 0; j < matrix [0].length; j++){
+	
+		Bicluster inter = intersect(biclust1.biclusters.elementAt(i),biclust2.biclusters.elementAt(j));
+		Bicluster union = union(biclust1.biclusters.elementAt(i),biclust2.biclusters.elementAt(j));
+		
+		matrix [i][j] = (double)(inter.columns.size()*inter.rows.size())/(union.columns.size()*union.rows.size()); 
+	//	System.out.print(matrix [i][j]+ " ");
+	}	
+	//System.out.println();
+	}
+	
+	orderCols = new int [matrix.length];
+	for (int i = 0; i < orderCols.length; i++) {
+		orderCols [i] = i;
+	}
+	
+	
+	orderRows = new int [matrix[0].length];
+	for (int i = 0; i < orderRows.length; i++) {
+		orderRows [i] = i;
+	}
+    	
+	  
+	
+	
+	
+	double Crit = calcCrit(orderCols,orderRows);
+	double temp;
+	System.out.println("Start Crit: " + Crit);
+	while (Crit<(temp = permute())) {
+		Crit = temp;
+	    
+	}
+	System.out.println("End Crit: " + Crit);
+	
+
+	
+	Vector<Bicluster> b1 = new Vector();
+	for (int i = 0; i<orderCols.length; i++) {
+		b1.add(biclust1.biclusters.elementAt(orderCols [i]));
+	}
+	biclust1.biclusters = b1;
+	
+	
+	Vector<Bicluster> b2 = new Vector();
+	for (int i = 0; i<orderRows.length; i++) {
+		b2.add(biclust2.biclusters.elementAt(orderRows [i]));
+	}
+	biclust2.biclusters = b2;
+	
+
+	repaint();
+	
+	
+	
+	paint(this.getGraphics());
+	repaint();
+	
+	
+	
+	
+	
+	
+	
+	
+}	
+
+
+
+
+
+
+
+public double permute() {
+	
+	Vector<int []> colPermutations = getAllPermutations(orderCols);
+	Vector<int []> rowPermutations = getAllPermutations(orderRows);
+	int maxI = colPermutations.size()-1;
+	int maxJ = rowPermutations.size()-1;
+	
+	
+			
+	double criterion = calcCrit(orderCols,orderRows);
+	
+   System.out.println(" Vor  ->  " + criterion);
+
+	for (int i = 0; i < colPermutations.size(); i++) {
+	for (int j = 0; j < rowPermutations.size(); j++) {
+		
+			int [] pC = colPermutations.elementAt(i);
+			int [] pR = rowPermutations.elementAt(j);
+		    
+			double crit = calcCrit(pC,pR);
+			
+			if (crit > criterion) {
+				criterion = crit;
+				maxI = i;
+				maxJ = j;
+			}
+	}	
+	}
+	
+	
+	orderCols = colPermutations.elementAt(maxI); 
+	orderRows = rowPermutations.elementAt(maxJ); 
+	System.out.println(" Nach  ->  " + criterion);
+	
+	return criterion;
+
+}
+
+
+
+
+
+
+
+public Vector<int []> getAllPermutations(int [] order) {
+	Vector per = new Vector();
+   
+	for (int i = 0; i < order.length; i++) {
+	for (int j = i+1; j < order.length; j++) {
+
+		int [] o = new int [order.length];
+		
+		for (int k = 0; k < i; k++) o [k] = order [k];
+		for (int k = i; k < j; k++) o [k] = order [k+1];
+		o [j] = order [i];
+		for (int k = j+1; k < order.length; k++) o [k] = order [k];
+        
+		
+		per.add(o);
+		
+		
+		}
+	}
+	
+	int [] o = new int [order.length];
+	
+	for (int k = 0; k < order.length; k++) o [k] = order [k];
+	per.add(o);
+	
+	
+	return per;
+}
+
+
+
+
+
+
+
+
+
+
+
+public double calcCrit(int [] orderCols, int [] orderRows) {
+	double crit = 0;
+	/*
+	
+	
+	int [] sum = new int  [matrix.length]; 
+	
+	for (int j = 0; j < matrix [0].length-1; j++) {
+	int temp  = 0;
+	for (int i = matrix.length-1; i >0; i--) {
+		temp+= matrix [i][j];
+		sum  [i] +=  temp;
+		
+		crit+= sum [i] * matrix [i-1][j+1];
+	}
+	}
+	//System.out.println(crit2 + "   ");
+	*/
+	
+	for (int i = 0; i < matrix.length; i++) {
+	for (int j = 0; j < matrix[0].length; j++) {
+			for (int ii = i; ii < matrix.length; ii++) {
+			for (int jj = j; jj < matrix[0].length; jj++) {
+					crit+=matrix [orderCols[i]][orderRows[j]]*matrix [orderCols[ii]][orderRows[jj]];
+				}
+			}
+		}
+	}
+	
+	
+	return crit;
+	
+	
+	
+}
+
+
+
+
+
+
+
+
+public Bicluster union(Bicluster b1, Bicluster b2) {
+     Vector<ISelectable> cols = new Vector();	
+     Vector<ISelectable> rows = new Vector();	
+
+     for (int i = 0; i<b1.columns.size(); i++) {
+    	 cols.add(b1.columns.elementAt(i));
+     }
+     
+     
+     for (int i = 0; i<b2.columns.size(); i++) {
+    	 if (cols.indexOf(b2.columns.elementAt(i))==-1) cols.add(b2.columns.elementAt(i));
+     }
+     
+     
+     
+
+     for (int i = 0; i<b1.rows.size(); i++) {
+    	 rows.add(b1.rows.elementAt(i));
+     }
+     
+     
+     for (int i = 0; i<b2.rows.size(); i++) {
+    	 if (rows.indexOf(b2.rows.elementAt(i))==-1) rows.add(b2.rows.elementAt(i));
+     }
+     
+     
+   
+
+     return new Bicluster(b1.name + " " + b2.name,cols,rows); 
+     
+}
+
+	
+	
 	
 	
 	
@@ -88,6 +345,38 @@ int MaxWidth = 700, MaxHeight = 700;
 	
 	
 	
+	public void updatePlot( ){
+		
+		int columnsHeight = 0;
+		for (int i = 0; i < biclust2.biclusters.size(); i++) {
+			if (columnsHeight < biclust2.biclusters.elementAt(i).rows.size()) columnsHeight = biclust2.biclusters.elementAt(i).rows.size();
+		}
+		
+		int rowWidth = 0;
+		for (int i = 0; i < biclust1.biclusters.size(); i++) {
+			if (rowWidth < biclust1.biclusters.elementAt(i).columns.size()) rowWidth = biclust1.biclusters.elementAt(i).columns.size();
+		}
+		
+		
+		int columnsWidth = 0;
+		for (int i = 0; i < biclust2.biclusters.size(); i++) {
+			columnsWidth += biclust2.biclusters.elementAt(i).columns.size();
+		}
+	  
+		
+		int rowsHeight = 0;
+		for (int i = 0; i < biclust1.biclusters.size(); i++) {
+			rowsHeight += biclust1.biclusters.elementAt(i).rows.size();
+		}
+		
+		Dimension d = new Dimension(panel.pixelW*(columnsWidth+rowWidth) + 3*panel.minDist + biclust2.biclusters.size()*panel.minDist,
+            panel.pixelH*(rowsHeight+columnsHeight) + 3*panel.minDist + biclust1.biclusters.size()*panel.minDist);
+	
+	panel.setPreferredSize(d);
+	setSize(new Dimension((int)d.getWidth()+10,(int)d.getHeight()+25));
+	setVisible(true);
+	}
+	
 	
 	
 	
@@ -98,13 +387,44 @@ int MaxWidth = 700, MaxHeight = 700;
 		return -1;
 	}
 	
+	
+	
+
+	
+	public Bicluster intersect(Bicluster b1, Bicluster b2) {
+	     Vector<ISelectable> cols1 = b1.columns;	
+	     Vector<ISelectable> cols2 = b2.columns;	
+
+	     Vector<ISelectable> rows1 = b1.rows;	
+	     Vector<ISelectable> rows2 = b2.rows;	
+   
+	     return new Bicluster(b1.name + " " + b2.name, intersectV(b1.rows,b2.rows), intersectV(b1.columns,b2.columns)); 
+	     
+	}
+	
+	
+	public Vector<ISelectable> intersectV(Vector<ISelectable> v1, Vector<ISelectable> v2) {
+	       Vector<ISelectable> v = new Vector();
+	       
+	       for(int i = 0; i < v1.size(); i++) {
+	       for(int j = 0; j < v2.size(); j++) {
+	   	         if (v1.elementAt(i).getID() == v2.elementAt(j).getID()) {
+	   	        	 v.add(v1.elementAt(i)); 	
+	   	        	 break;
+	   	         }
+	       }
+	       }
+	       
+	       return v;
+	}
 
 
 
 
 
 
-class BiPanel extends JPanel {	
+
+class BiPanel extends JPanel implements KeyListener{	
 
 
 	Biclustering biclust1,biclust2;
@@ -116,14 +436,15 @@ class BiPanel extends JPanel {
 	int minDist = 10;
 	double Min,Max;
 	
-	
+	Biconf biconf;
  
-	public BiPanel(Biclustering biclust1,Biclustering biclust2) {
+	public BiPanel(Biconf biconf,Biclustering biclust1,Biclustering biclust2) {
 		
 		this.biclust1 = biclust1;
 		this.biclust2 = biclust2;
+		this.biconf = biconf;
 		
-		
+		addKeyListener(this);
 		calculateAbstande();
 		calculateMinMax();
 	
@@ -556,36 +877,84 @@ class BiPanel extends JPanel {
 		
 	}
 	
-
 	
-	public Bicluster intersect(Bicluster b1, Bicluster b2) {
-	     Vector<ISelectable> cols1 = b1.columns;	
-	     Vector<ISelectable> cols2 = b2.columns;	
+	
 
-	     Vector<ISelectable> rows1 = b1.rows;	
-	     Vector<ISelectable> rows2 = b2.rows;	
-   
-	     return new Bicluster(b1.name + " " + b2.name, intersectV(b1.rows,b2.rows), intersectV(b1.columns,b2.columns)); 
-	     
+	public void keyPressed(KeyEvent arg0) {
+		// TODO Auto-generated method stub
+
+		if (arg0.getKeyCode() == 38) {
+
+			
+			
+			if (pixelH > 1) {
+				pixelH--;
+				repaint();
+			}
+
+		}
+
+		if (arg0.getKeyCode() == 40) {
+			
+			pixelH++;
+			repaint();
+			
+			
+			
+			
+	/*
+			if (Aggregation > 1)
+				Aggregation--;
+
+			this.PixelCount = this.Rows.size() / Aggregation;
+			this.calculateMatrixValues();
+
+			globalView.infoLabel.setText("Aggregation: 1 : " + Aggregation);
+			globalView.applyNewPixelSize();*/
+		}
+
+		if (arg0.getKeyCode() == 39) {
+
+			pixelW++;
+			repaint();
+
+		}
+
+		if (arg0.getKeyCode() == 37) {
+
+			if (pixelW > 1)
+				pixelW--;
+				repaint();}
+		
+		
+		biconf.updatePlot();
+		
+		
+		
+		
+	}
+
+
+	public void keyReleased(KeyEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	public void keyTyped(KeyEvent e) {
+		// TODO Auto-generated method stub
+		
 	}
 	
-	
-	public Vector<ISelectable> intersectV(Vector<ISelectable> v1, Vector<ISelectable> v2) {
-	       Vector<ISelectable> v = new Vector();
-	       
-	       for(int i = 0; i < v1.size(); i++) {
-	       for(int j = 0; j < v2.size(); j++) {
-	   	         if (v1.elementAt(i).getID() == v2.elementAt(j).getID()) {
-	   	        	 v.add(v1.elementAt(i)); 	
-	   	        	 break;
-	   	         }
-	       }
-	       }
-	       
-	       return v;
-	}
 
 
 }
+
+
+
+
+
+
+
 
 }
