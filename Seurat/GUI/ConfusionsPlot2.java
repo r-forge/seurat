@@ -31,7 +31,7 @@ public class ConfusionsPlot2 extends JFrame implements IPlot {
 
 	public ConfusionsPlot2(Seurat seurat, String method1, String method2,
 			Clustering Experiments1, Clustering Experiments2) {
-		super("Confusion Matrix: ( " + method1 + " , " + method2 + " )");
+		super("Confusion Matrix2: ( " + method1 + " , " + method2 + " )");
 		System.out.println("ConfusionsPlot2");
 		this.seurat = seurat;
 
@@ -466,6 +466,8 @@ class ConfusionsPanel2 extends JPanel implements KeyListener, MouseListener,
 		}
 	}
 
+	
+	
 	public int permute() {
 		
 		Vector<Permutation> colPermutations = Experiments1.getAllPermutations();
@@ -502,6 +504,13 @@ class ConfusionsPanel2 extends JPanel implements KeyListener, MouseListener,
 		return criterion;
 
 	}
+	
+	
+	
+	
+	
+	
+	
 	
 	
 	
