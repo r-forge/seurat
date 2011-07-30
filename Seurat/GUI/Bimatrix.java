@@ -692,20 +692,57 @@ class BiConfPanel extends JPanel implements KeyListener,MouseListener,MouseMotio
 	
 	
 	
+	public int [] getPermutation(int [] order,int dest, int from, int to) {
+		int [] neworder = new int [order.length];
+		
+		Vector<Integer> v = new Vector();
+		for (int i = 0; i < from; i++) {
+			v.add(order [i]);
+		}
+		
+		for (int i = to; i < order.length; i++) {
+			v.add(order [i]);
+		}
+		
+		int newdest = dest;
+		if (dest > from) {
+			newdest = dest - from + to;
+		}
+		
+		System.out.println("getPermut:   " + order.length + " dest = " + dest + " from: " + from + " to: "+to);
+		
+		for (int i = 0; i < dest; i++) {
+			neworder [i] = v.elementAt(i);
+		}
+		for (int i = dest; i < dest+to; i++) {
+			neworder [i] = order [i-dest+from];
+		}
+		for (int i = dest+to; i < order.length; i++) {
+			neworder [i] = v.elementAt(i-to);
+		}
+		
+		
+		return neworder;
+	}
+	
+	
 	
 	
 
 	public Vector<int []> getAllPermutations(int [] order, int [] [] bi) {
 		Vector per = new Vector();
 		
-		/*
 		
+		/*
 		for (int i = 0; i < bi.length; i++) {
 			int [] o = bi [i];
 			Vector<Integer> starts = new Vector();
 			Vector<Integer> ends = new Vector();
 			
 			boolean start = false;
+			
+
+			
 			for (int k = 0; k < o.length; k++) {
 			    
 				if (!start) {
@@ -721,20 +758,21 @@ class BiConfPanel extends JPanel implements KeyListener,MouseListener,MouseMotio
 						ends.add(k-1);
 					}
 				}
+				
 			
 			   
 			}
 			
+
+			if (start) ends.add(o.length-1);
+
 			
 			
 			for (int k = 0; k < starts.size(); k++) {
 				for (int t = 0; t < starts.size(); t++) {
-					int [] ord  = new int [order.length];
-					for (int j = 0; i < starts.elementAt(k); j++) ord [j] = order [j];
-					for (int j = starts.elementAt(k);j <= ends.elementAt(k); j++) ord [j] = order [j];
+				per.add(getPermutation(order,starts.elementAt(t),starts.elementAt(k),ends.elementAt(k)));
+				per.add(getPermutation(order,ends.elementAt(t),starts.elementAt(k),ends.elementAt(k)));
 
-					
-					
 					
 				}
 			}
@@ -743,7 +781,10 @@ class BiConfPanel extends JPanel implements KeyListener,MouseListener,MouseMotio
 			
 			
 		}
+		
 		*/
+		
+		
 	   
 		for (int i = 0; i < order.length; i++) {
 		for (int j = i+1; j < order.length; j++) {
