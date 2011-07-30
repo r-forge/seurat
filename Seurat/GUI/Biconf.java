@@ -3,12 +3,14 @@ package GUI;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
+import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
 import java.util.Vector;
 
 import javax.swing.JFrame;
@@ -82,7 +84,7 @@ JMenuItem item;
 	    panel.calculateAbstande();
 		this.addKeyListener(panel);
 		this.addMouseListener(panel);
-
+this.addMouseMotionListener(panel);
 		
 		this.setVisible(true);
 	}
@@ -454,7 +456,7 @@ public Bicluster union(Bicluster b1, Bicluster b2) {
 
 
 
-class BiPanel extends JPanel implements KeyListener,  MouseListener{	
+class BiPanel extends JPanel implements KeyListener,  MouseListener, MouseMotionListener{	
 
 
 	Biclustering biclust1,biclust2;
@@ -472,6 +474,7 @@ class BiPanel extends JPanel implements KeyListener,  MouseListener{
 	
 	int [] order;
 
+	Point point1, point2;
  
 	public BiPanel(Biconf biconf,Biclustering biclust1,Biclustering biclust2) {
 		
@@ -480,7 +483,8 @@ class BiPanel extends JPanel implements KeyListener,  MouseListener{
 		this.biconf = biconf;
 		
 		addKeyListener(this);
-		addMouseListener(this);
+		 this.addMouseListener(this);
+		    this.addMouseMotionListener(this);
 		calculateAbstande();
 		calculateMinMax();
 		
@@ -498,8 +502,380 @@ class BiPanel extends JPanel implements KeyListener,  MouseListener{
 	}
 	
 	
+	public String getToolTipText(MouseEvent e) {
+
+	      String text = null;
+	   
+	      int shift = minDist;
+			for (int k = 0; k < biclust1.biclusters.size(); k++) {
+				
+				Bicluster biclust = biclust1.biclusters.elementAt(k);
+				
+				for (int i = 0; i < biclust.columns.size(); i++) {
+				for (int j = 0; j < biclust.rows.size(); j++) {
+						
+					
+					 ISelectable col = biclust.columns.elementAt(i);
+			         ISelectable row = biclust.rows.elementAt(j);
+			         
+			      
+					 double value = col.getValue(row.getID());
+			    	
+		             if (
+		            e.getX()>  abstandLinks - pixelW*biclust.columns.size() -minDist+ i*pixelW &&
+		            e.getX() < abstandLinks - pixelW*biclust.columns.size() -minDist+ i*pixelW + pixelW &&
+		            e.getY() >    abstandOben + shift + j*pixelH &&
+		            e.getY() < abstandOben + shift + j*pixelH + pixelH
+		             
+		             
+		             ) return value+"";
+		              
+		           
+		   				
+					
+				}
+				}
+				
+			  
+	             
+				
+				
+				shift += biclust.rows.size()*pixelH + minDist;
+			}
+			
+			
+			
+			
+			
+			
+			
+			
+			shift = minDist;
+			
+			for (int k = 0; k < biclust2.biclusters.size(); k++) {
+				Bicluster biclust = biclust2.biclusters.elementAt(k);
+				for (int i = 0; i < biclust.columns.size(); i++) {
+				for (int j = 0; j < biclust.rows.size(); j++) {
+						
+					
+					 ISelectable col = biclust.columns.elementAt(i);
+			         ISelectable row = biclust.rows.elementAt(j);
+			         
+			         
+			         
+					 double value = col.getValue(row.getID());
+			    
+		             
+		             
+		             if(
+		                 e.getX() >  abstandLinks + shift + i*pixelW &&
+		                 e.getX() <  abstandLinks + shift + i*pixelW + pixelW&&
+                         e.getY() >	abstandOben - biclust.rows.size()*pixelH - minDist+ j*pixelH&&
+                         e.getY() <	abstandOben - biclust.rows.size()*pixelH - minDist+ j*pixelH + pixelH		                
+		             ) return value + "";
+		             
+		             
+		             
+		             
+		             
+
+					
+					
+				}
+				}
+				
+			
+	         
+	           	 
+				
+				shift += biclust.columns.size()*pixelW + minDist;
+			}
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			int shiftY = minDist;
+			
+			
+			for (int k = 0; k < biclust1.biclusters.size(); k++) {
+				
+			int shiftX = minDist;	
+				
+			for (int t = 0; t < biclust2.biclusters.size(); t++) {
+
+				
+				  
+			    
+				Bicluster biclust = biconf.intersect(biclust1.biclusters.elementAt(k),biclust2.biclusters.elementAt(t));
+				
+				for (int i = 0; i < biclust.columns.size(); i++) {
+				for (int j = 0; j < biclust.rows.size(); j++) {
+						
+					
+					 ISelectable col = biclust.columns.elementAt(i);
+			         ISelectable row = biclust.rows.elementAt(j);
+			         
+			         
+			         
+			         
+
+			    	 Color c = Color.WHITE;
+					 double value = col.getValue(row.getID());
+			    	
+		             
+		          
+		             
+		             	int shX = getPosition(col,biclust2.biclusters.elementAt(t).columns);
+					    int shY = getPosition(row,biclust1.biclusters.elementAt(k).rows);
+						
+						
+					    if (
+				            e.getX() >        abstandLinks + shiftX + shX*pixelW &&
+				            e.getX() <        abstandLinks + shiftX + shX*pixelW + pixelW &&
+				            e.getY() >      abstandOben + shiftY + shY*pixelH &&
+				            e.getY() <  abstandOben + shiftY + shY*pixelH + pixelH
+				               ) return ""+ value;
+					    
+				
+		             
+		             
+		             
+		             
+
+					
+					
+				}
+				}
+				          
+				
+			
+			    
+			    
+	             
+				
+	 			shiftX += biclust2.biclusters.elementAt(t).columns.size()*pixelW + minDist;
+				
+			}
+			shiftY += biclust1.biclusters.elementAt(k).rows.size()*pixelH + minDist;
+
+			}
+			
+			
+	      
+	      
+	      
+	 return null;     
+	}
 	
 	
+	
+
+   public boolean isPointInRect (double x, double y, int xx1, int yy1, int xx2, int yy2) {
+	
+	   if (x > xx1 && x < xx2 && y > yy1 && y < yy2) return true; 
+	   
+	   return false;
+   }
+	
+	
+	public void selectRectangle(int xx1, int yy1, int xx2, int yy2) {
+
+		
+		 int shift = minDist;
+			for (int k = 0; k < biclust1.biclusters.size(); k++) {
+				
+				Bicluster biclust = biclust1.biclusters.elementAt(k);
+				
+				for (int i = 0; i < biclust.columns.size(); i++) {
+				for (int j = 0; j < biclust.rows.size(); j++) {
+						
+					
+					 ISelectable col = biclust.columns.elementAt(i);
+			         ISelectable row = biclust.rows.elementAt(j);
+			         
+			      
+					 double value = col.getValue(row.getID());
+			    	
+		             if (isPointInRect(
+		          
+		             (double)abstandLinks - pixelW*biclust.columns.size() -minDist+ i*pixelW + pixelW/2 ,
+		          
+		            (double)abstandOben + shift + j*pixelH + pixelH/2, xx1,yy1,xx2,yy2))
+		             
+		             
+		              {
+		            	 col.select(true);
+		            	 row.select(true);
+		             }
+		              
+		           
+		   				
+					
+				}
+				}
+				
+			  
+	             
+				
+				
+				shift += biclust.rows.size()*pixelH + minDist;
+			}
+			
+			
+			
+			
+			
+			
+			
+			
+			shift = minDist;
+			
+			for (int k = 0; k < biclust2.biclusters.size(); k++) {
+				Bicluster biclust = biclust2.biclusters.elementAt(k);
+				for (int i = 0; i < biclust.columns.size(); i++) {
+				for (int j = 0; j < biclust.rows.size(); j++) {
+						
+					
+					 ISelectable col = biclust.columns.elementAt(i);
+			         ISelectable row = biclust.rows.elementAt(j);
+			         
+			         
+			         
+					 double value = col.getValue(row.getID());
+			    
+					 if (isPointInRect(
+					          
+				             (double)abstandLinks + shift + i*pixelW + pixelW/2 ,
+				          
+				            (double)abstandOben - biclust.rows.size()*pixelH - minDist+ j*pixelH + pixelH/2, xx1,yy1,xx2,yy2))
+				             
+				             
+				              {
+				            	 col.select(true);
+				            	 row.select(true);
+				             }
+		             
+		           
+		             
+		             
+		             
+		             
+
+					
+					
+				}
+				}
+				
+			
+	         
+	           	 
+				
+				shift += biclust.columns.size()*pixelW + minDist;
+			}
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			int shiftY = minDist;
+			
+			
+			for (int k = 0; k < biclust1.biclusters.size(); k++) {
+				
+			int shiftX = minDist;	
+				
+			for (int t = 0; t < biclust2.biclusters.size(); t++) {
+
+				
+				  
+			    
+				Bicluster biclust = biconf.intersect(biclust1.biclusters.elementAt(k),biclust2.biclusters.elementAt(t));
+				
+				for (int i = 0; i < biclust.columns.size(); i++) {
+				for (int j = 0; j < biclust.rows.size(); j++) {
+						
+					
+					 ISelectable col = biclust.columns.elementAt(i);
+			         ISelectable row = biclust.rows.elementAt(j);
+			         
+			         
+			         
+			         
+
+			    	 Color c = Color.WHITE;
+					 double value = col.getValue(row.getID());
+			    	
+		             
+		          
+		             
+		             	int shX = getPosition(col,biclust2.biclusters.elementAt(t).columns);
+					    int shY = getPosition(row,biclust1.biclusters.elementAt(k).rows);
+						
+					    
+					    if (isPointInRect(
+						          
+					             (double)  abstandLinks + shiftX + shX*pixelW + pixelW/2 ,
+					          
+					            (double)abstandOben + shiftY + shY*pixelH + pixelH/2, xx1,yy1,xx2,yy2))
+					             
+					             
+					              {
+					            	 col.select(true);
+					            	 row.select(true);
+					             }
+			             
+			           
+			            
+		             
+		             
+		             
+		             
+
+					
+					
+				}
+				}
+				          
+				
+			
+			    
+			    
+	             
+				
+	 			shiftX += biclust2.biclusters.elementAt(t).columns.size()*pixelW + minDist;
+				
+			}
+			shiftY += biclust1.biclusters.elementAt(k).rows.size()*pixelH + minDist;
+
+			}
+		
+		
+	}
 	
 	
 	public Bicluster [][] calculateIntersect(Biclustering biclust1,Biclustering biclust2) {
@@ -969,7 +1345,18 @@ class BiPanel extends JPanel implements KeyListener,  MouseListener{
 		}
 		
 		
-		
+		 
+		if (point1 != null && point2 != null) {
+			g.setColor(Color.RED);
+			
+			
+			g.drawRect(Math.min(point1.x, point2.x), Math.min(point1.y,
+					point2.y), Math.abs(point2.x - point1.x), Math
+					.abs(point2.y - point1.y));
+			
+			
+		}
+	    
 		
 		
 		
@@ -1435,31 +1822,112 @@ class BiPanel extends JPanel implements KeyListener,  MouseListener{
 
 
 
-	public void mouseEntered(MouseEvent e) {
+
+	public void mouseEntered(MouseEvent arg0) {
 		// TODO Auto-generated method stub
 		
 	}
 
 
 
-	public void mouseExited(MouseEvent e) {
+
+
+
+
+	public void mouseExited(MouseEvent arg0) {
 		// TODO Auto-generated method stub
 		
 	}
+
+
+
+
 
 
 
 	public void mousePressed(MouseEvent e) {
 		// TODO Auto-generated method stub
+		point1 = e.getPoint();
+
 		
+
+		this.repaint();
+
 	}
+
+
+
+
 
 
 
 	public void mouseReleased(MouseEvent e) {
 		// TODO Auto-generated method stub
 		
+		
+		point2 = e.getPoint();
+
+		if (point1 != null	&& point2 != null && (point1.getX() - point2.getX())
+						* (point1.getY() - point2.getY()) < 0) {
+			Point p = point1;
+			point1 = point2;
+			point2 = p;
+
+		}
+		
+		
+
+		if (e.getButton() == MouseEvent.BUTTON3 || e.isControlDown()) {
+			return;
+		}
+
+		if (point1 != null && point2 != null) {
+
+			if (!e.isShiftDown()) biconf.seurat.dataManager.deleteSelection();
+			
+			selectRectangle(point1.x, point1.y, point2.x, point2.y);
+				
+
+			point1 = null;
+			point2 = null;
+			biconf.seurat.repaintWindows();
+		}
+
+		this.repaint();
+		
+		
+		
+		
+		
+	}	
+
+
+
+	public void mouseDragged(MouseEvent e) {
+		// TODO Auto-generated method stub
+		point2 = e.getPoint();
+
+		
+
+		this.repaint();
+
 	}
+
+
+
+
+
+
+
+	public void mouseMoved(MouseEvent e) {
+		// TODO Auto-generated method stub
+		repaint();
+	}
+
+
+	
+	
+	
 	
 
 
