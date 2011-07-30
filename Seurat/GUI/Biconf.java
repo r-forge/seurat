@@ -1378,6 +1378,139 @@ class BiPanel extends JPanel implements KeyListener,  MouseListener, MouseMotion
 	
 	public void mouseClicked(MouseEvent e) {
 
+		point1 = e.getPoint();
+
+		
+		
+if (e.getClickCount() == 2) {
+	
+	
+	
+	if (e.getX()<abstandLinks && e.getY()>abstandOben) { 
+		
+		
+
+		int shift = minDist;
+		for (int k = 0; k < biclust1.biclusters.size(); k++) {
+			Bicluster biclust = biclust1.biclusters.elementAt(k);
+			
+			 
+		    	
+			
+			shift += biclust.rows.size()*pixelH + minDist;
+			
+			
+			if (abstandOben + shift > e.getY()) {
+				
+				
+				
+				GlobalView g = new GlobalView(biconf.seurat,biclust.name, biclust.columns,biclust.rows);
+				g.applyNewPixelSize(pixelW,pixelH);
+				break;
+				
+				}      
+			
+			
+		}
+		
+	}
+	
+	
+	
+if (e.getX()>abstandLinks && e.getY()<abstandOben) { 
+
+		
+		
+
+		int shift = minDist;
+		for (int k = 0; k < biclust2.biclusters.size(); k++) {
+			Bicluster biclust = biclust2.biclusters.elementAt(k);
+			
+			     
+		    	
+			
+			shift += biclust.columns.size()*pixelW + minDist;
+			
+			
+			if (abstandLinks + shift > e.getX()) {
+				
+				
+				
+				GlobalView g = new GlobalView(biconf.seurat,biclust.name, biclust.columns,biclust.rows);
+				g.applyNewPixelSize(pixelW,pixelH);
+				break;
+				
+				}  
+			
+			
+		}
+		
+	}
+
+
+
+
+
+
+if (e.getX()>abstandLinks && e.getY()>abstandOben) { 
+	
+	
+	
+	
+
+	
+	
+	int shiftY = minDist+abstandOben;
+	
+	boolean br = false;
+	
+
+	
+	for (int k = 0; k < biclust1.biclusters.size(); k++) {
+
+	shiftY += biclust1.biclusters.elementAt(k).rows.size()*pixelH + minDist;
+
+	int shiftX = minDist+abstandLinks;	
+		
+	for (int t = 0; t < biclust2.biclusters.size(); t++) {
+
+		shiftX += biclust2.biclusters.elementAt(t).columns.size()*pixelW + minDist;
+
+		
+		Bicluster biclust = biconf.intersect(biclust1.biclusters.elementAt(k),biclust2.biclusters.elementAt(t));
+		
+	
+	    if (shiftX>e.getX() && shiftY>e.getY()){
+			
+
+			GlobalView g = new GlobalView(biconf.seurat,biclust.name, biclust.columns,biclust.rows);
+			g.applyNewPixelSize(pixelW,pixelH);
+			br = true;
+			break;
+	    } 
+	    
+         
+		
+		
+	}
+	if (br) break;
+
+	}
+	
+	
+	
+	
+	
+		
+	
+		
+		
+}
+
+
+
+	
+}
 
 
 		if (e.getButton() == MouseEvent.BUTTON3 || e.isControlDown()) {
