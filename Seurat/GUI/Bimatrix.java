@@ -3,13 +3,23 @@ package GUI;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
+import java.awt.Point;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
 import java.util.Vector;
 
+import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JFrame;
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
+import javax.swing.ToolTipManager;
 
 import org.rosuda.REngine.Rserve.RConnection;
 
@@ -24,7 +34,7 @@ import Data.DataManager;
 
 
 
-public class Bimatrix extends JFrame{
+public class Bimatrix extends JFrame implements IPlot{
 	
 	BiConfPanel panel;
 	
@@ -36,12 +46,26 @@ public class Bimatrix extends JFrame{
 	
 	DataManager dataManager;
 	
+	JMenuItem item;
+	
 	public Bimatrix(Seurat seurat,Biclustering biclust) {
 		super("Bimatrix " + biclust.name);
 	    this.biclust = biclust;
 	    this.seurat = seurat;
 		this.dataManager = seurat.dataManager;
 	    
+		item = new JMenuItem(biclust.name);
+		item.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				setVisible(true);
+			}
+		});
+		
+		seurat.windows.add(this);
+
+		seurat.windowMenu.add(item);
+		
+		
 	    
 	    sortBiclustering();
     
@@ -50,7 +74,11 @@ public class Bimatrix extends JFrame{
 	    setPlotSize();
 	    this.getContentPane().add(new JScrollPane(panel));
 
+	
+	    
 	    this.addKeyListener(panel);
+	    this.addMouseListener(panel);
+	    this.addMouseMotionListener(panel);
 	    setLocation(330,0);
 		this.setVisible(true);
 	}
@@ -122,8 +150,10 @@ public class Bimatrix extends JFrame{
 	     Vector<ISelectable> rows1 = b1.rows;	
 	     Vector<ISelectable> rows2 = b2.rows;	
   
-	     return new Bicluster(b1.name + " " + b2.name, intersectV(b1.rows,b2.rows), intersectV(b1.columns,b2.columns)); 
+	     Bicluster b =  new Bicluster(b1.name + " " + b2.name, intersectV(b1.rows,b2.rows), intersectV(b1.columns,b2.columns)); 
 	     
+	     
+	     return b;
 	}
 	
 	
@@ -238,6 +268,26 @@ public class Bimatrix extends JFrame{
 			
 		setVisible(true);
 	}
+
+	public void brush() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void print() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void removeColoring() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void updateSelection() {
+		// TODO Auto-generated method stub
+		repaint();
+	}
 	
 	
 	
@@ -250,7 +300,7 @@ public class Bimatrix extends JFrame{
 
 
 
-class BiConfPanel extends JPanel implements KeyListener{
+class BiConfPanel extends JPanel implements KeyListener,MouseListener,MouseMotionListener{
 	
 	public Biclustering biclust;
 	public double Max, Min;
@@ -264,14 +314,106 @@ class BiConfPanel extends JPanel implements KeyListener{
 	
 	Bimatrix biconf;
 	
+	int [] order;
+	
+	Point point1, point2;
+	
+	  Vector<Integer> xStart;
+	    Vector<Integer> yStart;
+
+	
+	Bicluster [][] Intersect;
+	
 	public BiConfPanel(Bimatrix biconf,Biclustering biclust) {
 	
 		this.biconf = biconf;
 		this.biclust = biclust;
 		calculateMinMax();
 	    this.addKeyListener(this);
+	    this.addMouseListener(this);
+	    this.addMouseMotionListener(this);
+	    
+	    Intersect = calculateIntersect(biclust);
+	  //  vorsort();
+	    
+	    
+		ToolTipManager.sharedInstance().registerComponent(this);
+		ToolTipManager.sharedInstance().setInitialDelay(150);
+		ToolTipManager.sharedInstance().setDismissDelay(Integer.MAX_VALUE);
+		ToolTipManager.sharedInstance().setReshowDelay(150);
+		
 	}
 	
+	
+	public Bicluster [][] calculateIntersect(Biclustering biclust) {
+		Bicluster [][] inter = new Bicluster [biclust.biclusters.size()][biclust.biclusters.size()];
+	    for (int i = 0; i < biclust.biclusters.size(); i++) {
+	    	 for (int j = 0; j < biclust.biclusters.size(); j++) {
+	 	    	inter [j][i]= biconf.intersect(biclust.biclusters.elementAt(i),biclust.biclusters.elementAt(j));
+	 	    }
+	    }
+	    return inter;
+	
+	}
+	
+	
+	
+	public void mouseClicked(MouseEvent e) {
+
+		point1 = e.getPoint();
+		
+		
+		if (e.getClickCount() == 2) {
+			
+			int i = 0;
+			int j = 0;
+			for (int k = 0; k < xStart.size(); k++) {
+				if (xStart.elementAt(k)<e.getX()) i = k;
+			}
+			
+			for (int k = 0; k < yStart.size(); k++) {
+				if (yStart.elementAt(k)<e.getY()) j = k;
+			}
+			
+			GlobalView g = new GlobalView(biconf.seurat,Intersect[i][j].name, Intersect [i][j].columns,Intersect [i][j].rows);
+			g.applyNewPixelSize(pixelW,pixelH);
+			
+			
+		}
+
+
+		if (e.getButton() == MouseEvent.BUTTON3 || e.isControlDown()) {
+
+			JPopupMenu menu = new JPopupMenu();
+
+			JMenuItem item = new JMenuItem("Sort");
+			item.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					// createCorrelationExperiments();
+
+					sortBiclusters();
+				}
+			});
+			menu.add(item);
+			
+			item = new JMenuItem("Vorsort");
+			item.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					// createCorrelationExperiments();
+
+					vorsort();
+				}
+			});
+			menu.add(item);
+			
+			
+			
+			
+
+			menu.show(this, e.getX(), e.getY());
+		}
+
+	}
 	
 	
 
@@ -282,21 +424,379 @@ class BiConfPanel extends JPanel implements KeyListener{
 			sortBicluster(i); 
 			
 		}
+		repaint();
 	}
+	
+	
+	public void vorsort() {
+        for (int i = 0; i < biclust.biclusters.size(); i++) {
+			
+			vorsortBicluster(i); 
+			
+		}
+		repaint();
+	}
+	
+	
+	
+	public void vorsortBicluster(int i) {
+		Bicluster bi = biclust.biclusters.elementAt(i);
+
+	
+	    
+		int [] newOrder = null;
+		Vector<ISelectable> columns = bi.columns;
+		Vector<ISelectable> rows = bi.rows;
+        int [] countC  = new int [columns.size()];
+        int [] countR  = new int [rows.size()];
+
+		
+		for (int k = 0; k < biclust.biclusters.size(); k++) {
+			if (i!=k) {
+		     Bicluster inter = Intersect [i][k];
+		    
+		    	 
+		     for (int t = 0; t < columns.size(); t++) {
+		    	 if (inter.columns.indexOf(columns.elementAt(t))!=-1 && inter.rows.size()!=0) countC [t]+=inter.rows.size();
+		     }
+		     for (int t = 0; t < rows.size(); t++) {
+		    	 if (inter.rows.indexOf(rows.elementAt(t))!=-1 && inter.columns.size()!=0) countR [t]+=inter.columns.size();
+		     }
+		     
+			}
+		}
+		
+		System.out.println("Bicluster " + i);
+		for (int ii = 0; ii < countC.length; ii++) System.out.print(countC [ii]); 
+		System.out.println();
+		for (int ii = 0; ii < countR.length; ii++) System.out.print(countR [ii]); 
+        System.out.println();
+		
+		
+		
+		order = new int [bi.columns.size()];
+		for (int  k= 0; k < order.length; k++) order [k] = k;	
+		
+
+		for (int j = 0; j < order.length; j++) {
+			for (int jj = j+1; jj < order.length; jj++) {
+				if (countC [order[j]] < countC [order[jj]]) {
+					int temp = order [j];
+					order [j] = order [jj];
+					order [jj] = temp;
+				}
+			}
+		}
+		
+		Vector<ISelectable> cols = new Vector();
+		for (int  k = 0; k<bi.columns.size(); k++) {
+			cols.add(bi.columns.elementAt(order [k]));
+		}
+	
+		bi.columns = cols;
+		
+		
+		
+		
+		order = new int [bi.rows.size()];
+		for (int  k= 0; k < order.length; k++) order [k] = k;	
+		
+
+		for (int j = 0; j < order.length; j++) {
+			for (int jj = j+1; jj < order.length; jj++) {
+				if (countR [order[j]] < countR [order[jj]]) {
+					int temp = order [j];
+					order [j] = order [jj];
+					order [jj] = temp;
+				}
+			}
+		}
+		
+		rows = new Vector();
+		for (int  k = 0; k<bi.rows.size(); k++) {
+			rows.add(bi.rows.elementAt(order [k]));
+		}
+	
+		bi.rows = rows;
+		
+		
+	
+	}
+	
+	
 	
 	
 	public void sortBicluster(int i) {
 		Bicluster bi = biclust.biclusters.elementAt(i);
-	}
-	
-	public int calculateCrit(int j) {
-		int crit = 0;
-		Bicluster cl = biclust.biclusters.elementAt(j);
+
+		order = new int [bi.columns.size()];
+		for (int  k= 0; k < order.length; k++) order [k] = k;
+	    
+		int [] newOrder = null;
+		Vector<Vector<ISelectable>> columns = new Vector();
+		Vector<Vector<ISelectable>> rows = new Vector();
+
+		Vector<Integer> sizeC = new Vector();
+		Vector<Integer> sizeR = new Vector();
+
+		for (int k = 0; k < biclust.biclusters.size(); k++) {
+			Bicluster bicluster = Intersect [i] [k];
+			Vector<ISelectable> cols = bicluster.columns; 
+			Vector<ISelectable> row = bicluster.rows; 
+
+			columns.add(cols);
+			rows.add(row);
+		    sizeC.add(row.size());
+		    sizeR.add(cols.size());
+
+		}
 
 		
+		double crit = calcCrit(bi.columns,columns,sizeC,order);
+		double newCrit = crit;
+		System.out.println("Sort columns of bicluster " + i+"   " + newCrit);
+
+	
+		while ((newCrit = permute(bi.columns,columns,sizeC))<crit) {
+			crit = newCrit;
+			System.out.println(i+"   " + newCrit);
+		} 
+		System.out.println("   ");
+
+		
+		Vector<ISelectable> cols = new Vector();
+		for (int  k = 0; k<bi.columns.size(); k++) {
+			cols.add(bi.columns.elementAt(order [k]));
+		}
+	
+		bi.columns = cols;
+		
+		
+		
+		order = new int [bi.rows.size()];
+		for (int  k= 0; k < order.length; k++) order [k] = k;
+	    
+		
+		
+		crit = calcCrit(bi.rows,rows,sizeR,order);
+		newCrit = crit;
+		System.out.println("Sort rows of bicluster " + i+"   " + newCrit);
+
+	
+		while ((newCrit = permute(bi.rows,rows,sizeR))<crit) {
+			crit = newCrit;
+			System.out.println(i+"   " + newCrit);
+		} 
+		System.out.println("   ");
+
+		
+		Vector<ISelectable> row = new Vector();
+		for (int  k = 0; k<bi.rows.size(); k++) {
+			row.add(bi.rows.elementAt(order [k]));
+		}
+	
+		bi.rows = row;
+		
+	
+	}
+	
+	
+	
+	
+	
+	public double  permute(Vector<ISelectable> b, Vector<Vector<ISelectable>> bis, Vector<Integer> size) {
+		Vector<ISelectable> newb = new Vector();
+	    
+	    int [][] orders = new int [bis.size()][];
+	    for (int i = 0; i < bis.size(); i++) {
+	    	Vector<ISelectable> items = bis.elementAt(i);
+	    	orders [i] = new int [items.size()];
+	    	for (int k = 0; k < items.size(); k++) {
+	    		int index = b.indexOf(items.elementAt(k));
+	    	
+	    		orders [i] [k] = index;
+
+	    	}
+	    }
+		
+		
+		Vector<int []> colPermutations = getAllPermutations(order,orders);
+		int maxJ = colPermutations.size()-1;
+		
+		
+				
+		double criterion = calcCrit(b, bis, size, order);
+		
+	 //  System.out.println(" Vor  ->  " + criterion);
+
+		for (int i = 0; i < colPermutations.size(); i++) {
+			
+				int [] pC = colPermutations.elementAt(i);
+			    
+				double crit = calcCrit(b, bis, size,pC);
+				
+				if (crit < criterion) {
+					criterion = crit;
+					maxJ = i;
+				}
+		}	
+		
+		order =  colPermutations.elementAt(maxJ); 
+	    return criterion; 
+		
+	}
+	
+	
+	
+	
+	public double calcCrit(Vector<ISelectable> b, Vector<Vector<ISelectable>> bis, Vector<Integer> size, int [] order) {
+	double crit = 0;
+		
+		for (int i = 0; i < bis.size(); i++) {
+			Vector<ISelectable> cols = bis.elementAt(i);
+			
+			int ind = -2;
+			
+			
+			for (int k  = 0 ; k < b.size(); k++) {
+				
+				ISelectable col1 = b.elementAt(order [k]);
+			    int index = cols.indexOf(col1);
+		
+				
+			    if (index != -1 && ind != -2 && k - ind >1) {
+			    	crit+= size.elementAt(i);
+				}
+
+			    if (index != -1) {
+		        ind = k;
+			    }
+			    
+			    
+			}	
+				
+			
+			
+			
+			
+		
+		}
+				
 	
 		return crit;
 	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+
+	public Vector<int []> getAllPermutations(int [] order, int [] [] bi) {
+		Vector per = new Vector();
+		
+		/*
+		
+		for (int i = 0; i < bi.length; i++) {
+			int [] o = bi [i];
+			Vector<Integer> starts = new Vector();
+			Vector<Integer> ends = new Vector();
+			
+			boolean start = false;
+			for (int k = 0; k < o.length; k++) {
+			    
+				if (!start) {
+					if (o [order [k]] !=-1)	{
+						start = true;
+						starts.add(k);
+					}
+					
+				}
+				else {
+					if (o [order [k]] ==-1)	{
+						start = false;
+						ends.add(k-1);
+					}
+				}
+			
+			   
+			}
+			
+			
+			
+			for (int k = 0; k < starts.size(); k++) {
+				for (int t = 0; t < starts.size(); t++) {
+					int [] ord  = new int [order.length];
+					for (int j = 0; i < starts.elementAt(k); j++) ord [j] = order [j];
+					for (int j = starts.elementAt(k);j <= ends.elementAt(k); j++) ord [j] = order [j];
+
+					
+					
+					
+				}
+			}
+			
+			
+			
+			
+		}
+		*/
+	   
+		for (int i = 0; i < order.length; i++) {
+		for (int j = i+1; j < order.length; j++) {
+
+			int [] o = new int [order.length];
+			
+			for (int k = 0; k < i; k++) o [k] = order [k];
+			for (int k = i; k < j; k++) o [k] = order [k+1];
+			o [j] = order [i];
+			for (int k = j+1; k < order.length; k++) o [k] = order [k];
+	        
+			
+			per.add(o);
+			
+			
+			}
+		
+		
+		for (int j = 0; j < i; j++) {
+
+			int [] o = new int [order.length];
+			
+			for (int k = 0; k < j; k++) o [k] = order [k];
+			o [j] = order [i];
+			for (int k = j+1; k < i+1; k++) o [k] = order [k-1];
+			for (int k = i+1; k < order.length; k++) o [k] = order [k];
+	        
+			
+			per.add(o);
+			
+			
+			}
+		
+		
+		
+		}
+		
+		int [] o = new int [order.length];
+		
+		for (int k = 0; k < order.length; k++) o [k] = order [k];
+		per.add(o);
+		
+		
+		return per;
+	}
+
+
+
+
+
+	
+	
+	
 	
 	
 	
@@ -334,8 +834,8 @@ class BiConfPanel extends JPanel implements KeyListener{
 	    g.fillRect(0,0,this.getWidth(), this.getHeight());
 		
 	    Vector<Bicluster> biclusters = biclust.biclusters;
-	    Vector<Integer> xStart = new Vector();
-	    Vector<Integer> yStart = new Vector();
+	    xStart = new Vector();
+	    yStart = new Vector();
         int maxX = 0;
         int maxY = 0;
 	    
@@ -392,10 +892,10 @@ class BiConfPanel extends JPanel implements KeyListener{
 	    	 
 						
 	    	
-	    	    Bicluster  b = biconf.intersect(biclusters.elementAt(i),biclusters.elementAt(j));
+	    	    Bicluster  b = Intersect [i][j];
 	    	    
 	    	    
-	    	    if (b.columns.size()>0 && b.rows.size()>0) {
+	    	    if (b.columns != null && b.rows != null && b.columns.size()>0 && b.rows.size()>0) {
 	    	    	
 	    	    	
 	    	    	
@@ -417,6 +917,12 @@ class BiConfPanel extends JPanel implements KeyListener{
 	  						
 	  						c = Tools.convertHLCtoRGB(new MyColor(Settings.Lmax -  Tools.fPos(koeff)*(Settings.Lmax-Settings.Lmin),Tools.fPos(koeff)*Settings.Cmax, 360 )).getRGBColor();
 	    	    	 
+	  						if (col.isSelected() && row.isSelected()) c = Tools.convertHLCtoRGB(new MyColor(
+						    		(Settings.Lmax -  Tools.fPos(koeff)*(Settings.Lmax-Settings.Lmin))*(1-Settings.Selection),
+						    		Tools.fPos(koeff)*Settings.Cmax*Settings.Selection, 
+						    		biconf.seurat.PosColor 
+						    )).getRGBColor();	
+	  						
 	    	    	    }
 	  					else {
 	  						
@@ -427,13 +933,25 @@ class BiConfPanel extends JPanel implements KeyListener{
 									              Tools.fNeg(koeff)*Settings.Cmax, 
 									              120
 									)).getRGBColor();
+							
+							
+							
+							if (col.isSelected() && row.isSelected())  c = Tools.convertHLCtoRGB(new MyColor((
+						               Settings.Lmax- Tools.fNeg(koeff)*(Settings.Lmax-Settings.Lmin))*(1-Settings.Selection), 
+						               Tools.fNeg(koeff)*Settings.Cmax*Settings.Selection, 
+						               biconf.seurat.NegColor
+						         )).getRGBColor();
 	  					
 	  					
 	  					}
 	  					
 	  					
-	  					g.setColor(c);
 	  					
+	  					
+	  					
+
+	  					g.setColor(c);
+
 	  					
 	  					int shiftX = ii;
 	  					int shiftY = jj;
@@ -549,15 +1067,163 @@ class BiConfPanel extends JPanel implements KeyListener{
 	    
 	    
 	    
+		if (point1 != null && point2 != null) {
+			g.setColor(Color.RED);
+			
+			
+			g.drawRect(Math.min(point1.x, point2.x), Math.min(point1.y,
+					point2.y), Math.abs(point2.x - point1.x), Math
+					.abs(point2.y - point1.y));
+			
+			
+		}
+	    
 	    
 	    
 	}
 	
 	
 	
+	
+	
+	public String getToolTipText(MouseEvent e) {
+
+	      String text = null;
+	   
+	      
+	      
+	      
+	      
+		    Vector<Bicluster> biclusters = biclust.biclusters;
+
+		    
+		    for (int i = 0; i < biclusters.size(); i++) {
+		    for (int j = 0; j < biclusters.size(); j++) {
+		    	
+		    	
+		    	 
+							
+		    	
+		    	    Bicluster  b = Intersect [i][j];
+		    	    
+		    	    
+		    	    if (b.columns != null && b.rows != null && b.columns.size()>0 && b.rows.size()>0) {
+		    	    	
+		    	    	
+		    	    	
+		    	    	 for (int ii = 0; ii < b.columns.size(); ii++) {
+		    	    	 for (int jj = 0; jj < b.rows.size(); jj++) {
+		    	    	
+		    	         ISelectable col = b.columns.elementAt(ii);
+		    	         ISelectable row = b.rows.elementAt(jj);
+		 
+		    	    		 
+		    	    		Color c = Color.WHITE;
+		  					double value = col.getValue(row.getID());
+		    	    	
+
+		  				
+
+		  					
+		  					int shiftX = ii;
+		  					int shiftY = jj;
+		  					if (i != j)
+		  					{
+		  						shiftX = biconf.getPosition(col,biclusters.elementAt(i).columns);
+		  						shiftY = biconf.getPosition(row,biclusters.elementAt(j).rows);
+
+		  					}
+		  					
+		  					if (abstandLinks + xStart.elementAt(i) + shiftX*pixelW < e.getX() &&
+		  						e.getX() < abstandLinks + xStart.elementAt(i) + shiftX*pixelW + pixelW &&
+		  						abstandOben + yStart.elementAt(j) +shiftY*pixelH < e.getY() && 
+		  					e.getY() < abstandOben + yStart.elementAt(j) +shiftY*pixelH + pixelH
+		  					) 
+		  						return value + "";
+		    	    	 }
+		    	    	 }
+		    	    	 
+		    	    	 
+		    	    	 }
+
+		    }}
+	   
+		  return null;
+	      
+		}
+			
 
 
 
+
+	public void selectRectangle(int xx1, int yy1, int xx2, int yy2) {
+
+
+	      
+	      
+	    Vector<Bicluster> biclusters = biclust.biclusters;
+
+	    
+	    for (int i = 0; i < biclusters.size(); i++) {
+	    for (int j = 0; j < biclusters.size(); j++) {
+	    	
+	    	
+	    	 
+						
+	    	
+	    	    Bicluster  b = Intersect [i][j];
+	    	    
+	    	    
+	    	    if (b.columns != null && b.rows != null && b.columns.size()>0 && b.rows.size()>0) {
+	    	    	
+	    	    	
+	    	    	
+	    	    	 for (int ii = 0; ii < b.columns.size(); ii++) {
+	    	    	 for (int jj = 0; jj < b.rows.size(); jj++) {
+	    	    	
+	    	         ISelectable col = b.columns.elementAt(ii);
+	    	         ISelectable row = b.rows.elementAt(jj);
+	 
+	    	    		 
+	    	    		Color c = Color.WHITE;
+	  					double value = col.getValue(row.getID());
+	    	    	
+
+	  				
+
+	  					
+	  					int shiftX = ii;
+	  					int shiftY = jj;
+	  					if (i != j)
+	  					{
+	  						shiftX = biconf.getPosition(col,biclusters.elementAt(i).columns);
+	  						shiftY = biconf.getPosition(row,biclusters.elementAt(j).rows);
+
+	  					}
+	  					
+	  					double x = (double)abstandLinks + xStart.elementAt(i) + shiftX*pixelW + pixelW/2;
+	  					double y =	(double)abstandOben + yStart.elementAt(j) +shiftY*pixelH + pixelH/2;
+	  						
+	  						
+	  						if (xx1 < x && x < xx2 && yy1 < y && y < yy2) {
+	  						 col.select(true);
+	  						 row.select(true);
+
+	  					  }
+	  						
+	    	    	 }
+	    	    	 }
+	    	    	 
+	    	    	 
+	    	    	 }
+
+	    }}
+   
+	
+		this.repaint();
+
+	}
+	
 
 
 	public void keyPressed(KeyEvent arg0) {
@@ -626,6 +1292,112 @@ class BiConfPanel extends JPanel implements KeyListener{
 		// TODO Auto-generated method stub
 		
 	}
+
+
+
+
+	public void mouseEntered(MouseEvent arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+
+
+
+
+
+	public void mouseExited(MouseEvent arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+
+
+
+
+
+	public void mousePressed(MouseEvent e) {
+		// TODO Auto-generated method stub
+		point1 = e.getPoint();
+
+		
+
+		this.repaint();
+
+	}
+
+
+
+
+
+
+
+	public void mouseReleased(MouseEvent e) {
+		// TODO Auto-generated method stub
+		
+		
+		point2 = e.getPoint();
+
+		if (point1 != null	&& point2 != null && (point1.getX() - point2.getX())
+						* (point1.getY() - point2.getY()) < 0) {
+			Point p = point1;
+			point1 = point2;
+			point2 = p;
+
+		}
+		
+		
+
+		if (e.getButton() == MouseEvent.BUTTON3 || e.isControlDown()) {
+			return;
+		}
+
+		if (point1 != null && point2 != null) {
+
+			if (!e.isShiftDown()) biconf.seurat.dataManager.deleteSelection();
+			
+			selectRectangle(point1.x, point1.y, point2.x, point2.y);
+				
+
+			point1 = null;
+			point2 = null;
+			biconf.seurat.repaintWindows();
+		}
+
+		this.repaint();
+		
+		
+		
+		
+		
+	}	
+
+
+
+	public void mouseDragged(MouseEvent e) {
+		// TODO Auto-generated method stub
+		point2 = e.getPoint();
+
+		
+
+		this.repaint();
+
+	}
+
+
+
+
+
+
+
+	public void mouseMoved(MouseEvent e) {
+		// TODO Auto-generated method stub
+		repaint();
+	}
+
+
 	
 	
 	

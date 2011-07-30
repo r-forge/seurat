@@ -638,6 +638,9 @@ public class Seurat extends JFrame implements ColorListener{
 
 					Object obj = tree.getLastSelectedPathComponent();
 
+					
+				
+					
 					if (obj instanceof DataTreeNode) {
 
 						ISelectable object = ((DataTreeNode) obj).object;
@@ -647,6 +650,15 @@ public class Seurat extends JFrame implements ColorListener{
 							new GlobalView(seurat,bic.name,bic.columns,bic.rows).applyNewPixelSize(15, 5);
 							//System.out.println("is Bicluster");
 						}
+						
+						
+						if (((DataTreeNode) obj).cObject instanceof Biclustering){
+
+						    new Bimatrix(seurat,(Biclustering)((DataTreeNode) obj).cObject );
+						    new BiHeatmap(seurat,"Biheatmap  "+ ((Biclustering)((DataTreeNode) obj).cObject).name,(Biclustering)((DataTreeNode) obj).cObject );
+						}
+						
+						
 						
 						if (((DataTreeNode) obj).object == null) {
 							if (((DataTreeNode) obj).cObject != null && ((DataTreeNode) obj).cObject instanceof Clustering) {
