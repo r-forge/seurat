@@ -4,18 +4,21 @@ package GUI;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
+import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
 import java.util.Vector;
 
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.ToolTipManager;
 
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
@@ -31,7 +34,7 @@ import Settings.Settings;
 import Tools.Tools;
 
 
-public class BiHeatmap extends JFrame{
+public class BiHeatmap extends JFrame implements IPlot{
 	
 	String name;
 	BiPanel panel;
@@ -39,11 +42,28 @@ public class BiHeatmap extends JFrame{
 	int maxWidth = 450,maxHeight = 450;
 	Seurat seurat;
 	
+	JMenuItem item;
+
+	
 	public BiHeatmap(Seurat seurat,String name,Biclustering biclust) {
 		super("Biheatmap: " + name);
 		
 		this.seurat = seurat;
 	    this.biclust = biclust;
+	    
+	    item = new JMenuItem(biclust.name);
+		item.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				setVisible(true);
+			}
+		});
+		
+		seurat.windows.add(this);
+
+		seurat.windowMenu.add(item);
+		
+		
+	    
 		panel = new BiPanel(this,biclust);
 		
 	    setPlotSize();
@@ -51,6 +71,7 @@ public class BiHeatmap extends JFrame{
 
 	    this.addKeyListener(panel);
 		this.addMouseListener(panel);
+		this.addMouseMotionListener(panel);
 
 	    setLocation(760,0);
 		this.setVisible(true);
@@ -95,13 +116,45 @@ public class BiHeatmap extends JFrame{
 			
 		setVisible(true);
 	}
+
+
+
+
+	public void brush() {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+
+
+	public void print() {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+
+
+	public void removeColoring() {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+
+
+	public void updateSelection() {
+		// TODO Auto-generated method stub
+		repaint();
+	}
 	
 	
 	
 }
 	
 	
-class BiPanel extends JPanel implements MouseListener, KeyListener{
+class BiPanel extends JPanel implements MouseListener,MouseMotionListener, KeyListener{
 	
 	
 	public Biclustering biclust;
@@ -118,6 +171,9 @@ class BiPanel extends JPanel implements MouseListener, KeyListener{
 	
 	Vector<Bielement> origColumns;
 	Vector<Bielement> origRows;
+	
+	Point point1, point2;
+
 	
 	boolean showColors = true;
 	
@@ -148,7 +204,14 @@ class BiPanel extends JPanel implements MouseListener, KeyListener{
 		this.setVisible(true);
 		
 		this.addMouseListener(this);
+		this.addMouseMotionListener(this);
 		this.addKeyListener(this);
+		
+		
+		ToolTipManager.sharedInstance().registerComponent(this);
+		ToolTipManager.sharedInstance().setInitialDelay(150);
+		ToolTipManager.sharedInstance().setDismissDelay(Integer.MAX_VALUE);
+		ToolTipManager.sharedInstance().setReshowDelay(150);
 	}
 	
 	
@@ -215,7 +278,14 @@ class BiPanel extends JPanel implements MouseListener, KeyListener{
              if (value > 0) {
            			double koeff = value/Max;			
 					c = Tools.convertHLCtoRGB(new MyColor(Settings.Lmax -  Tools.fPos(koeff)*(Settings.Lmax-Settings.Lmin),Tools.fPos(koeff)*Settings.Cmax, 360 )).getRGBColor();	    	 
-	    	 }
+	   
+					if (col.isSelected() && row.isSelected()) c = Tools.convertHLCtoRGB(new MyColor(
+				    		(Settings.Lmax -  Tools.fPos(koeff)*(Settings.Lmax-Settings.Lmin))*(1-Settings.Selection),
+				    		Tools.fPos(koeff)*Settings.Cmax*Settings.Selection, 
+				    		biheatmap.seurat.PosColor 
+				    )).getRGBColor();	
+             
+             }
 			 else {
 						
 					double koeff = value/Min;
@@ -225,6 +295,12 @@ class BiPanel extends JPanel implements MouseListener, KeyListener{
 							              Tools.fNeg(koeff)*Settings.Cmax, 
 							              120
 							)).getRGBColor();
+					
+					if (col.isSelected() && row.isSelected())  c = Tools.convertHLCtoRGB(new MyColor((
+				               Settings.Lmax- Tools.fNeg(koeff)*(Settings.Lmax-Settings.Lmin))*(1-Settings.Selection), 
+				               Tools.fNeg(koeff)*Settings.Cmax*Settings.Selection, 
+				               biheatmap.seurat.NegColor
+				         )).getRGBColor();
 					
 					
 			}
@@ -469,11 +545,41 @@ class BiPanel extends JPanel implements MouseListener, KeyListener{
 		 
 		 
 		 
-		 
+			if (point1 != null && point2 != null) {
+				g.setColor(Color.RED);
+				
+				
+				g.drawRect(Math.min(point1.x, point2.x), Math.min(point1.y,
+						point2.y), Math.abs(point2.x - point1.x), Math
+						.abs(point2.y - point1.y));
+				
+				
+			}
+
 		 
 	}
 	
 	
+	
+
+	@Override
+	public String getToolTipText(MouseEvent e) {
+
+      String text = null;
+      int i = (e.getX()-abstandLinks)/pixelW;
+      int j = (e.getY()-abstandOben)/pixelH;
+
+      ISelectable col = columns.elementAt(i).isel;
+      ISelectable row = rows.elementAt(j).isel;
+
+	  double value = col.getValue(row.getID());
+
+	  return ""+value;
+      
+	}
+		
+		
+		
 	
 	
 	public void presort() {
@@ -610,7 +716,8 @@ class BiPanel extends JPanel implements MouseListener, KeyListener{
 	
 	public void mouseClicked(MouseEvent e) {
 
-	
+		point1 = e.getPoint();
+
 
 		if (e.getButton() == MouseEvent.BUTTON3 || e.isControlDown()) {
 
@@ -1490,9 +1597,14 @@ public void mouseExited(MouseEvent arg0) {
 
 
 
-public void mousePressed(MouseEvent arg0) {
+public void mousePressed(MouseEvent e) {
 	// TODO Auto-generated method stub
+	point1 = e.getPoint();
+
 	
+
+	this.repaint();
+
 }
 
 
@@ -1501,10 +1613,67 @@ public void mousePressed(MouseEvent arg0) {
 
 
 
-public void mouseReleased(MouseEvent arg0) {
+public void mouseReleased(MouseEvent e) {
 	// TODO Auto-generated method stub
 	
+	
+	point2 = e.getPoint();
+
+	if (point1 != null	&& point2 != null && (point1.getX() - point2.getX())
+					* (point1.getY() - point2.getY()) < 0) {
+		Point p = point1;
+		point1 = point2;
+		point2 = p;
+
+	}
+	
+	
+
+	if (e.getButton() == MouseEvent.BUTTON3 || e.isControlDown()) {
+		return;
+	}
+
+	if (point1 != null && point2 != null) {
+
+		if (!e.isShiftDown()) biheatmap.seurat.dataManager.deleteSelection();
+		
+		selectRectangle(point1.x, point1.y, point2.x, point2.y);
+			
+
+		point1 = null;
+		point2 = null;
+		biheatmap.seurat.repaintWindows();
+	}
+
+	this.repaint();
+	
+	
+	
+	
+	
 }	
+
+
+
+public void selectRectangle(int xx1, int yy1, int xx2, int yy2) {
+
+	for (int i = 0; i < columns.size(); i++) {
+	for (int j = 0; j < rows.size(); j++) {
+	
+	  double x = abstandLinks + i * pixelW + (double)pixelW/2;	
+	  double y = abstandOben + j * pixelH+(double)pixelH/2;	
+
+	  if (xx1 < x && x < xx2 && yy1 < y && y < yy2) {
+		  columns.elementAt(i).isel.select(true);
+		  rows.elementAt(j).isel.select(true);
+
+	  }
+		
+	}	
+	}
+	this.repaint();
+
+}
 	
 	
 	
@@ -1627,6 +1796,33 @@ public void mouseReleased(MouseEvent arg0) {
 
 
 	public void keyTyped(KeyEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+
+
+
+
+
+	public void mouseDragged(MouseEvent e) {
+		// TODO Auto-generated method stub
+		point2 = e.getPoint();
+
+		
+
+		this.repaint();
+
+	}
+
+
+
+
+
+
+
+	public void mouseMoved(MouseEvent e) {
 		// TODO Auto-generated method stub
 		
 	}

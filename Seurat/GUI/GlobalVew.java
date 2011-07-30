@@ -159,6 +159,12 @@ class GlobalView extends JFrame implements MatrixWindow, IPlot {
 		
 
 		item = new JMenuItem(name);
+		item.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				globalView.setVisible(true);
+			}
+		});
+		
 		this.seurat = seurat;
 		this.dataManager = seurat.dataManager;
 		this.Experiments = Experiments;
@@ -246,11 +252,7 @@ class GlobalView extends JFrame implements MatrixWindow, IPlot {
 
 		panel.calculateMatrixValues();
 
-		item.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				globalView.setVisible(true);
-			}
-		});
+		
 
 		this.addWindowListener(new WindowAdapter() {
 			@Override
