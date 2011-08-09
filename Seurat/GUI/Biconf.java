@@ -73,7 +73,7 @@ JMenuItem item;
 	
 		
 		
-		permuteMatrix();
+		//permuteMatrix();
 		
 		panel = new BiPanel(this,biclust1,biclust2);
 		
@@ -1536,6 +1536,20 @@ if (e.getX()>abstandLinks && e.getY()>abstandOben) {
 				}
 			});
 			menu.add(item);
+			
+			
+			
+			item = new JMenuItem("Confsort ");
+			item.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					// createCorrelationExperiments();
+
+					biconf.permuteMatrix();
+					repaint();
+				}
+			});
+			menu.add(item);
+			
 			
 			
 			
