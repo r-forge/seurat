@@ -65,18 +65,30 @@ public class BiclusteringDialog extends JFrame{
 	JTextField fieldShuffle = new JTextField("3",2);
 	String[] bimaxopt = {"up","down"};
 	JComboBox boxBimaxopt = new JComboBox(bimaxopt);
+	//JTextField fieldminCBimax = new JTextField("5",2);
+	JTextField pcerv = new JTextField("0.2",2);
+	JTextField pceru = new JTextField("0.05",2);
+	JTextField nbiclust = new JTextField("5",2);
+	JTextField merr = new JTextField("0.01",2);
+	String[] truefalse = {"TRUE","FALSE"};
+	JComboBox coloverlap = new JComboBox(truefalse);
+	JComboBox rowoverlap = new JComboBox(truefalse);
+	JComboBox nccolcorr = new JComboBox(truefalse);
+	JComboBox ncrowcorr = new JComboBox(truefalse);
 	//JButton okBtnISA = new JButton("Ok");
 		
 	JButton okBtnBimax = new JButton("Ok");
 	
 	JButton okBtnPlaid = new JButton("Ok");
 	
+	JButton okBtnS4VD = new JButton("Ok");
+	
 	public BiclusteringDialog(Seurat seurat,Vector Rows, Vector Columns, int pixelW, int pixelH){
 		super("Biclustering");
 		
 		this.seurat = seurat;
 		this.dataManager = seurat.dataManager;
-		this.setBounds(100, 320, 450, 245);
+		this.setBounds(100, 520, 450, 345);
         this.pixelW = pixelW;
         this.pixelH = pixelH;
         this.Rows = Rows;
@@ -251,7 +263,85 @@ public class BiclusteringDialog extends JFrame{
 	    
 		tabLeiste.addTab("PlaidModel", panelallPlaid);
 		
-		this.setResizable(false);
+        //s4vd
+		
+		JPanel panelallS4VD = new JPanel();
+		JPanel panelgridS4VD = new JPanel();
+		JPanel panelbuttonS4VD = new JPanel(); 
+
+		panelgridS4VD.setLayout(new GridLayout(8,2));
+		
+		panelgridS4VD.add(new JLabel("PCERV:"));
+		
+		panelgridS4VD.add(pcerv);
+		
+		//panelgridPlaid.add(new JLabel("0.7"));
+		
+		panelgridS4VD.add(new JLabel("PCERU:"));
+
+		panelgridS4VD.add(pceru);
+		
+		//panelgridPlaid.add(new JLabel("0.7"));
+		
+		panelgridS4VD.add(new JLabel("nbiclust:"));
+		
+		panelgridS4VD.add(nbiclust);
+		
+		panelgridS4VD.add(new JLabel("merr:"));
+		
+		panelgridS4VD.add(merr);
+		
+		panelgridS4VD.add(new JLabel("coloverlap:"));
+		
+		panelgridS4VD.add(coloverlap);
+		
+		panelgridS4VD.add(new JLabel("rowoverlap:"));
+		
+		panelgridS4VD.add(rowoverlap);
+		
+		panelgridS4VD.add(new JLabel("anti correlated columns:"));
+		
+		panelgridS4VD.add(nccolcorr);
+		
+		panelgridS4VD.add(new JLabel("anti correlated rows:"));
+		
+		panelgridS4VD.add(ncrowcorr);	
+		
+		//panelgridPlaid.add(new JLabel("3"));
+		
+		//panelgridPlaid.setBorder(BorderFactory.createEtchedBorder());
+			
+		panelbuttonS4VD.setLayout(new BorderLayout());
+	    panelbuttonS4VD.add(okBtnS4VD, BorderLayout.CENTER);
+		
+	    okBtnS4VD.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				    double Pcerv  =Double.parseDouble(pcerv.getText());
+				    double Pceru  =Double.parseDouble(pceru.getText());
+				    int Number  =Integer.parseInt(nbiclust.getText());
+				    double Merr =Double.parseDouble(merr.getText());
+				    String Coloverlap = coloverlap.getSelectedItem().toString();
+				    String Rowoverlap = rowoverlap.getSelectedItem().toString();
+				    String nccol = nccolcorr.getSelectedItem().toString();
+				    String ncrow = ncrowcorr.getSelectedItem().toString();
+			     	Biclustering biclustering;
+			     	biclustering = S4VD(Pcerv,Pceru,Number,Merr,Coloverlap,Rowoverlap,nccol,ncrow);		
+				    bicdialog.seurat.dataManager.Biclusterings.insertElementAt(biclustering,0);
+				    ClusteringManager cManager = bicdialog.seurat.getClusteringManager();
+					cManager.addBiclustering(biclustering);
+				    bicdialog.seurat.repaint();
+				    dataManager.BiclusteringNumber++;
+				    bicdialog.setVisible(false);
+				    }
+					
+			});
+	    
+	    panelallS4VD.add(panelgridS4VD,BorderLayout.CENTER);
+	    panelallS4VD.add(panelbuttonS4VD,BorderLayout.SOUTH);
+	    
+		tabLeiste.addTab("S4VD", panelallS4VD);
+		
+		this.setResizable(true);
 		
 		this.getContentPane().add(tabLeiste,BorderLayout.CENTER);
 		
@@ -442,7 +532,7 @@ public class BiclusteringDialog extends JFrame{
 		    
 		    
 		    new Bimatrix(seurat,new Biclustering("Bimax",bicresult));
-		    new BiHeatmap(seurat,"Bimax",new Biclustering("PlaidModel",bicresult));
+		    new BiHeatmap(seurat,"Bimax",new Biclustering("Bimax",bicresult));
 
 		    
 		    
@@ -460,4 +550,97 @@ public class BiclusteringDialog extends JFrame{
 		return biclustering;
 	}	
 	
+
+
+public Biclustering S4VD(double pcerv,double pceru,int number, double merr, String coloverlap, String rowoverlap, String nccol, String ncrow){
+	int nbiclusters = 0;
+	Vector<Vector<ISelectable>> rowresult = new Vector();
+    Vector<Vector<ISelectable>> colresult = new Vector();
+    Vector<Bicluster> bicresult = new Vector();
+	try {
+
+		if (dataManager.getRConnection() == null)
+			dataManager.setRConnection(new RConnection());
+
+		RConnection rConnection = dataManager.getRConnection();
+			
+		rConnection.voidEval("require(biclust)");
+		rConnection.voidEval("require(s4vd)");
+		rConnection.assign("tempData", Columns.elementAt(0).getColumn(Rows));
+
+		for (int i = 1; i < Columns.size(); i++) {
+			rConnection.assign("x",
+		(Columns.elementAt(i)).getColumn(Rows));
+			rConnection.voidEval("tempData <- cbind(tempData, x)");
+		}
+		 rConnection.voidEval("res <- biclust(tempData,method=BCs4vd(),pcerv="+ pcerv+ ",pceru=" + pceru + ",nbiclust=" + number+ "" +
+		 		",merr="+ merr+ ",col.overlap="+ coloverlap + ",row.overlap="+ rowoverlap+ ",cols.nc="+ nccol+ ", rows.nc="+ ncrow+ ")"); 
+		
+	    nbiclusters = rConnection.eval("res@Number").asInteger();      
+	   
+//Biclustering bicresult = new Biclustering();
+	    if(nbiclusters==0) JOptionPane.showMessageDialog(this, "No biclusters found");
+	    
+	    
+	   	for (int i = 0; i < nbiclusters; i++) {
+	   		colresult.add(new Vector());
+			rowresult.add(new Vector());
+		}
+	   // System.out.println("Colresultsize"+colresult.size()+"gleich"+nbiclusters);
+	    
+	    for (int i = 1 ; i < (nbiclusters+1); i++){
+	    	//System.out.println("next bicluster"+i);
+	    	int[] rows = rConnection.eval("which(res@RowxNumber[," + i + "])").asIntegers();
+	    	for (int j= 0; j < rows.length; j++){
+	    		//System.out.print("Gene:");
+	    		//System.out.println(rows[j]);
+	    		//System.out.println(">i:"+i+ "j:" +j);
+	    		//System.out.println(i-1);
+	    		rowresult.elementAt(i-1).add(Rows.elementAt(rows[j]-1));
+	    		//System.out.println(rowresult.elementAt(i-1).toString());
+	    	} 
+	    	 	
+	    	int[] cols = rConnection.eval("which(res@NumberxCol[" + i + ",])").asIntegers();
+	    	   	 			    		    	
+	    	for (int j = 0; j < cols.length; j++){
+	    		//System.out.print("Sample:");
+	    		//System.out.println(cols[j]);
+	    		colresult.elementAt(i-1).add(Columns.elementAt(cols[j]-1));
+	    	}
+	    	
+	    	bicresult.add(new Bicluster("Bicluster"+i+"(S4VD,Rows:"+rowresult.elementAt(i-1).size()+",Columns:"+colresult.elementAt(i-1).size()+")",
+	    			rowresult.elementAt(i-1),colresult.elementAt(i-1)));
+	    /*
+	    	GlobalView globalView = new GlobalView(seurat,bicresult.elementAt(i-1).name,bicresult.elementAt(i-1).colums,bicresult.elementAt(i-1).rows);
+	    	
+	    	
+	    	int aggr = 1;
+			while (rowresult.elementAt(i-1).size()*5/aggr > 700) aggr++;
+            globalView.gPanel.setAggregation(aggr);
+            globalView.applyNewPixelSize(15, 5);
+		    globalView.setLocation(320 + (1000 * (i-1))/nbiclusters,0);		
+	    */
+	    
+	    }    
+	    
+	    
+	    new Bimatrix(seurat,new Biclustering("S4VD",bicresult));
+	    new BiHeatmap(seurat,"S4VD",new Biclustering("S4VD",bicresult));
+
+	    
+	    
+
+	    rConnection.voidEval("rm(list=ls())");
+	    rConnection.voidEval("gc()");    
+	    
+	} catch (Exception e) {
+		e.printStackTrace();
+		JOptionPane.showMessageDialog(this, "Calculation failed.");
+	}
+	
+	Biclustering biclustering = new Biclustering("Biclustering"+dataManager.BiclusteringNumber+"(S4VD)",bicresult);
+	//bicresult.remove(0);
+	return biclustering;
+}	
+
 }
