@@ -654,7 +654,7 @@ public class Seurat extends JFrame implements ColorListener{
 						
 						if (((DataTreeNode) obj).cObject instanceof Biclustering){
 
-						    new Bimatrix(seurat,(Biclustering)((DataTreeNode) obj).cObject );
+						    new Bimatrix(seurat,(Biclustering)((DataTreeNode) obj).cObject,true);
 						    new BiHeatmap(seurat,"Biheatmap  "+ ((Biclustering)((DataTreeNode) obj).cObject).name,(Biclustering)((DataTreeNode) obj).cObject );
 						}
 						

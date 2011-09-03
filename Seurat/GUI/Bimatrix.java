@@ -48,7 +48,7 @@ public class Bimatrix extends JFrame implements IPlot{
 	
 	JMenuItem item;
 	
-	public Bimatrix(Seurat seurat,Biclustering biclust) {
+	public Bimatrix(Seurat seurat,Biclustering biclust,boolean vorsort) {
 		super("Bimatrix " + biclust.name);
 	    this.biclust = biclust;
 	    this.seurat = seurat;
@@ -67,10 +67,12 @@ public class Bimatrix extends JFrame implements IPlot{
 		
 		
 	    
-	    //sortBiclustering();
+	    sortBiclustering();
     
 	    panel = new BiConfPanel(this,this.biclust);
 		
+	    if (vorsort) panel.vorsort();
+	    
 	    setPlotSize();
 	    this.getContentPane().add(new JScrollPane(panel));
 
@@ -391,11 +393,12 @@ class BiConfPanel extends JPanel implements KeyListener,MouseListener,MouseMotio
 				public void actionPerformed(ActionEvent e) {
 					// createCorrelationExperiments();
 
+					vorsort();
 					sortBiclusters();
 				}
 			});
 			menu.add(item);
-			
+/*			
 			item = new JMenuItem("Vorsort");
 			item.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
@@ -405,9 +408,9 @@ class BiConfPanel extends JPanel implements KeyListener,MouseListener,MouseMotio
 				}
 			});
 			menu.add(item);
+	*/		
 			
-			
-			
+			/*
 			item = new JMenuItem("Sort Biclusters");
 			item.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
@@ -422,7 +425,7 @@ class BiConfPanel extends JPanel implements KeyListener,MouseListener,MouseMotio
 				}
 			});
 			menu.add(item);
-			
+			*/
 			
 			
 			
