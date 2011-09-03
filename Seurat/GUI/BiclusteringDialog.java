@@ -433,7 +433,13 @@ public class BiclusteringDialog extends JFrame{
 	    */
 	    }    
 
-	    new Bimatrix(seurat,new Biclustering("PlaidModel",bicresult));
+	    
+
+	    for (int i = 0; i < bicresult.size(); i++) {
+	    	bicresult.elementAt(i).seriate(dataManager);
+	    }
+	    
+	    new Bimatrix(seurat,new Biclustering("PlaidModel",bicresult),true);
 	    new BiHeatmap(seurat,"PlaidModel",new Biclustering("PlaidModel",bicresult));
 
 	    
@@ -531,7 +537,13 @@ public class BiclusteringDialog extends JFrame{
 		    }    
 		    
 		    
-		    new Bimatrix(seurat,new Biclustering("Bimax",bicresult));
+
+		    for (int i = 0; i < bicresult.size(); i++) {
+		    	bicresult.elementAt(i).seriate(dataManager);
+		    }
+		    
+		    
+		    new Bimatrix(seurat,new Biclustering("Bimax",bicresult),true);
 		    new BiHeatmap(seurat,"Bimax",new Biclustering("Bimax",bicresult));
 
 		    
@@ -624,7 +636,16 @@ public Biclustering S4VD(double pcerv,double pceru,int number, double merr, Stri
 	    }    
 	    
 	    
-	    new Bimatrix(seurat,new Biclustering("S4VD",bicresult));
+	    for (int i = 0; i < bicresult.size(); i++) {
+	    	bicresult.elementAt(i).seriate(dataManager);
+	    }
+	    
+	    boolean vorsort = true;
+	    if (nccol.equals("TRUE")||ncrow.equals("TRUE")) vorsort = false;
+	    
+	    
+	    
+	    new Bimatrix(seurat,new Biclustering("S4VD",bicresult),vorsort);
 	    new BiHeatmap(seurat,"S4VD",new Biclustering("S4VD",bicresult));
 
 	    

@@ -490,6 +490,18 @@ class BiPanel extends JPanel implements KeyListener,  MouseListener, MouseMotion
 		
 	    Intersect = calculateIntersect(biclust1,biclust2);
 	    
+		vorsort();
+		biconf.permuteMatrix();
+	    sortBiclusters();
+	
+			
+	
+
+			
+	
+		
+		
+		
 	    
 	    
 	    
@@ -1514,7 +1526,7 @@ if (e.getX()>abstandLinks && e.getY()>abstandOben) {
 
 
 		if (e.getButton() == MouseEvent.BUTTON3 || e.isControlDown()) {
-
+/*
 			JPopupMenu menu = new JPopupMenu();
 
 			JMenuItem item = new JMenuItem("Sort");
@@ -1556,6 +1568,7 @@ if (e.getX()>abstandLinks && e.getY()>abstandOben) {
 			
 
 			menu.show(this, e.getX(), e.getY());
+			*/
 		}
 
 	}

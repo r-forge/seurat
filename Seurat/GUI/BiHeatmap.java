@@ -191,14 +191,20 @@ class BiPanel extends JPanel implements MouseListener,MouseMotionListener, KeyLi
 		columns = unionC(biclust);
 		rows =  unionR(biclust);
 		
-		origColumns = unionC(biclust);
-		origRows =  unionR(biclust);
 		
 		
 		calculateMinMax();
 		
 		System.out.println("Anfangskriterium:  " + calculateCriterium(columns,rows));
 
+		vorsort();
+		vorsort();
+
+		
+		origColumns = unionC(biclust);
+		origRows =  unionR(biclust);
+		
+		
 		
 		this.setBounds(750,550,columns.size()*pixelW + 6,rows.size()*pixelH + 35);
 		this.setVisible(true);
@@ -723,7 +729,7 @@ class BiPanel extends JPanel implements MouseListener,MouseMotionListener, KeyLi
 
 			JPopupMenu menu = new JPopupMenu();
 
-			JMenuItem item = new JMenuItem("Sort");
+			/*JMenuItem item = new JMenuItem("Sort");
 			item.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
 					// createCorrelationExperiments();
@@ -733,7 +739,7 @@ class BiPanel extends JPanel implements MouseListener,MouseMotionListener, KeyLi
 			});
 			menu.add(item);
 			
-			
+			*/
 			/*
 			item = new JMenuItem("Presort");
 			item.addActionListener(new ActionListener() {
@@ -745,7 +751,7 @@ class BiPanel extends JPanel implements MouseListener,MouseMotionListener, KeyLi
 			});
 			menu.add(item);
 			*/
-			
+			/*
 			item = new JMenuItem("Original order");
 			item.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
@@ -758,7 +764,7 @@ class BiPanel extends JPanel implements MouseListener,MouseMotionListener, KeyLi
 				}
 			});
 			menu.add(item);
-			
+			*/
 			
 			
 			
@@ -790,16 +796,32 @@ class BiPanel extends JPanel implements MouseListener,MouseMotionListener, KeyLi
 	
 	
 	
+
+	public void vorsort() {
+	
+		
+		sortColumns3();
+		
+
+		sortRows3();
+		
+	    repaint();
+	    
+		System.out.println("Kriterium nach Sort:  " + calculateCriterium(columns,rows));
+
+	    
+	}
+	
+	
+	
 	public void sort() {
 	
 		sortColumns();
 		sortColumns2();
-		sortColumns3();
-
+		
 
 		sortRows();
 		sortRows2();
-		sortRows3();
 
 		
 	    repaint();
